@@ -1,0 +1,3 @@
+you can use localization and l10n for ar & en.
+if you have something else you want to use keep it here in this folder
+but change the name

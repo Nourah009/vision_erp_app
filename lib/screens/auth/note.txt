@@ -1,0 +1,2 @@
+this is for the login, register, and payment gateway screens
+and any other auuthintication screens
