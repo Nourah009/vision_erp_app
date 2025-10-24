@@ -760,158 +760,62 @@ class DashboardPage extends StatelessWidget {
   }
 
   Widget _buildSidebarMenu(BuildContext context) {
-    return Drawer(
-      width: 200, // Reduced from 300 to make it narrower
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
-        ),
+  return Drawer(
+    width: 280, // Increased from 200 to 280
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+        bottomRight: Radius.circular(20),
+        bottomLeft: Radius.circular(20),
       ),
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(
-                    12,
-                  ), // Rounded corners for the content background
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.person, color: Colors.white, size: 20),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Eissa Ahmed',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                          Text(
-                            'SALES MANAGER',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 10,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+    ),
+    child: SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(20), // Increased padding
+            child: Container(
+              padding: EdgeInsets.all(20), // Increased padding
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-            ),
-
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.all(12), // Reduced padding
+              child: Row(
                 children: [
-                  // MATH section
-                  _buildMenuSectionHeader('MAIN'),
-                  _buildMenuOption(context, Icons.dashboard, 'Dashboard', () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => DashboardPage()),
-                    );
-                  }),
-                  _buildMenuOption(
-                    context,
-                    Icons.account_circle,
-                    'My Account',
-                    () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _buildMenuOption(
-                    context,
-                    Icons.notifications,
-                    'Notification',
-                    () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _buildMenuOption(
-                    context,
-                    Icons.card_membership,
-                    'My Subscription',
-                    () {
-                      Navigator.pop(context);
-                    },
-                  ),
-
-                  SizedBox(height: 16), // Reduced spacing
-                  // SETTINGS section
-                  _buildMenuSectionHeader('SETTINGS'),
-                  _buildMenuOption(context, Icons.language, 'Language', () {
-                    Navigator.pop(context);
-                  }),
-
-                  SizedBox(height: 16), // Reduced spacing
-                  // MONGE INFO section
-                  _buildMenuSectionHeader('MONGE INFO'),
-                  _buildMenuOption(context, Icons.info, 'About Us', () {
-                    Navigator.pop(context);
-                  }),
-
-                  SizedBox(height: 165), // Reduced spacing
-                  // Light Mode toggle - made more compact
                   Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 6,
-                    ), // Reduced padding
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    width: 50, // Increased size
+                    height: 50, // Increased size
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.person, color: Colors.white, size: 24), // Increased icon size
+                  ),
+                  SizedBox(width: 12), // Increased spacing
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.light_mode,
-                              color: AppColors.primaryColor,
-                              size: 18, // Reduced icon size
-                            ),
-                            SizedBox(width: 8), // Reduced spacing
-                            Text(
-                              'Light Mode ON',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 12, // Reduced font size
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'Eissa Ahmed',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 16, // Increased font size
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor,
+                          ),
                         ),
-                        Switch(
-                          value: true,
-                          onChanged: (value) {},
-                          activeThumbColor: AppColors.primaryColor,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                        Text(
+                          'SALES MANAGER',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 12, // Increased font size
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -919,89 +823,179 @@ class DashboardPage extends StatelessWidget {
                 ],
               ),
             ),
+          ),
 
-            // Logout button at bottom - made more compact
-            Container(
-              padding: EdgeInsets.all(12), // Reduced padding
-              child: SizedBox(
-                width: double.infinity,
-                height: 40, // Reduced button height
-                child: ElevatedButton.icon(
-                  onPressed: () {
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.all(16), // Increased padding
+              children: [
+                // MAIN section
+                _buildMenuSectionHeader('MAIN'),
+                _buildMenuOption(context, Icons.dashboard, 'Dashboard', () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => DashboardPage()),
+                  );
+                }),
+                _buildMenuOption(
+                  context,
+                  Icons.account_circle,
+                  'My Account',
+                  () {
                     Navigator.pop(context);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.secondaryColor,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ), // Reduced padding
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                ),
+                _buildMenuOption(
+                  context,
+                  Icons.notifications,
+                  'Notification',
+                  () {
+                    Navigator.pop(context);
+                  },
+                ),
+                _buildMenuOption(
+                  context,
+                  Icons.card_membership,
+                  'My Subscription',
+                  () {
+                    Navigator.pop(context);
+                  },
+                ),
+
+                SizedBox(height: 20), // Increased spacing
+
+                // SETTINGS section
+                _buildMenuSectionHeader('SETTINGS'),
+                _buildMenuOption(context, Icons.language, 'Language', () {
+                  Navigator.pop(context);
+                }),
+
+                SizedBox(height: 20), // Increased spacing
+
+                _buildMenuSectionHeader('MORE INFO'),
+                _buildMenuOption(context, Icons.info, 'About Us', () {
+                  Navigator.pop(context);
+                }),
+
+                SizedBox(height: 180), // Increased spacing
+
+                // Light Mode toggle
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 10), // Increased padding
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.light_mode,
+                            color: AppColors.primaryColor,
+                            size: 20, // Increased icon size
+                          ),
+                          SizedBox(width: 10), // Increased spacing
+                          Text(
+                            'Light Mode ON',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 14, // Increased font size
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: true,
+                        onChanged: (value) {},
+                        activeThumbColor: AppColors.primaryColor,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ],
                   ),
-                  icon: Icon(Icons.logout, size: 16), // Reduced icon size
-                  label: Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 12, // Reduced font size
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+              ],
+            ),
+          ),
+
+          // Logout button
+          Container(
+            padding: EdgeInsets.all(16), // Increased padding
+            child: SizedBox(
+              width: double.infinity,
+              height: 44, // Increased button height
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Increased padding
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // Slightly larger radius
+                  ),
+                ),
+                icon: Icon(Icons.logout, size: 18), // Increased icon size
+                label: Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 14, // Increased font size
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildMenuSectionHeader(String title) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 6, top: 6), // Reduced padding
-      child: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 10, // Reduced from 12
-          fontWeight: FontWeight.bold,
-          color: AppColors.textSecondary,
-          letterSpacing: 1.0, // Reduced letter spacing
-        ),
+Widget _buildMenuSectionHeader(String title) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8, top: 8), // Increased padding
+    child: Text(
+      title,
+      style: TextStyle(
+        fontFamily: 'Cairo',
+        fontSize: 12, // Increased from 10
+        fontWeight: FontWeight.bold,
+        color: AppColors.textSecondary,
+        letterSpacing: 1.2, // Increased letter spacing
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildMenuOption(
-    BuildContext context,
-    IconData icon,
-    String title,
-    VoidCallback onTap,
-  ) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: AppColors.primaryColor,
-        size: 18, // Reduced from 20
+Widget _buildMenuOption(
+  BuildContext context,
+  IconData icon,
+  String title,
+  VoidCallback onTap,
+) {
+  return ListTile(
+    leading: Icon(
+      icon,
+      color: AppColors.primaryColor,
+      size: 20, // Increased from 18
+    ),
+    title: Text(
+      title,
+      style: TextStyle(
+        fontFamily: 'Cairo',
+        fontSize: 14, // Increased from 12
+        color: AppColors.textPrimary,
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 12, // Reduced from 14
-          color: AppColors.textPrimary,
-        ),
-      ),
-      onTap: onTap,
-      contentPadding: EdgeInsets.zero,
-      minLeadingWidth: 0,
-      dense: true, // Added this to make ListTile more compact
-      minVerticalPadding: 8, // Reduced vertical padding
-    );
-  }
+    ),
+    onTap: onTap,
+    contentPadding: EdgeInsets.zero,
+    minLeadingWidth: 0,
+    dense: true,
+    minVerticalPadding: 10, // Increased vertical padding
+  );
+}
 }
 
 class _PieChartPainter extends CustomPainter {
