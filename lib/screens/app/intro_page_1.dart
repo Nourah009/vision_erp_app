@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/services/shared_preferences_service.dart';
+import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'intro_page_2.dart';
 
 class IntroPage1 extends StatelessWidget {
@@ -19,18 +21,35 @@ class IntroPage1 extends StatelessWidget {
     }
   }
 
+  void _skipToHome(BuildContext context) async {
+  // Mark intro as shown
+  await SharedPreferencesService.setIntroShown();
+  
+  print('Intro skipped - user will not see intro pages again');
+  
+  // Navigate to home page
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const HomePage()),
+  );
+}
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const IntroPage2()),
-        );
-      },
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
-        body: SafeArea(
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
+      body: SafeArea(
+        child: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity! > 0) {
+              // Swiped right - do nothing or go back if needed
+            } else if (details.primaryVelocity! < 0) {
+              // Swiped left - go to next page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const IntroPage2()),
+              );
+            }
+          },
           child: Container(
             width: double.infinity,
             height: double.infinity,
@@ -131,12 +150,12 @@ class IntroPage1 extends StatelessWidget {
                 ),
                 
                 // Added space between text and circles
-              SizedBox(height: _responsiveValue(
-                context,
-                mobile: 90,  // Increased from 40 to 50
-                tablet: 100,  // Increased from 50 to 60
-                desktop: 110, // Increased from 60 to 70
-              )),
+                SizedBox(height: _responsiveValue(
+                  context,
+                  mobile: 90,
+                  tablet: 100,
+                  desktop: 110,
+                )),
                 
                 // Page Indicator Circles
                 Row(
@@ -216,6 +235,40 @@ class IntroPage1 extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+
+                // Skip Button - Bottom Middle
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: _responsiveValue(
+                          context,
+                          mobile: 30,
+                          tablet: 40,
+                          desktop: 50,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () => _skipToHome(context),
+                        child: Text(
+                          'Skip',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: _responsiveValue(
+                              context,
+                              mobile: 16,
+                              tablet: 18,
+                              desktop: 20,
+                            ),
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

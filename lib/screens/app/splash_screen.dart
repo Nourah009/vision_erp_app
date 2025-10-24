@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/intro_page_1.dart';
+import 'package:vision_erp_app/screens/app/home_page.dart';
+import 'package:vision_erp_app/services/shared_preferences_service.dart';
 import '../models/theme_model.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,13 +19,29 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToNext() async {
-    await Future.delayed(const Duration(seconds: 3)); // Reduced from 10 to 3 seconds
+    await Future.delayed(const Duration(seconds: 5)); // Reduced from 10 to 3 seconds
     
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const IntroPage1()),
-      );
+      // Check if intro has been shown before
+      bool introShown = await SharedPreferencesService.isIntroShown();
+      
+      print('Intro shown status: $introShown');
+      
+      if (introShown) {
+        // Intro already shown - go directly to home page
+        print('Intro already shown - navigating directly to HomePage');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        // Intro not shown yet - show intro pages
+        print('Intro not shown yet - navigating to IntroPage1');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const IntroPage1()),
+        );
+      }
     }
   }
 
@@ -43,7 +61,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
@@ -133,6 +150,42 @@ class _SplashScreenState extends State<SplashScreen> {
                 tablet: 60,
                 desktop: 70,
               )),
+              
+              // Loading indicator with intro status message
+              FutureBuilder<bool>(
+                future: SharedPreferencesService.isIntroShown(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    bool introShown = snapshot.data!;
+                    return Column(
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          introShown 
+                            ? 'Welcome back!'
+                            : 'First time setup...',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: _responsiveValue(
+                              context,
+                              mobile: 12,
+                              tablet: 14,
+                              desktop: 16,
+                            ),
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                  );
+                },
+              ),
             ],
           ),
         ),
