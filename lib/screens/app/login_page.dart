@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
+import 'package:vision_erp_app/services/auth_service.dart';
 import '../models/theme_model.dart';
-import '../providers/theme_notifier.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,11 +12,100 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
+  bool _rememberMe = false;
+  bool _isLoading = false;
+  
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill with test credentials for easier testing
+    _usernameController.text = 'Sysadmin01';
+    _passwordController.text = '2367';
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (_usernameController.text.isEmpty) {
+      _showError('Please enter your username');
+      return;
+    }
+    
+    if (_passwordController.text.isEmpty) {
+      _showError('Please enter your password');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await AuthService.loginUser(
+        username: _usernameController.text,
+        password: _passwordController.text,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (result['success'] == true) {
+        final user = result['user'] as Map<String, dynamic>;
+        _handleSuccessfulLogin(user);
+      } else {
+        _showError(result['message'] ?? 'Login failed');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showError('An unexpected error occurred: ${e.toString()}');
+    }
+  }
+
+  void _handleSuccessfulLogin(Map<String, dynamic> user) {
+    final String? userName = user['userName'];
+    
+    _showSuccess('Login successful! Welcome ${userName ?? "User"}');
+
+    // Navigate to dashboard
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const DashboardPage()),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeNotifier>(context);
-    final currentTheme = theme.currentTheme.themeData;
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -28,12 +116,12 @@ class _LoginPageState extends State<LoginPage> {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                // ----------- Top Blue Section -----------
+                // Top Blue Section
                 Container(
                   width: double.infinity,
-                  height: size.height * 0.50, // slightly taller top section
+                  height: size.height * 0.50,
                   decoration: BoxDecoration(
-                    color: currentTheme.primaryColor,
+                    color: AppColors.primaryColor,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -43,8 +131,10 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Login into your\nAccount',
                         textAlign: TextAlign.center,
-                        style: currentTheme.textTheme.headlineMedium!.copyWith(
+                        style: TextStyle(
                           color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                           height: 1.3,
                         ),
                       ),
@@ -52,15 +142,16 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Enter your user name and password to log in',
                         textAlign: TextAlign.center,
-                        style: currentTheme.textTheme.bodyMedium!.copyWith(
+                        style: TextStyle(
                           color: Colors.white70,
+                          fontSize: 16,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                // ----------- Floating White Card -----------
+                // Floating White Card
                 Positioned(
                   bottom: -150,
                   left: 0,
@@ -84,12 +175,13 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           // Username field
                           TextField(
+                            controller: _usernameController,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 15), // taller input box
+                                  vertical: 18, horizontal: 15),
                               hintText: 'User Name',
                               prefixIcon: Icon(Icons.person_outline,
-                                  color: currentTheme.primaryColor),
+                                  color: AppColors.primaryColor),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
@@ -100,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: currentTheme.primaryColor, width: 1.5),
+                                borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5),
                               ),
                             ),
                           ),
@@ -108,23 +200,26 @@ class _LoginPageState extends State<LoginPage> {
 
                           // Password field
                           TextField(
+                            controller: _passwordController,
                             obscureText: _obscurePassword,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 15), // taller input box
+                                  vertical: 18, horizontal: 15),
                               hintText: 'Password',
                               prefixIcon: Icon(Icons.lock_outline,
-                                  color: currentTheme.primaryColor),
-                              suffixIcon: IconButton(
-                                icon: Icon(
+                                  color: AppColors.primaryColor),
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                                child: Icon(
                                   _obscurePassword
                                       ? Icons.visibility_off_outlined
                                       : Icons.visibility_outlined,
                                   color: Colors.grey.shade600,
                                 ),
-                                onPressed: () {
-                                  setState(() => _obscurePassword = !_obscurePassword);
-                                },
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -136,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: currentTheme.primaryColor, width: 1.5),
+                                borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5),
                               ),
                             ),
                           ),
@@ -149,28 +244,53 @@ class _LoginPageState extends State<LoginPage> {
                               Row(
                                 children: [
                                   Checkbox(
-                                    value: false,
-                                    onChanged: (_) {},
+                                    value: _rememberMe,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        _rememberMe = value ?? false;
+                                      });
+                                    },
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(3),
                                     ),
-                                    activeColor: currentTheme.primaryColor,
+                                    activeColor: AppColors.primaryColor,
                                   ),
-                                  Text(
-                                    'Remember me',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade800,
-                                      fontSize: 13,
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _rememberMe = !_rememberMe;
+                                      });
+                                    },
+                                    child: Text(
+                                      'Remember me',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade800,
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                               TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Forgot Password'),
+                                      content: const Text('Please contact your administrator to reset your password.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                                 child: Text(
                                   'Forgot Password?',
                                   style: TextStyle(
-                                    color: currentTheme.primaryColor,
+                                    color: AppColors.primaryColor,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -187,63 +307,79 @@ class _LoginPageState extends State<LoginPage> {
 
             const SizedBox(height: 130),
 
-            // ----------- Login Button -----------
+            // Login Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 50),
               child: SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle login action
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const DashboardPage()),
-                    );
-                  },
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.secondaryColor,
+                    backgroundColor: _isLoading ? Colors.grey : AppColors.secondaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     elevation: 2,
                   ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                 ),
               ),
             ),
 
-            // ----------- Sign Up Section -----------
+            // Sign Up Section
             Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 0.1),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      const Text(
-        "Don't have an account? ",
-        style: TextStyle(color: Colors.black54),
-      ),
-      TextButton(
-        onPressed: () {},
-        child: Text(
-          'Sign Up',
-          style: TextStyle(
-            color: currentTheme.primaryColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    ],
-  ),
-),
-
+              padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 0.1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account? ",
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Sign Up'),
+                          content: const Text('Please contact your administrator to create a new account.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
