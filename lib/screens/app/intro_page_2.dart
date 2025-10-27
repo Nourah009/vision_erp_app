@@ -3,6 +3,7 @@ import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'intro_page_3.dart';
+import 'intro_page_1.dart';
 
 class IntroPage2 extends StatelessWidget {
   const IntroPage2({super.key});
@@ -22,17 +23,17 @@ class IntroPage2 extends StatelessWidget {
   }
 
   void _skipToHome(BuildContext context) async {
-  // Mark intro as shown
-  await SharedPreferencesService.setIntroShown();
-  
-  print('Intro skipped - user will not see intro pages again');
-  
-  // Navigate to home page
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const HomePage()),
-  );
-}
+    // Mark intro as shown
+    await SharedPreferencesService.setIntroShown();
+    
+    print('Intro skipped - user will not see intro pages again');
+    
+    // Navigate to home page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +66,9 @@ class IntroPage2 extends StatelessWidget {
             ),
             child: Column(
               children: [
-                // Back Button - Top Left
+                // Skip Button - Top Right
                 Align(
-                  alignment: Alignment.topLeft,
+                  alignment: Alignment.topRight,
                   child: Padding(
                     padding: EdgeInsets.only(
                       top: _responsiveValue(
@@ -77,20 +78,22 @@ class IntroPage2 extends StatelessWidget {
                         desktop: 20,
                       ),
                     ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: AppColors.primaryColor,
-                        size: _responsiveValue(
-                          context,
-                          mobile: 24,
-                          tablet: 28,
-                          desktop: 32,
+                    child: TextButton(
+                      onPressed: () => _skipToHome(context),
+                      child: Text(
+                        'Skip',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: _responsiveValue(
+                            context,
+                            mobile: 16,
+                            tablet: 18,
+                            desktop: 20,
+                          ),
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.textSecondary,
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
                     ),
                   ),
                 ),
@@ -275,7 +278,7 @@ class IntroPage2 extends StatelessWidget {
                   ),
                 ),
 
-                // Skip Button - Bottom Middle
+                // Navigation Arrows - Bottom
                 Padding(
                   padding: EdgeInsets.only(
                     bottom: _responsiveValue(
@@ -285,22 +288,49 @@ class IntroPage2 extends StatelessWidget {
                       desktop: 50,
                     ),
                   ),
-                  child: TextButton(
-                    onPressed: () => _skipToHome(context),
-                    child: Text(
-                      'Skip',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: _responsiveValue(
-                          context,
-                          mobile: 16,
-                          tablet: 18,
-                          desktop: 20,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Back Arrow - Left side
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const IntroPage1()),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: AppColors.primaryColor,
+                          size: _responsiveValue(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            desktop: 32,
+                          ),
                         ),
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.textSecondary,
                       ),
-                    ),
+                      
+                      // Forward Arrow - Right side
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const IntroPage3()),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppColors.primaryColor,
+                          size: _responsiveValue(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            desktop: 32,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

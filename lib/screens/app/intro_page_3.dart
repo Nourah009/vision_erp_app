@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
+import 'intro_page_2.dart';
 
 class IntroPage3 extends StatelessWidget {
   const IntroPage3({super.key});
@@ -20,18 +21,18 @@ class IntroPage3 extends StatelessWidget {
     }
   }
 
- void _getStarted(BuildContext context) async {
-  // Mark intro as shown - THIS IS CRITICAL
-  await SharedPreferencesService.setIntroShown();
-  
-  print('Intro completed - user will not see intro pages again');
-  
-  // Navigate to home page
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const HomePage()),
-  );
-}
+  void _getStarted(BuildContext context) async {
+    // Mark intro as shown - THIS IS CRITICAL
+    await SharedPreferencesService.setIntroShown();
+    
+    print('Intro completed - user will not see intro pages again');
+    
+    // Navigate to home page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,36 +61,6 @@ class IntroPage3 extends StatelessWidget {
             ),
             child: Column(
               children: [
-                // Back Button - Top Left
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top: _responsiveValue(
-                        context,
-                        mobile: 10,
-                        tablet: 15,
-                        desktop: 20,
-                      ),
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: AppColors.primaryColor,
-                        size: _responsiveValue(
-                          context,
-                          mobile: 24,
-                          tablet: 28,
-                          desktop: 32,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ),
-
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -318,7 +289,7 @@ class IntroPage3 extends StatelessWidget {
                   ),
                 ),
 
-                // Skip Button - Bottom Middle
+                // Navigation Arrows - Bottom
                 Padding(
                   padding: EdgeInsets.only(
                     bottom: _responsiveValue(
@@ -327,6 +298,40 @@ class IntroPage3 extends StatelessWidget {
                       tablet: 40,
                       desktop: 50,
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Back Arrow - Left side
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const IntroPage2()),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: AppColors.primaryColor,
+                          size: _responsiveValue(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            desktop: 32,
+                          ),
+                        ),
+                      ),
+                      
+                      // Empty container for right side (to balance layout)
+                      Container(
+                        width: _responsiveValue(
+                          context,
+                          mobile: 40,
+                          tablet: 50,
+                          desktop: 60,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
