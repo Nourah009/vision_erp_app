@@ -14,7 +14,7 @@ class SidebarMenu extends StatelessWidget {
   final VoidCallback onResetIntroTap;
 
   const SidebarMenu({
-    Key? key,
+    super.key,
     required this.userName,
     required this.userRole,
     required this.onDashboardTap,
@@ -24,7 +24,7 @@ class SidebarMenu extends StatelessWidget {
     required this.onLanguageTap,
     required this.onAboutUsTap,
     required this.onResetIntroTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -124,8 +124,16 @@ class SidebarMenu extends StatelessWidget {
       children: [
         _buildMenuSectionHeader('MAIN'),
         _buildMenuOption(Icons.account_circle, 'My Account', onMyAccountTap),
-        _buildMenuOption(Icons.notifications, 'Notification', onNotificationTap),
-        _buildMenuOption(Icons.card_membership, 'My Subscription', onMySubscriptionTap),
+        _buildMenuOption(
+          Icons.notifications,
+          'Notification',
+          onNotificationTap,
+        ),
+        _buildMenuOption(
+          Icons.card_membership,
+          'My Subscription',
+          onMySubscriptionTap,
+        ),
 
         SizedBox(height: 20),
 
@@ -133,7 +141,11 @@ class SidebarMenu extends StatelessWidget {
         _buildMenuOption(Icons.language, 'Language', onLanguageTap),
 
         // Testing option
-        _buildMenuOption(Icons.refresh, 'Reset Intro (Testing)', onResetIntroTap),
+        _buildMenuOption(
+          Icons.refresh,
+          'Reset Intro (Testing)',
+          onResetIntroTap,
+        ),
 
         SizedBox(height: 20),
 
@@ -165,11 +177,7 @@ class SidebarMenu extends StatelessWidget {
 
   Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(
-        icon, 
-        color: AppColors.primaryColor,
-        size: 20
-      ),
+      leading: Icon(icon, color: AppColors.primaryColor, size: 20),
       title: Text(
         title,
         style: TextStyle(

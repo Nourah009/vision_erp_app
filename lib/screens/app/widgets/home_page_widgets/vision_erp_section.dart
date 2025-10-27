@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class VisionERPSection extends StatelessWidget {
-  final Function(BuildContext context, {
+  final Function(
+    BuildContext context, {
     required double mobile,
     double? tablet,
     double? desktop,
-  }) responsiveValue;
+  })
+  responsiveValue;
 
-  const VisionERPSection({
-    Key? key,
-    required this.responsiveValue,
-  }) : super(key: key);
+  const VisionERPSection({super.key, required this.responsiveValue});
 
   @override
   Widget build(BuildContext context) {
