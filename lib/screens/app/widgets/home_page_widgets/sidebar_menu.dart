@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/login_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class SidebarMenu extends StatelessWidget {
   final String userName;
   final String userRole;
+  final VoidCallback onDashboardTap;
   final VoidCallback onMyAccountTap;
   final VoidCallback onNotificationTap;
   final VoidCallback onMySubscriptionTap;
@@ -12,16 +14,17 @@ class SidebarMenu extends StatelessWidget {
   final VoidCallback onResetIntroTap;
 
   const SidebarMenu({
-    super.key,
+    Key? key,
     required this.userName,
     required this.userRole,
+    required this.onDashboardTap,
     required this.onMyAccountTap,
     required this.onNotificationTap,
     required this.onMySubscriptionTap,
     required this.onLanguageTap,
     required this.onAboutUsTap,
     required this.onResetIntroTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +43,7 @@ class SidebarMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUserProfile(),
+            _buildUserProfile(context),
             Expanded(child: _buildMenuItems()),
             _buildLogoutButton(context),
           ],
@@ -49,53 +52,67 @@ class SidebarMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildUserProfile() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
+  Widget _buildUserProfile(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context); // إغلاق القائمة الجانبية أولاً
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      },
       child: Container(
+        width: double.infinity,
         padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.person, color: Colors.white, size: 24),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userName,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                    Text(
+                      userRole,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
                 color: AppColors.primaryColor,
-                shape: BoxShape.circle,
+                size: 16,
               ),
-              child: Icon(Icons.person, color: Colors.white, size: 24),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userName,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryColor,
-                    ),
-                  ),
-                  Text(
-                    userRole,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -148,7 +165,11 @@ class SidebarMenu extends StatelessWidget {
 
   Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primaryColor, size: 20),
+      leading: Icon(
+        icon, 
+        color: AppColors.primaryColor,
+        size: 20
+      ),
       title: Text(
         title,
         style: TextStyle(
@@ -205,6 +226,10 @@ class SidebarMenu extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: () {
             Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.secondaryColor,

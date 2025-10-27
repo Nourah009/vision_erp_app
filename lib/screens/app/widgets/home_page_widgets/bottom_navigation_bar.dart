@@ -12,7 +12,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     required this.currentIndex,
     required this.onHomeTap,
     required this.onDemoTap,
-    required this.onProfileTap,
+    required this.onProfileTap, required Null Function() onDashboardTap, required Null Function() onMenuTap,
   });
 
   @override

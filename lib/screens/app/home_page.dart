@@ -53,8 +53,12 @@ class HomePage extends StatelessWidget {
             );
           },
           onProfileTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
             // Navigate to Profile (you'll need to create this)
-          },
+          }, onDashboardTap: () {  }, onMenuTap: () {  },
         ),
       ),
     );
@@ -236,7 +240,7 @@ class HomePage extends StatelessWidget {
             backgroundColor: AppColors.secondaryColor,
           ),
         );
-      },
+      }, onDashboardTap: () {  },
     );
   }
 }

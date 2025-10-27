@@ -9,9 +9,9 @@ class RecommendationsSection extends StatelessWidget {
   }) responsiveValue;
 
   const RecommendationsSection({
-    super.key,
+    Key? key,
     required this.responsiveValue,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

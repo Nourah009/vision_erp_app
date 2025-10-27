@@ -9,9 +9,9 @@ class PlanPricingSection extends StatelessWidget {
   }) responsiveValue;
 
   const PlanPricingSection({
-    super.key,
+    Key? key,
     required this.responsiveValue,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

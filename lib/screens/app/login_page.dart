@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
-import 'package:vision_erp_app/services/auth_service.dart';
 import '../models/theme_model.dart';
 
 class LoginPage extends StatefulWidget {
@@ -48,34 +47,31 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
+    // Simulate API call delay
+    await Future.delayed(const Duration(seconds: 1));
+
     try {
-      final result = await AuthService.loginUser(
-        username: _usernameController.text,
-        password: _passwordController.text,
-      );
+      // Simple validation for demo purposes
+      final username = _usernameController.text.trim();
+      final password = _passwordController.text.trim();
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (result['success'] == true) {
-        final user = result['user'] as Map<String, dynamic>;
-        _handleSuccessfulLogin(user);
+      // Demo credentials check
+      if ((username == 'Sysadmin01' || username == 'sysadmin01') && password == '2367') {
+        _handleSuccessfulLogin();
       } else {
-        _showError(result['message'] ?? 'Login failed');
+        _showError('Invalid username or password. Use: Sysadmin01 / 2367');
       }
     } catch (e) {
+      _showError('An unexpected error occurred: ${e.toString()}');
+    } finally {
       setState(() {
         _isLoading = false;
       });
-      _showError('An unexpected error occurred: ${e.toString()}');
     }
   }
 
-  void _handleSuccessfulLogin(Map<String, dynamic> user) {
-    final String? userName = user['userName'];
-    
-    _showSuccess('Login successful! Welcome ${userName ?? "User"}');
+  void _handleSuccessfulLogin() {
+    _showSuccess('Login successful! Welcome ${_usernameController.text}');
 
     // Navigate to dashboard
     Navigator.pushReplacement(
@@ -342,6 +338,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
+
+            const SizedBox(height: 20),
 
             // Sign Up Section
             Padding(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/app/home_page.dart'; // تأكد من استيراد HomePage
 
 class DemoSystemPage extends StatelessWidget {
   const DemoSystemPage({super.key});
@@ -101,6 +102,16 @@ class DemoSystemPage extends StatelessWidget {
         foregroundColor: AppColors.primaryColor,
         elevation: 0,
         automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // العودة إلى HomePage بدلاً من Intro pages
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),
         title: Text(
           'Demo System',
           style: TextStyle(
@@ -336,7 +347,7 @@ class DemoSystemPage extends StatelessWidget {
                   desktop: 50,
                 )),
                 
-                // Additional Info Section - RETURNED BACK
+                // Additional Info Section
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(
