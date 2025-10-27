@@ -1,0 +1,230 @@
+import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/models/theme_model.dart';
+
+class SidebarMenu extends StatelessWidget {
+  final String userName;
+  final String userRole;
+  final VoidCallback onMyAccountTap;
+  final VoidCallback onNotificationTap;
+  final VoidCallback onMySubscriptionTap;
+  final VoidCallback onLanguageTap;
+  final VoidCallback onAboutUsTap;
+  final VoidCallback onResetIntroTap;
+
+  const SidebarMenu({
+    super.key,
+    required this.userName,
+    required this.userRole,
+    required this.onMyAccountTap,
+    required this.onNotificationTap,
+    required this.onMySubscriptionTap,
+    required this.onLanguageTap,
+    required this.onAboutUsTap,
+    required this.onResetIntroTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      width: 280,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+          bottomLeft: Radius.circular(20),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildUserProfile(),
+            Expanded(child: _buildMenuItems()),
+            _buildLogoutButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserProfile() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20),
+      child: Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.person, color: Colors.white, size: 24),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userName,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  Text(
+                    userRole,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItems() {
+    return ListView(
+      padding: EdgeInsets.all(16),
+      children: [
+        _buildMenuSectionHeader('MAIN'),
+        _buildMenuOption(Icons.account_circle, 'My Account', onMyAccountTap),
+        _buildMenuOption(Icons.notifications, 'Notification', onNotificationTap),
+        _buildMenuOption(Icons.card_membership, 'My Subscription', onMySubscriptionTap),
+
+        SizedBox(height: 20),
+
+        _buildMenuSectionHeader('SETTINGS'),
+        _buildMenuOption(Icons.language, 'Language', onLanguageTap),
+
+        // Testing option
+        _buildMenuOption(Icons.refresh, 'Reset Intro (Testing)', onResetIntroTap),
+
+        SizedBox(height: 20),
+
+        _buildMenuSectionHeader('MORE INFO'),
+        _buildMenuOption(Icons.info, 'About Us', onAboutUsTap),
+
+        SizedBox(height: 180),
+
+        _buildThemeToggle(),
+      ],
+    );
+  }
+
+  Widget _buildMenuSectionHeader(String title) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8, top: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textSecondary,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: AppColors.primaryColor, size: 20),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 14,
+          color: AppColors.textPrimary,
+        ),
+      ),
+      onTap: onTap,
+      contentPadding: EdgeInsets.zero,
+      minLeadingWidth: 0,
+      dense: true,
+      minVerticalPadding: 10,
+    );
+  }
+
+  Widget _buildThemeToggle() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.light_mode, color: AppColors.primaryColor, size: 20),
+              SizedBox(width: 10),
+              Text(
+                'Light Mode ON',
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 14,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          Switch(
+            value: true,
+            onChanged: (value) {},
+            activeThumbColor: AppColors.primaryColor,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 44,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.secondaryColor,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          icon: Icon(Icons.logout, size: 18),
+          label: Text(
+            'Logout',
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

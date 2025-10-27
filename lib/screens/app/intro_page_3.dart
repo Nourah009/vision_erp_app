@@ -243,7 +243,7 @@ class IntroPage3 extends StatelessWidget {
                         context,
                         mobile: 50,
                         tablet: 60,
-                        desktop: 70,
+                        desktop: 90,
                       )),
                       
                       // Get Started Button - Orange color
