@@ -191,11 +191,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
 
   Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap, bool isDarkMode) {
     return ListTile(
-      leading: Icon(
-        icon, 
-        color: AppColors.primaryColor,
-        size: 20
-      ),
+      leading: Icon(icon, color: AppColors.primaryColor, size: 20),
       title: Text(
         title,
         style: TextStyle(
