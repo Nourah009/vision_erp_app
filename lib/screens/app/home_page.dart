@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/demo_system_page.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
@@ -9,11 +10,16 @@ import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/vision_erp_
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
 
-
-
-
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool _isDarkMode = false;
+  String _currentLanguage = 'en';
 
   // Responsive value calculator
   double _responsiveValue(
@@ -31,6 +37,57 @@ class HomePage extends StatelessWidget {
     } else {
       return mobile;
     }
+  }
+
+  void _handleThemeChanged(bool isDarkMode) {
+    setState(() {
+      _isDarkMode = isDarkMode;
+    });
+    // Here you can implement your theme switching logic
+    // You might want to use a state management solution like Provider
+    print('Theme changed to: ${isDarkMode ? 'Dark' : 'Light'}');
+  }
+
+  void _handleLanguageChanged(String languageCode) {
+    setState(() {
+      _currentLanguage = languageCode;
+    });
+    // Here you can implement your language switching logic
+    // You might want to use a localization package like flutter_localizations
+    print('Language changed to: $languageCode');
+    
+    // For now, we'll just show a dialog suggesting app restart
+    _showLanguageChangeDialog();
+  }
+
+  void _showLanguageChangeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          _currentLanguage == 'en' ? 'Language Changed' : 'تم تغيير اللغة',
+          style: TextStyle(fontFamily: 'Cairo'),
+        ),
+        content: Text(
+          _currentLanguage == 'en' 
+            ? 'Please restart the app to see all text in the new language.'
+            : 'يرجى إعادة تشغيل التطبيق لرؤية جميع النصوص باللغة الجديدة.',
+          style: TextStyle(fontFamily: 'Cairo'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              _currentLanguage == 'en' ? 'OK' : 'موافق',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                color: AppColors.primaryColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -57,8 +114,9 @@ class HomePage extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => const LoginPage()),
             );
-            // Navigate to Profile (you'll need to create this)
-          }, onDashboardTap: () {  }, onMenuTap: () {  },
+          }, 
+          onDashboardTap: () {  }, 
+          onMenuTap: () {  },
         ),
       ),
     );
@@ -240,7 +298,16 @@ class HomePage extends StatelessWidget {
             backgroundColor: AppColors.secondaryColor,
           ),
         );
-      }, onDashboardTap: () {  },
+      }, 
+      onDashboardTap: () {  },
+      onThemeChanged: _handleThemeChanged,
+      onLanguageChanged: _handleLanguageChanged,
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<bool>('_isDarkMode', _isDarkMode));
   }
 }

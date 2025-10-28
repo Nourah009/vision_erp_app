@@ -18,6 +18,36 @@ class ThemeCollection {
   static const Color silverSand = Color(0xFFbfc2c6);    // Light Silver - Borders
   static const Color dairyCream = Color(0xFFf9dab5);    // Light Cream - Secondary container
 
+  // Static theme getters
+  static AppTheme get lightTheme => AppTheme(
+    name: 'Light',
+    themeData: getLightTheme(),
+  );
+
+  static AppTheme get darkTheme => AppTheme(
+    name: 'Dark', 
+    themeData: getDarkTheme(),
+  );
+
+  static AppTheme get warmTheme => AppTheme(
+    name: 'Warm',
+    themeData: getLightTheme().copyWith(
+      colorScheme: getLightTheme().colorScheme.copyWith(
+        secondary: diSerria,
+        secondaryContainer: dairyCream,
+      ),
+    ),
+  );
+
+  static AppTheme get coolTheme => AppTheme(
+    name: 'Cool',
+    themeData: getLightTheme().copyWith(
+      colorScheme: getLightTheme().colorScheme.copyWith(
+        primaryContainer: hippieBlue,
+      ),
+    ),
+  );
+
   // Cairo Font Text Theme
   static TextTheme get cairoTextTheme {
     return TextTheme(
@@ -211,355 +241,375 @@ class ThemeCollection {
   }
 
   // Light Theme - DARK BLUE as primary color, WHITE SMOKE background
-  static AppTheme get lightTheme {
-    return AppTheme(
-      name: 'Light',
-      themeData: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        primaryColor: matisse, // DARK BLUE - Main color
-        secondaryHeaderColor: hippieBlue,
-        scaffoldBackgroundColor: whiteSmoke, // WHITE SMOKE background
-        cardColor: Colors.white,
-        fontFamily: 'Cairo',
-        
-        colorScheme: const ColorScheme.light(
-          primary: matisse, // DARK BLUE - Primary buttons, app bar
-          primaryContainer: hippieBlue, // Medium blue for containers
-          secondary: diSerria, // Orange for secondary actions
-          secondaryContainer: dairyCream, // Cream for secondary containers
-          surface: Colors.white, // WHITE SMOKE background
-          error: Color(0xFFBA1A1A),
-          onPrimary: Colors.white, // White text on dark blue
-          onSecondary: Colors.white,
-          onSurface: mako,
-          onError: Colors.white,
-          surfaceContainerHighest: silverSand,
+  static ThemeData getLightTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      primaryColor: matisse, // DARK BLUE - Main color
+      secondaryHeaderColor: hippieBlue,
+      scaffoldBackgroundColor: whiteSmoke, // WHITE SMOKE background
+      cardColor: Colors.white,
+      fontFamily: 'Cairo',
+      
+      colorScheme: const ColorScheme.light(
+        primary: matisse, // DARK BLUE - Primary buttons, app bar
+        primaryContainer: hippieBlue, // Medium blue for containers
+        secondary: diSerria, // Orange for secondary actions
+        secondaryContainer: dairyCream, // Cream for secondary containers
+        surface: Colors.white, // Cards and surfaces
+        background: whiteSmoke, // App background
+        error: Color(0xFFBA1A1A),
+        onPrimary: Colors.white, // White text on dark blue
+        onSecondary: Colors.white,
+        onSurface: mako,
+        onBackground: mako,
+        onError: Colors.white,
+        surfaceContainerHighest: silverSand,
+      ),
+      
+      // App Bar Theme - DARK BLUE
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        foregroundColor: matisse,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: matisse),
+        titleTextStyle: cairoTextTheme.titleLarge!.copyWith(color: matisse),
+      ),
+      
+      // Text Theme with Cairo font
+      textTheme: cairoTextTheme,
+      
+      // Input Decoration Theme - DARK BLUE focus
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: silverSand),
         ),
-        
-        // App Bar Theme - DARK BLUE
-        appBarTheme: AppBarTheme(
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: silverSand),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: matisse), // DARK BLUE focus
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFBA1A1A)),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFBA1A1A)),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintStyle: cairoTextTheme.bodyMedium!.copyWith(color: jumbo),
+        labelStyle: cairoTextTheme.bodyMedium!.copyWith(color: mako),
+        errorStyle: cairoTextTheme.bodySmall!.copyWith(color: Color(0xFFBA1A1A)),
+      ),
+      
+      // Button Themes - DARK BLUE primary
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
           backgroundColor: matisse, // DARK BLUE
           foregroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          iconTheme: const IconThemeData(color: Colors.white),
-          titleTextStyle: cairoTextTheme.titleLarge!.copyWith(color: Colors.white),
-        ),
-        
-        // Text Theme with Cairo font
-        textTheme: cairoTextTheme,
-        
-        // Input Decoration Theme - DARK BLUE focus
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: silverSand),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: silverSand),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: matisse), // DARK BLUE focus
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFBA1A1A)),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFBA1A1A)),
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          hintStyle: cairoTextTheme.bodyMedium!.copyWith(color: jumbo),
-          labelStyle: cairoTextTheme.bodyMedium!.copyWith(color: mako),
-          errorStyle: cairoTextTheme.bodySmall!.copyWith(color: Color(0xFFBA1A1A)),
-        ),
-        
-        // Button Themes - DARK BLUE primary
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: matisse, // DARK BLUE
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            textStyle: cairoTextTheme.labelLarge,
-          ),
-        ),
-        
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: matisse, // DARK BLUE
-            side: const BorderSide(color: matisse), // DARK BLUE border
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            textStyle: cairoTextTheme.labelLarge!.copyWith(color: matisse),
-          ),
-        ),
-        
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: matisse, // DARK BLUE
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            textStyle: cairoTextTheme.labelMedium!.copyWith(color: matisse),
-          ),
-        ),
-        
-
-        
-        // Bottom Navigation Bar Theme - DARK BLUE selected
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: matisse, // DARK BLUE selected
-          unselectedItemColor: jumbo,
-          elevation: 2,
-          selectedLabelStyle: cairoTextTheme.labelSmall,
-          unselectedLabelStyle: cairoTextTheme.labelSmall,
-        ),
-        
-        // Floating Action Button Theme - Orange for contrast
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: diSerria, // Orange for visibility
-          foregroundColor: Colors.white,
-        ),
-        
-        // Divider Theme
-        dividerTheme: const DividerThemeData(
-          color: silverSand,
-          thickness: 1,
-          space: 1,
-        ),
-        
-        // SnackBar Theme - DARK BLUE background
-        snackBarTheme: SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: matisse, // DARK BLUE background
-          contentTextStyle: cairoTextTheme.bodyMedium!.copyWith(color: Colors.white),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          textStyle: cairoTextTheme.labelLarge,
         ),
-        
-        // Progress Indicator Theme - DARK BLUE
-        progressIndicatorTheme: const ProgressIndicatorThemeData(
-          color: matisse, // DARK BLUE
-        ),
-        
-        // Switch Theme - DARK BLUE
-        switchTheme: SwitchThemeData(
-          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
-            if (states.contains(WidgetState.selected)) {
-              return matisse; // DARK BLUE when selected
-            }
-            return Colors.grey;
-          }),
-          trackColor: WidgetStateProperty.resolveWith<Color>((states) {
-            if (states.contains(WidgetState.selected)) {
-              return matisse.withOpacity(0.5); // DARK BLUE when selected
-            }
-            return Colors.grey.withOpacity(0.5);
-          }),
-        ),
-        
-        // Radio Theme - DARK BLUE
-        radioTheme: RadioThemeData(
-          fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-            if (states.contains(WidgetState.selected)) {
-              return matisse; // DARK BLUE when selected
-            }
-            return Colors.grey;
-          }),
-        ),
-        
-        // Checkbox Theme - DARK BLUE
-        checkboxTheme: CheckboxThemeData(
-          fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-            if (states.contains(WidgetState.selected)) {
-              return matisse; // DARK BLUE when selected
-            }
-            return Colors.grey;
-          }),
-        ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
       ),
+      
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: matisse, // DARK BLUE
+          side: const BorderSide(color: matisse), // DARK BLUE border
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          textStyle: cairoTextTheme.labelLarge!.copyWith(color: matisse),
+        ),
+      ),
+      
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: matisse, // DARK BLUE
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          textStyle: cairoTextTheme.labelMedium!.copyWith(color: matisse),
+        ),
+      ),
+      
+      // Bottom Navigation Bar Theme - DARK BLUE selected
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: matisse, // DARK BLUE selected
+        unselectedItemColor: jumbo,
+        elevation: 2,
+        selectedLabelStyle: cairoTextTheme.labelSmall,
+        unselectedLabelStyle: cairoTextTheme.labelSmall,
+      ),
+      
+      // Floating Action Button Theme - Orange for contrast
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: diSerria, // Orange for visibility
+        foregroundColor: Colors.white,
+      ),
+      
+      // Divider Theme
+      dividerTheme: const DividerThemeData(
+        color: silverSand,
+        thickness: 1,
+        space: 1,
+      ),
+      
+      // SnackBar Theme - DARK BLUE background
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        backgroundColor: matisse, // DARK BLUE background
+        contentTextStyle: cairoTextTheme.bodyMedium!.copyWith(color: Colors.white),
+      ),
+      
+      // Progress Indicator Theme - DARK BLUE
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: matisse, // DARK BLUE
+      ),
+      
+      // Switch Theme - DARK BLUE
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse; // DARK BLUE when selected
+          }
+          return Colors.grey;
+        }),
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse.withOpacity(0.5); // DARK BLUE when selected
+          }
+          return Colors.grey.withOpacity(0.5);
+        }),
+      ),
+      
+      // Radio Theme - DARK BLUE
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse; // DARK BLUE when selected
+          }
+          return Colors.grey;
+        }),
+      ),
+      
+      // Checkbox Theme - DARK BLUE
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse; // DARK BLUE when selected
+          }
+          return Colors.grey;
+        }),
+      ), 
+      
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      
     );
   }
 
   // Dark Theme - DARK BLUE adapted for dark mode
-  static AppTheme get darkTheme {
-    return AppTheme(
-      name: 'Dark',
-      themeData: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        primaryColor: matisse, // DARK BLUE remains primary
-        secondaryHeaderColor: diSerria,
-        scaffoldBackgroundColor: mako, // Dark background for dark mode
-        cardColor: const Color(0xFF4A545B),
-        fontFamily: 'Cairo',
-        
-        colorScheme: const ColorScheme.dark(
-          primary: matisse, // DARK BLUE - Primary in dark mode
-          primaryContainer: hippieBlue,
-          secondary: diSerria,
-          secondaryContainer: dairyCream,
-          surface: Color(0xFF4A545B), // Dark background
-          error: Color(0xFFFFB4AB),
-          onPrimary: Colors.white,
-          onSecondary: Colors.black,
-          onSurface: Colors.white,
-          onError: Colors.black,
-          surfaceContainerHighest: jumbo,
+  static ThemeData getDarkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: matisse, // DARK BLUE remains primary
+      secondaryHeaderColor: diSerria,
+      scaffoldBackgroundColor: const Color(0xFF121212), // Dark background for dark mode
+      cardColor: const Color(0xFF1E1E1E),
+      fontFamily: 'Cairo',
+      
+      colorScheme: const ColorScheme.dark(
+        primary: matisse, // DARK BLUE - Primary in dark mode
+        primaryContainer: hippieBlue,
+        secondary: diSerria,
+        secondaryContainer: dairyCream,
+        surface: Color(0xFF1E1E1E), // Dark background
+        background: Color(0xFF121212), // Dark background
+        error: Color(0xFFFFB4AB),
+        onPrimary: Colors.white,
+        onSecondary: Colors.black,
+        onSurface: Colors.white,
+        onBackground: Colors.white,
+        onError: Colors.black,
+        surfaceContainerHighest: Color(0xFF2D2D2D),
+      ),
+      
+      // App Bar Theme - DARK BLUE in dark mode
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: cairoDarkTextTheme.titleLarge!.copyWith(color: Colors.white),
+      ),
+      
+      // Text Theme for Dark Mode with Cairo font
+      textTheme: cairoDarkTextTheme,
+      
+      // Input Decoration Theme for Dark Mode - DARK BLUE focus
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF2D2D2D)),
         ),
-        
-        // App Bar Theme - DARK BLUE in dark mode
-        appBarTheme: AppBarTheme(
-          backgroundColor: matisse, // DARK BLUE app bar
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF2D2D2D)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: matisse), // DARK BLUE focus
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFFFB4AB)),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFFFB4AB)),
+        ),
+        filled: true,
+        fillColor: const Color(0xFF1E1E1E),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintStyle: cairoDarkTextTheme.bodyMedium!.copyWith(color: silverSand),
+        labelStyle: cairoDarkTextTheme.bodyMedium!.copyWith(color: Colors.white),
+        errorStyle: cairoDarkTextTheme.bodySmall!.copyWith(color: Color(0xFFFFB4AB)),
+      ),
+      
+      // Button Themes for Dark Mode - DARK BLUE primary
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: matisse, // DARK BLUE
           foregroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: cairoDarkTextTheme.titleLarge!.copyWith(color: Colors.white),
-        ),
-        
-        // Text Theme for Dark Mode with Cairo font
-        textTheme: cairoDarkTextTheme,
-        
-        // Input Decoration Theme for Dark Mode - DARK BLUE focus
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: jumbo),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: jumbo),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: matisse), // DARK BLUE focus
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFFFB4AB)),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFFFB4AB)),
-          ),
-          filled: true,
-          fillColor: const Color(0xFF4A545B),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          hintStyle: cairoDarkTextTheme.bodyMedium!.copyWith(color: silverSand),
-          labelStyle: cairoDarkTextTheme.bodyMedium!.copyWith(color: Colors.white),
-          errorStyle: cairoDarkTextTheme.bodySmall!.copyWith(color: Color(0xFFFFB4AB)),
-        ),
-        
-        // Button Themes for Dark Mode - DARK BLUE primary
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: matisse, // DARK BLUE
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            textStyle: cairoDarkTextTheme.labelLarge,
-          ),
-        ),
-        
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: matisse, // DARK BLUE
-            side: const BorderSide(color: matisse), // DARK BLUE border
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            textStyle: cairoDarkTextTheme.labelLarge!.copyWith(color: matisse),
-          ),
-        ),
-        
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: matisse, // DARK BLUE
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            textStyle: cairoDarkTextTheme.labelMedium!.copyWith(color: matisse),
-          ),
-        ),
-        
-
-        // Bottom Navigation Bar Theme for Dark Mode - DARK BLUE selected
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: mako,
-          selectedItemColor: matisse, // DARK BLUE selected
-          unselectedItemColor: silverSand,
-          elevation: 2,
-          selectedLabelStyle: cairoDarkTextTheme.labelSmall,
-          unselectedLabelStyle: cairoDarkTextTheme.labelSmall,
-        ),
-        
-        // Floating Action Button Theme for Dark Mode - Orange for contrast
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: diSerria, // Orange for visibility
-          foregroundColor: Colors.white,
-        ),
-        
-        // Divider Theme for Dark Mode
-        dividerTheme: const DividerThemeData(
-          color: jumbo,
-          thickness: 1,
-          space: 1,
-        ),
-        
-        // SnackBar Theme for Dark Mode - DARK BLUE background
-        snackBarTheme: SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: matisse, // DARK BLUE background
-          contentTextStyle: cairoDarkTextTheme.bodyMedium!.copyWith(color: Colors.white),
-        ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF4A545B)),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          textStyle: cairoDarkTextTheme.labelLarge,
+        ),
       ),
-    );
-  }
+      
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: matisse, // DARK BLUE
+          side: const BorderSide(color: matisse), // DARK BLUE border
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          textStyle: cairoDarkTextTheme.labelLarge!.copyWith(color: matisse),
+        ),
+      ),
+      
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: matisse, // DARK BLUE
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          textStyle: cairoDarkTextTheme.labelMedium!.copyWith(color: matisse),
+        ),
+      ),
 
-  // Warm Theme - Still using DARK BLUE as primary but with warm accents
-  static AppTheme get warmTheme {
-    return AppTheme(
-      name: 'Warm',
-      themeData: lightTheme.themeData.copyWith(
-        // Keep DARK BLUE as primary but enhance warm accents
-        colorScheme: lightTheme.themeData.colorScheme.copyWith(
-          primary: matisse, // DARK BLUE remains primary
-          secondary: diSerria, // Enhanced orange
-          secondaryContainer: dairyCream, // Enhanced cream
+      // Bottom Navigation Bar Theme for Dark Mode - DARK BLUE selected
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: const Color(0xFF1E1E1E),
+        selectedItemColor: matisse, // DARK BLUE selected
+        unselectedItemColor: silverSand,
+        elevation: 2,
+        selectedLabelStyle: cairoDarkTextTheme.labelSmall,
+        unselectedLabelStyle: cairoDarkTextTheme.labelSmall,
+      ),
+      
+      // Floating Action Button Theme for Dark Mode - Orange for contrast
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: diSerria, // Orange for visibility
+        foregroundColor: Colors.white,
+      ),
+      
+      // Divider Theme for Dark Mode
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFF2D2D2D),
+        thickness: 1,
+        space: 1,
+      ),
+      
+      // SnackBar Theme for Dark Mode - DARK BLUE background
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: diSerria, // Orange FAB for warm theme
-          foregroundColor: Colors.white,
+        backgroundColor: matisse, // DARK BLUE background
+        contentTextStyle: cairoDarkTextTheme.bodyMedium!.copyWith(color: Colors.white),
+      ),
+      
+      // Progress Indicator Theme for Dark Mode - DARK BLUE
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: matisse, // DARK BLUE
+      ),
+      
+      // Switch Theme for Dark Mode - DARK BLUE
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse; // DARK BLUE when selected
+          }
+          return Colors.grey;
+        }),
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse.withOpacity(0.5); // DARK BLUE when selected
+          }
+          return Colors.grey.withOpacity(0.5);
+        }),
+      ),
+      
+      // Radio Theme for Dark Mode - DARK BLUE
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse; // DARK BLUE when selected
+          }
+          return Colors.grey;
+        }),
+      ),
+      
+      // Checkbox Theme for Dark Mode - DARK BLUE
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return matisse; // DARK BLUE when selected
+          }
+          return Colors.grey;
+        }),
+      ),
+      
+      dialogTheme: DialogThemeData(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
-    );
-  }
-
-  // Cool Theme - DARK BLUE with cool blue accents
-  static AppTheme get coolTheme {
-    return AppTheme(
-      name: 'Cool',
-      themeData: lightTheme.themeData.copyWith(
-        colorScheme: lightTheme.themeData.colorScheme.copyWith(
-          primary: matisse, // DARK BLUE primary
-          primaryContainer: hippieBlue, // Enhanced medium blue
-        ),
-      ),
+      
     );
   }
 }
@@ -575,4 +625,9 @@ class AppColors {
   static const Color borderColor = Color(0xFFbfc2c6); // Light Silver
   static const Color creamColor = Color(0xFFf9dab5); // Light Cream
   static const Color whiteSmoke = Color(0xFFf1f1f2); // WHITE SMOKE
+  
+  // Dark mode colors
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkSurface = Color(0xFF1E1E1E);
+  static const Color darkSurfaceVariant = Color(0xFF2D2D2D);
 }

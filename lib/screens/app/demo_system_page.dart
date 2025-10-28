@@ -99,11 +99,12 @@ class DemoSystemPage extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.secondaryColor, // Changed to secondary color
         elevation: 0,
         automaticallyImplyLeading: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
+          color: AppColors.secondaryColor, // Changed to secondary color
           onPressed: () {
             // العودة إلى HomePage بدلاً من Intro pages
             Navigator.pushReplacement(

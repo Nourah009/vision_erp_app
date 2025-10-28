@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/theme_model.dart';
 
 class ThemeNotifier with ChangeNotifier {
   AppTheme _currentTheme = ThemeCollection.lightTheme;
   ThemeMode _themeMode = ThemeMode.light;
+
+  ThemeNotifier() {
+    _loadTheme();
+  }
 
   // Getters
   AppTheme get currentTheme => _currentTheme;
@@ -11,46 +16,85 @@ class ThemeNotifier with ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
 
+  Future<void> _loadTheme() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final themeName = prefs.getString('theme_name') ?? 'Light';
+      final themeModeString = prefs.getString('theme_mode') ?? 'light';
+      
+      // Set theme mode
+      _themeMode = themeModeString == 'dark' ? ThemeMode.dark : 
+                   themeModeString == 'system' ? ThemeMode.system : ThemeMode.light;
+      
+      // Set theme by name
+      final theme = getThemeByName(themeName);
+      if (theme != null) {
+        _currentTheme = theme;
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error loading theme: $e');
+    }
+  }
+
+  Future<void> _saveTheme() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('theme_name', _currentTheme.name);
+      await prefs.setString('theme_mode', _themeMode.toString().split('.').last);
+    } catch (e) {
+      print('Error saving theme: $e');
+    }
+  }
+
   // Theme switching methods
   void toggleTheme() {
     _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     _updateCurrentTheme();
+    _saveTheme();
     notifyListeners();
   }
 
   void setThemeMode(ThemeMode mode) {
     _themeMode = mode;
     _updateCurrentTheme();
+    _saveTheme();
     notifyListeners();
   }
 
   void setLightTheme() {
     _themeMode = ThemeMode.light;
     _currentTheme = ThemeCollection.lightTheme;
+    _saveTheme();
     notifyListeners();
   }
 
   void setDarkTheme() {
     _themeMode = ThemeMode.dark;
     _currentTheme = ThemeCollection.darkTheme;
+    _saveTheme();
     notifyListeners();
   }
 
   void setCustomTheme(AppTheme theme) {
     _currentTheme = theme;
     _themeMode = theme.themeData.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+    _saveTheme();
     notifyListeners();
   }
 
   void setWarmTheme() {
     _currentTheme = ThemeCollection.warmTheme;
     _themeMode = ThemeMode.light;
+    _saveTheme();
     notifyListeners();
   }
 
   void setCoolTheme() {
     _currentTheme = ThemeCollection.coolTheme;
     _themeMode = ThemeMode.light;
+    _saveTheme();
     notifyListeners();
   }
 
@@ -104,7 +148,6 @@ class ThemeNotifier with ChangeNotifier {
         _currentTheme = ThemeCollection.darkTheme;
         break;
       case ThemeMode.system:
-        // You can implement system theme detection here
         final Brightness systemBrightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
         _currentTheme = systemBrightness == Brightness.dark 
             ? ThemeCollection.darkTheme 

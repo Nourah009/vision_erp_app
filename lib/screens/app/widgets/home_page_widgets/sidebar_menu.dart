@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/services/localization_service.dart';
+import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 
-class SidebarMenu extends StatelessWidget {
-  final String userName;
-  final String userRole;
-  final VoidCallback onDashboardTap;
+class SidebarMenu extends StatefulWidget {
   final VoidCallback onMyAccountTap;
   final VoidCallback onNotificationTap;
   final VoidCallback onMySubscriptionTap;
-  final VoidCallback onLanguageTap;
   final VoidCallback onAboutUsTap;
   final VoidCallback onResetIntroTap;
 
   const SidebarMenu({
     Key? key,
-    required this.userName,
-    required this.userRole,
-    required this.onDashboardTap,
     required this.onMyAccountTap,
     required this.onNotificationTap,
     required this.onMySubscriptionTap,
-    required this.onLanguageTap,
     required this.onAboutUsTap,
-    required this.onResetIntroTap,
+    required this.onResetIntroTap, required String userName, required String userRole, required Null Function() onLanguageTap, required Null Function() onDashboardTap, required void Function(bool isDarkMode) onThemeChanged, required void Function(String languageCode) onLanguageChanged,
   }) : super(key: key);
 
   @override
+  State<SidebarMenu> createState() => _SidebarMenuState();
+}
+
+class _SidebarMenuState extends State<SidebarMenu> {
+  @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final localizationService = Provider.of<LocalizationService>(context);
+    final appLocalizations = AppLocalizations.of(context);
+
     return Drawer(
       width: 280,
-      backgroundColor: Colors.white,
+      backgroundColor: themeNotifier.isDarkMode ? Colors.grey[900] : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -43,19 +48,19 @@ class SidebarMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUserProfile(context),
-            Expanded(child: _buildMenuItems()),
-            _buildLogoutButton(context),
+            _buildUserProfile(context, appLocalizations),
+            Expanded(child: _buildMenuItems(context, themeNotifier, localizationService, appLocalizations)),
+            _buildLogoutButton(context, appLocalizations),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserProfile(BuildContext context) {
+  Widget _buildUserProfile(BuildContext context, AppLocalizations appLocalizations) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context); // إغلاق القائمة الجانبية أولاً
+        Navigator.pop(context);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
@@ -87,7 +92,7 @@ class SidebarMenu extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      userName,
+                      appLocalizations.welcome,
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 16,
@@ -96,7 +101,7 @@ class SidebarMenu extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      userRole,
+                      appLocalizations.toVisionERP,
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 12,
@@ -118,36 +123,57 @@ class SidebarMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItems() {
+  Widget _buildMenuItems(BuildContext context, ThemeNotifier themeNotifier, LocalizationService localizationService, AppLocalizations appLocalizations) {
     return ListView(
       padding: EdgeInsets.all(16),
       children: [
-        _buildMenuSectionHeader('MAIN'),
-        _buildMenuOption(Icons.account_circle, 'My Account', onMyAccountTap),
-        _buildMenuOption(Icons.notifications, 'Notification', onNotificationTap),
-        _buildMenuOption(Icons.card_membership, 'My Subscription', onMySubscriptionTap),
+        _buildMenuSectionHeader('MAIN', themeNotifier.isDarkMode),
+        _buildMenuOption(
+          Icons.account_circle, 
+          appLocalizations.myAccount, 
+          widget.onMyAccountTap,
+          themeNotifier.isDarkMode
+        ),
+        _buildMenuOption(
+          Icons.notifications, 
+          appLocalizations.notification, 
+          widget.onNotificationTap,
+          themeNotifier.isDarkMode
+        ),
+        _buildMenuOption(
+          Icons.card_membership, 
+          appLocalizations.mySubscription, 
+          widget.onMySubscriptionTap,
+          themeNotifier.isDarkMode
+        ),
 
         SizedBox(height: 20),
 
-        _buildMenuSectionHeader('SETTINGS'),
-        _buildMenuOption(Icons.language, 'Language', onLanguageTap),
+        _buildMenuSectionHeader('SETTINGS', themeNotifier.isDarkMode),
+        _buildLanguageOption(context, localizationService, appLocalizations, themeNotifier.isDarkMode),
+        _buildThemeToggle(context, themeNotifier, appLocalizations),
 
-        // Testing option
-        _buildMenuOption(Icons.refresh, 'Reset Intro (Testing)', onResetIntroTap),
+        _buildMenuOption(
+          Icons.refresh, 
+          appLocalizations.resetIntro, 
+          widget.onResetIntroTap,
+          themeNotifier.isDarkMode
+        ),
 
         SizedBox(height: 20),
 
-        _buildMenuSectionHeader('MORE INFO'),
-        _buildMenuOption(Icons.info, 'About Us', onAboutUsTap),
-
-        SizedBox(height: 180),
-
-        _buildThemeToggle(),
+        _buildMenuSectionHeader('MORE INFO', themeNotifier.isDarkMode),
+        _buildMenuOption(
+          Icons.info, 
+          appLocalizations.aboutUs, 
+          widget.onAboutUsTap,
+          themeNotifier.isDarkMode
+        ),
       ],
     );
   }
 
-  Widget _buildMenuSectionHeader(String title) {
+  Widget _buildMenuSectionHeader(String title, bool isDarkMode) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8, top: 8),
       child: Text(
@@ -156,14 +182,14 @@ class SidebarMenu extends StatelessWidget {
           fontFamily: 'Cairo',
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppColors.textSecondary,
+          color: isDarkMode ? Colors.white70 : AppColors.textSecondary,
           letterSpacing: 1.2,
         ),
       ),
     );
   }
 
-  Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap) {
+  Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap, bool isDarkMode) {
     return ListTile(
       leading: Icon(
         icon, 
@@ -175,7 +201,7 @@ class SidebarMenu extends StatelessWidget {
         style: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 14,
-          color: AppColors.textPrimary,
+          color: isDarkMode ? Colors.white : AppColors.textPrimary,
         ),
       ),
       onTap: onTap,
@@ -186,7 +212,64 @@ class SidebarMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeToggle() {
+  Widget _buildLanguageOption(BuildContext context, LocalizationService localizationService, AppLocalizations appLocalizations, bool isDarkMode) {
+    return ListTile(
+      leading: Icon(
+        Icons.language, 
+        color: AppColors.primaryColor,
+        size: 20
+      ),
+      title: Text(
+        appLocalizations.language,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 14,
+          color: isDarkMode ? Colors.white : AppColors.textPrimary,
+        ),
+      ),
+      trailing: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.primaryColor.withOpacity(0.3),
+          ),
+        ),
+        child: Text(
+          localizationService.isEnglish() ? appLocalizations.english : appLocalizations.arabic,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryColor,
+          ),
+        ),
+      ),
+      onTap: () async {
+        await localizationService.toggleLanguage();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              localizationService.isEnglish() 
+                ? 'Language changed to English' 
+                : 'تم تغيير اللغة إلى العربية',
+              style: TextStyle(fontFamily: 'Cairo'),
+            ),
+            backgroundColor: AppColors.secondaryColor,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+      contentPadding: EdgeInsets.zero,
+      minLeadingWidth: 0,
+      dense: true,
+      minVerticalPadding: 10,
+    );
+  }
+
+  Widget _buildThemeToggle(BuildContext context, ThemeNotifier themeNotifier, AppLocalizations appLocalizations) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -194,22 +277,33 @@ class SidebarMenu extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.light_mode, color: AppColors.primaryColor, size: 20),
+              Icon(
+                themeNotifier.isDarkMode ? Icons.dark_mode : Icons.light_mode, 
+                color: AppColors.primaryColor, 
+                size: 20
+              ),
               SizedBox(width: 10),
               Text(
-                'Light Mode ON',
+                themeNotifier.isDarkMode ? appLocalizations.darkMode : appLocalizations.lightMode,
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 14,
-                  color: AppColors.textPrimary,
+                  color: themeNotifier.isDarkMode ? Colors.white : AppColors.textPrimary,
                 ),
               ),
             ],
           ),
           Switch(
-            value: true,
-            onChanged: (value) {},
+            value: themeNotifier.isDarkMode,
+            onChanged: (value) {
+              if (value) {
+                themeNotifier.setDarkTheme();
+              } else {
+                themeNotifier.setLightTheme();
+              }
+            },
             activeThumbColor: AppColors.primaryColor,
+            activeTrackColor: AppColors.primaryColor.withOpacity(0.5),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ],
@@ -217,7 +311,7 @@ class SidebarMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, AppLocalizations appLocalizations) {
     return Container(
       padding: EdgeInsets.all(16),
       child: SizedBox(
@@ -241,7 +335,7 @@ class SidebarMenu extends StatelessWidget {
           ),
           icon: Icon(Icons.logout, size: 18),
           label: Text(
-            'Logout',
+            appLocalizations.logout,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
