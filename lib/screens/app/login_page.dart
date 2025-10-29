@@ -10,9 +10,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _obscurePassword = true;
   bool _rememberMe = false;
   bool _isLoading = false;
+  bool _obscurePassword = true;
   
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill with test credentials for easier testing
     _usernameController.text = 'Sysadmin01';
     _passwordController.text = '2367';
   }
@@ -47,15 +46,12 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    // Simulate API call delay
     await Future.delayed(const Duration(seconds: 1));
 
     try {
-      // Simple validation for demo purposes
       final username = _usernameController.text.trim();
       final password = _passwordController.text.trim();
 
-      // Demo credentials check
       if ((username == 'Sysadmin01' || username == 'sysadmin01') && password == '2367') {
         _handleSuccessfulLogin();
       } else {
@@ -72,8 +68,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handleSuccessfulLogin() {
     _showSuccess('Login successful! Welcome ${_usernameController.text}');
-
-    // Navigate to dashboard
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const DashboardPage()),
@@ -100,6 +94,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -109,137 +109,136 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Top Blue Section
-                Container(
-                  width: double.infinity,
-                  height: size.height * 0.50,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
+            // الجزء العلوي الأزرق
+            Container(
+              width: double.infinity,
+              height: size.height * 0.50, // تقليل الارتفاع قليلاً
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.shield_outlined, color: Colors.white, size: 40),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Login into your\nAccount',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      height: 1.3,
+                    ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.shield_outlined, color: Colors.white, size: 40),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Login into your\nAccount',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Enter your user name and password to log in',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Enter your user name and password to log in',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Transform.translate(
+              offset: const Offset(0, -55), // رفع البطاقة للأعلى
+              child: Center(
+                child: Container(
+                  width: size.width * 0.85,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                ),
-
-                // Floating White Card
-                Positioned(
-                  bottom: -150,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      width: size.width * 0.85,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+                  child: Column(
+                    children: [
+                      // حقل اسم المستخدم
+                      TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 18, horizontal: 15),
+                          hintText: 'User Name',
+                          prefixIcon: Icon(Icons.person_outline,
+                              color: AppColors.primaryColor),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
                           ),
-                        ],
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5),
+                          ),
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-                      child: Column(
+                      const SizedBox(height: 22),
+
+                      // حقل كلمة المرور
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 18, horizontal: 15),
+                          hintText: 'Password',
+                          prefixIcon: Icon(Icons.lock_outline,
+                              color: AppColors.primaryColor),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              color: AppColors.primaryColor,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // تذكرني ونسيت كلمة المرور
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Username field
-                          TextField(
-                            controller: _usernameController,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 15),
-                              hintText: 'User Name',
-                              prefixIcon: Icon(Icons.person_outline,
-                                  color: AppColors.primaryColor),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 22),
-
-                          // Password field
-                          TextField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 15),
-                              hintText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline,
-                                  color: AppColors.primaryColor),
-                              suffixIcon: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                                child: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Remember me & Forgot Password
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Checkbox(
+                          // تذكرني - محسّن للنقر
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _rememberMe = !_rememberMe;
+                              });
+                            },
+                            behavior: HitTestBehavior.opaque,
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: Checkbox(
                                     value: _rememberMe,
                                     onChanged: (bool? value) {
                                       setState(() {
@@ -250,62 +249,66 @@ class _LoginPageState extends State<LoginPage> {
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     activeColor: AppColors.primaryColor,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _rememberMe = !_rememberMe;
-                                      });
-                                    },
-                                    child: Text(
-                                      'Remember me',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade800,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Forgot Password'),
-                                      content: const Text('Please contact your administrator to reset your password.'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context),
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  'Forgot Password?',
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Remember me',
                                   style: TextStyle(
-                                    color: AppColors.primaryColor,
+                                    color: Colors.grey.shade800,
                                     fontSize: 13,
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          
+                          // نسيت كلمة المرور - محسّن للنقر
+                          TextButton(
+                            onPressed: _isLoading ? null : () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Forgot Password'),
+                                  content: const Text('Please contact your administrator to reset your password.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            ),
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: _isLoading ? Colors.grey : AppColors.primaryColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
 
-            const SizedBox(height: 130),
+            // المسافة بعد البطاقة
+            const SizedBox(height: 15),
 
-            // Login Button
+            // زر تسجيل الدخول
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 50),
+              padding: const EdgeInsets.symmetric(horizontal: 90),
               child: SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -339,11 +342,11 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
-            // Sign Up Section
+            // قسم إنشاء حساب جديد
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: 90),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -352,7 +355,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(color: Colors.black54),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: _isLoading ? null : () {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -367,10 +370,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       );
                     },
+                    style: TextButton.styleFrom(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: EdgeInsets.zero,
+                    ),
                     child: Text(
                       'Sign Up',
                       style: TextStyle(
-                        color: AppColors.primaryColor,
+                        color: _isLoading ? Colors.grey : AppColors.primaryColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
