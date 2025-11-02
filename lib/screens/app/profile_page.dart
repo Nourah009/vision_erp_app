@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  final UserModel user;
+  
+  const ProfilePage({super.key, required this.user});
 
   // Responsive value calculator
   double _responsiveValue(
@@ -28,12 +31,12 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.secondaryColor, // Changed to secondary color
+        foregroundColor: AppColors.secondaryColor,
         elevation: 0,
         automaticallyImplyLeading: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: AppColors.secondaryColor, // Changed to secondary color
+          color: AppColors.secondaryColor,
           onPressed: () {
             Navigator.pop(context);
           },
@@ -58,7 +61,7 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User Header Section - Like the image
+            // User Header Section
             _buildUserHeader(context),
             SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 20, desktop: 24)),
             
@@ -131,9 +134,9 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           SizedBox(height: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
-          // User Name
+          // User Name - استخدام اسم المستخدم الحقيقي
           Text(
-            'Essa Ahmed',
+            user.username,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: _responsiveValue(context, mobile: 20, tablet: 22, desktop: 24),
@@ -144,7 +147,7 @@ class ProfilePage extends StatelessWidget {
           SizedBox(height: _responsiveValue(context, mobile: 4, tablet: 6, desktop: 8)),
           // User Role and Department
           Text(
-            'Sales Manager - Sales Department',
+            '${user.role} - ${user.department}',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Cairo',
@@ -158,6 +161,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // باقي الدوال تبقى كما هي بدون تغيير...
   Widget _buildSectionHeader(String title, BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: _responsiveValue(context, mobile: 4, tablet: 6, desktop: 8)),
@@ -178,7 +182,7 @@ class ProfilePage extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.99, // Reduced width
+        maxWidth: MediaQuery.of(context).size.width * 0.99,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -224,7 +228,7 @@ class ProfilePage extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.99, // Reduced width
+        maxWidth: MediaQuery.of(context).size.width * 0.99,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -250,7 +254,7 @@ class ProfilePage extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.99, // Reduced width
+        maxWidth: MediaQuery.of(context).size.width * 0.99,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -290,7 +294,7 @@ class ProfilePage extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.99, // Reduced width
+        maxWidth: MediaQuery.of(context).size.width * 0.99,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -339,7 +343,6 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Icon
           Container(
             width: _responsiveValue(context, mobile: 32, tablet: 34, desktop: 36),
             height: _responsiveValue(context, mobile: 32, tablet: 34, desktop: 36),
@@ -354,7 +357,6 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           SizedBox(width: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12)),
-          // Text Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,7 +384,6 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
           ),
-          // Switch or Arrow
           if (hasSwitch)
             Transform.scale(
               scale: 0.7,
@@ -391,7 +392,7 @@ class ProfilePage extends StatelessWidget {
                 onChanged: (value) {
                   // Handle switch toggle
                 },
-                activeColor: AppColors.primaryColor,
+                activeThumbColor: AppColors.primaryColor,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             )

@@ -9,9 +9,12 @@ import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/recent
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/task_schedule_section.dart';
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/user_profile_section.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+  final UserModel user;
+  
+  const DashboardPage({super.key, required this.user});
 
   // Responsive value calculator
   double _responsiveValue(
@@ -36,7 +39,10 @@ class DashboardPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       endDrawer: _buildSidebarMenu(context),
-      appBar: DashboardAppBar(responsiveValue: _responsiveValue),
+      appBar: DashboardAppBar(
+        responsiveValue: _responsiveValue,
+        user: user,
+      ),
       body: _buildBody(context),
       bottomNavigationBar: Builder(
         builder: (context) => DashboardBottomNavigationBar(
@@ -50,13 +56,13 @@ class DashboardPage extends StatelessWidget {
           onDashboardTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const DashboardPage()),
+              MaterialPageRoute(builder: (context) => DashboardPage(user: user)),
             );
           },
           onProfileTap: () {
-           Navigator.push(
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfilePage()),
+              MaterialPageRoute(builder: (context) => ProfilePage(user: user)),
             );
           },
         ),
@@ -73,7 +79,10 @@ class DashboardPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // User Profile Section
-          UserProfileSection(responsiveValue: _responsiveValue),
+          UserProfileSection(
+            responsiveValue: _responsiveValue,
+            user: user,
+          ),
 
           SizedBox(
             height: _responsiveValue(
@@ -105,9 +114,7 @@ class DashboardPage extends StatelessWidget {
 
   Widget _buildSidebarMenu(BuildContext context) {
     return DashboardSidebarMenu(
-      userName: 'Eissa Ahmed',
-      userRole: 'SALES MANAGER',
-      userDepartment: 'Sales Department ',
+      user: user,
       onOrganizationTap: () {
         Navigator.pop(context);
         Navigator.pushReplacement(
@@ -119,7 +126,7 @@ class DashboardPage extends StatelessWidget {
         Navigator.pop(context);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProfilePage()),
+          MaterialPageRoute(builder: (context) => ProfilePage(user: user)),
         );
       },
       onNotificationTap: () {
@@ -284,5 +291,4 @@ class DashboardPage extends StatelessWidget {
       ),
     );
   }
-
 }

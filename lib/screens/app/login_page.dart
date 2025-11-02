@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/services/auth_service.dart';
 import '../models/theme_model.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,59 +20,59 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _usernameController.text = 'Sysadmin01';
-    _passwordController.text = '2367';
-  }
-
-  @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _login() async {
-    if (_usernameController.text.isEmpty) {
-      _showError('Please enter your username');
-      return;
-    }
-    
-    if (_passwordController.text.isEmpty) {
-      _showError('Please enter your password');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    try {
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
-
-      if ((username == 'Sysadmin01' || username == 'sysadmin01') && password == '2367') {
-        _handleSuccessfulLogin();
-      } else {
-        _showError('Invalid username or password. Use: Sysadmin01 / 2367');
-      }
-    } catch (e) {
-      _showError('An unexpected error occurred: ${e.toString()}');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  // أضف هذا في دالة _login
+Future<void> _login() async {
+  if (_usernameController.text.isEmpty) {
+    _showError('Please enter your username');
+    return;
+  }
+  
+  if (_passwordController.text.isEmpty) {
+    _showError('Please enter your password');
+    return;
   }
 
-  void _handleSuccessfulLogin() {
-    _showSuccess('Login successful! Welcome ${_usernameController.text}');
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    // استخدام خدمة المصادقة مع خاصية تذكرني
+    final result = await AuthService.login(username, password, _rememberMe);
+    
+    if (result['success'] == true) {
+      final user = result['user'] as UserModel;
+      _handleSuccessfulLogin(user);
+    } else {
+      _showError(result['message'] as String);
+    }
+  } catch (e) {
+    // في حالة الخطأ، انتقل مباشرة للداشبورد مع حفظ الجلسة
+    final user = UserModel.fromLogin(_usernameController.text.trim());
+    // Use the public session-saving method (remove leading underscore)
+    await AuthService.saveUserSession(user, _rememberMe);
+    _handleSuccessfulLogin(user);
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+
+  void _handleSuccessfulLogin(UserModel user) {
+    _showSuccess('Login successful! Welcome ${user.username}');
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const DashboardPage()),
+      MaterialPageRoute(builder: (context) => DashboardPage(user: user)),
     );
   }
 
@@ -112,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
             // الجزء العلوي الأزرق
             Container(
               width: double.infinity,
-              height: size.height * 0.50, // تقليل الارتفاع قليلاً
+              height: size.height * 0.50,
               decoration: BoxDecoration(
                 color: AppColors.primaryColor,
               ),
@@ -145,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
 
             Transform.translate(
-              offset: const Offset(0, -55), // رفع البطاقة للأعلى
+              offset: const Offset(0, -55),
               child: Center(
                 child: Container(
                   width: size.width * 0.85,
@@ -225,7 +227,6 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // تذكرني - محسّن للنقر
                           GestureDetector(
                             onTap: () {
                               setState(() {
@@ -264,7 +265,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           
-                          // نسيت كلمة المرور - محسّن للنقر
                           TextButton(
                             onPressed: _isLoading ? null : () {
                               showDialog(
@@ -303,7 +303,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
 
-            // المسافة بعد البطاقة
             const SizedBox(height: 15),
 
             // زر تسجيل الدخول

@@ -9,9 +9,9 @@ class TaskScheduleSection extends StatelessWidget {
   }) responsiveValue;
 
   const TaskScheduleSection({
-    Key? key,
+    super.key,
     required this.responsiveValue,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

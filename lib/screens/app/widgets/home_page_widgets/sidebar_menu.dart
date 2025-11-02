@@ -14,13 +14,13 @@ class SidebarMenu extends StatefulWidget {
   final VoidCallback onResetIntroTap;
 
   const SidebarMenu({
-    Key? key,
+    super.key,
     required this.onMyAccountTap,
     required this.onNotificationTap,
     required this.onMySubscriptionTap,
     required this.onAboutUsTap,
     required this.onResetIntroTap, required String userName, required String userRole, required Null Function() onLanguageTap, required Null Function() onDashboardTap, required void Function(bool isDarkMode) onThemeChanged, required void Function(String languageCode) onLanguageChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<SidebarMenu> createState() => _SidebarMenuState();

@@ -9,9 +9,9 @@ class RecentActivitySection extends StatelessWidget {
   }) responsiveValue;
 
   const RecentActivitySection({
-    Key? key,
+    super.key,
     required this.responsiveValue,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

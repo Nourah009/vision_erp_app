@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Function(BuildContext context, {
@@ -7,11 +8,14 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
     double? tablet,
     double? desktop,
   }) responsiveValue;
+  
+  final UserModel user;
 
   const DashboardAppBar({
-    Key? key,
+    super.key,
     required this.responsiveValue,
-  }) : super(key: key);
+    required this.user,
+  });
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
@@ -46,7 +50,7 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               Text(
-                'Essa Ahmed!',
+                '${user.username}!', // استخدام اسم المستخدم الحقيقي
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: responsiveValue(

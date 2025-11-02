@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class DashboardSidebarMenu extends StatelessWidget {
-  final String userName;
-  final String userRole;
-  final String userDepartment;
+  final UserModel user;
   final VoidCallback onOrganizationTap;
   final VoidCallback onMyAccountTap;
   final VoidCallback onNotificationTap;
@@ -15,17 +14,15 @@ class DashboardSidebarMenu extends StatelessWidget {
   final VoidCallback onAboutUsTap;
 
   const DashboardSidebarMenu({
-    Key? key,
-    required this.userName,
-    required this.userRole,
-    required this.userDepartment,
+    super.key,
+    required this.user,
     required this.onOrganizationTap,
     required this.onMyAccountTap,
     required this.onNotificationTap,
     required this.onMySubscriptionTap,
     required this.onLanguageTap,
     required this.onAboutUsTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +53,10 @@ class DashboardSidebarMenu extends StatelessWidget {
   Widget _buildUserProfile(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context); // إغلاق القائمة الجانبية أولاً
+        Navigator.pop(context);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProfilePage()),
+          MaterialPageRoute(builder: (context) => ProfilePage(user: user)),
         );
       },
       child: Container(
@@ -88,7 +85,7 @@ class DashboardSidebarMenu extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      userName,
+                      user.username, // استخدام اسم المستخدم الحقيقي
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 16,
@@ -96,9 +93,9 @@ class DashboardSidebarMenu extends StatelessWidget {
                         color: AppColors.primaryColor,
                       ),
                     ),
-                    SizedBox(height: 2), // مسافة صغيرة بين الاسم والمنصب
+                    SizedBox(height: 2),
                     Text(
-                      userRole,
+                      user.role, // استخدام الدور الحقيقي
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 12,
@@ -106,9 +103,9 @@ class DashboardSidebarMenu extends StatelessWidget {
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    SizedBox(height: 2), // مسافة صغيرة بين المنصب والقسم
+                    SizedBox(height: 2),
                     Text(
-                      userDepartment,
+                      user.department, // استخدام القسم الحقيقي
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 11,

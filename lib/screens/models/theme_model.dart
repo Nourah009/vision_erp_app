@@ -256,13 +256,11 @@ class ThemeCollection {
         primaryContainer: hippieBlue, // Medium blue for containers
         secondary: diSerria, // Orange for secondary actions
         secondaryContainer: dairyCream, // Cream for secondary containers
-        surface: Colors.white, // Cards and surfaces
-        background: whiteSmoke, // App background
+        surface: Colors.white, // App background
         error: Color(0xFFBA1A1A),
         onPrimary: Colors.white, // White text on dark blue
         onSecondary: Colors.white,
         onSurface: mako,
-        onBackground: mako,
         onError: Colors.white,
         surfaceContainerHighest: silverSand,
       ),
@@ -444,12 +442,10 @@ class ThemeCollection {
         secondary: diSerria,
         secondaryContainer: dairyCream,
         surface: Color(0xFF1E1E1E), // Dark background
-        background: Color(0xFF121212), // Dark background
         error: Color(0xFFFFB4AB),
         onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: Colors.white,
-        onBackground: Colors.white,
         onError: Colors.black,
         surfaceContainerHighest: Color(0xFF2D2D2D),
       ),

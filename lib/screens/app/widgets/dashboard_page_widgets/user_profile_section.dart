@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class UserProfileSection extends StatelessWidget {
   final Function(BuildContext context, {
@@ -8,11 +9,14 @@ class UserProfileSection extends StatelessWidget {
     double? tablet,
     double? desktop,
   }) responsiveValue;
+  
+  final UserModel user;
 
   const UserProfileSection({
-    Key? key,
+    super.key,
     required this.responsiveValue,
-  }) : super(key: key);
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +92,7 @@ class UserProfileSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Eissa Ahmed',
+                        user.username, // استخدام اسم المستخدم الحقيقي
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: responsiveValue(
@@ -103,7 +107,7 @@ class UserProfileSection extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'Sales Manager',
+                        user.role, // استخدام الدور الحقيقي
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: responsiveValue(
@@ -118,7 +122,7 @@ class UserProfileSection extends StatelessWidget {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Sales Department',
+                        user.department, // استخدام القسم الحقيقي
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: responsiveValue(
@@ -145,7 +149,7 @@ class UserProfileSection extends StatelessWidget {
               // Navigate to ProfilePage when arrow is pressed
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
+                MaterialPageRoute(builder: (context) => ProfilePage(user: user)),
               );
             },
             icon: Icon(
