@@ -119,7 +119,7 @@ class DashboardPage extends StatelessWidget {
         Navigator.pop(context);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => OrganizationPage()),
+          MaterialPageRoute(builder: (context) => OrganizationPage(user: user,)),
         );
       },
       onMyAccountTap: () {

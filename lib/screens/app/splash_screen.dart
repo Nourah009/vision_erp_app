@@ -53,6 +53,9 @@ class _SplashScreenState extends State<SplashScreen> {
     print('Intro shown status: $introShown');
     
     if (introShown) {
+        final currentUser = await AuthService.getCurrentUser();
+    
+        print('User data: ${currentUser?.username}');
       // Intro already shown - go directly to home page
       print('Intro already shown - navigating directly to HomePage');
       Navigator.pushReplacement(

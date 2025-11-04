@@ -4,15 +4,21 @@ import 'package:vision_erp_app/screens/models/theme_model.dart';
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
   final VoidCallback onHomeTap;
-  final VoidCallback onDemoTap;
+  final VoidCallback? onDemoTap;
+  final VoidCallback? onDashboardTap;
   final VoidCallback onProfileTap;
+  final VoidCallback onMenuTap;
+  final bool isUserLoggedIn;
 
   const CustomBottomNavigationBar({
     super.key,
     required this.currentIndex,
     required this.onHomeTap,
-    required this.onDemoTap,
-    required this.onProfileTap, required Null Function() onDashboardTap, required Null Function() onMenuTap,
+    this.onDemoTap,
+    this.onDashboardTap,
+    required this.onProfileTap,
+    required this.onMenuTap,
+    required this.isUserLoggedIn,
   });
 
   @override
@@ -43,24 +49,34 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 onHomeTap();
                 break;
               case 1:
-                onDemoTap();
+                // بناءً على حالة المستخدم، نحدد أي زر سيتم تفعيله
+                if (!isUserLoggedIn) {
+                  onDemoTap?.call(); // زر الديمو لغير المسجلين
+                } else {
+                  onDashboardTap?.call(); // زر الداشبورد للمسجلين
+                }
                 break;
               case 2:
                 onProfileTap();
                 break;
-              case 3:
-                break;
             }
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.app_registration),
-              label: 'Demo',
-            ),
+            // زر ديناميكي يعتمد على حالة المستخدم
+            if (!isUserLoggedIn)
+              BottomNavigationBarItem(
+                icon: Icon(Icons.app_registration),
+                label: 'Demo',
+              )
+            else
+              BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard),
+                label: 'Dashboard',
+              ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile',

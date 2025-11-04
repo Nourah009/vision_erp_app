@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vision_erp_app/screens/app/login_page.dart';
+import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/services/auth_service.dart';
 
 class DashboardSidebarMenu extends StatelessWidget {
   final UserModel user;
@@ -23,6 +24,21 @@ class DashboardSidebarMenu extends StatelessWidget {
     required this.onLanguageTap,
     required this.onAboutUsTap,
   });
+
+  Future<void> _handleLogout(BuildContext context) async {
+    // إغلاق السايدبار أولاً
+    Navigator.pop(context);
+    
+    // تسجيل الخروج من الخدمة
+    await AuthService.logout();
+    
+    // الانتقال إلى صفحة الهوم بيج
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      (route) => false, // إزالة جميع الصفحات من الستاك
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +70,7 @@ class DashboardSidebarMenu extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ProfilePage(user: user)),
         );
@@ -232,13 +248,7 @@ class DashboardSidebarMenu extends StatelessWidget {
         width: double.infinity,
         height: 44,
         child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-            );
-          },
+          onPressed: () => _handleLogout(context), // استخدام الدالة الجديدة
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.secondaryColor,
             foregroundColor: Colors.white,

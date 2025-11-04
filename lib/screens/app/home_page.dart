@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/demo_system_page.dart';
+import 'package:vision_erp_app/screens/app/dashboard_page.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
+import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/bottom_navigation_bar.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/plan_pricing_section.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/recommendations_section.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/sidebar_menu.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/vision_erp_section.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/services/auth_service.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +24,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isDarkMode = false;
   String _currentLanguage = 'en';
+  UserModel? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = await AuthService.getCurrentUser();
+    setState(() {
+      _currentUser = user;
+    });
+  }
 
   // Responsive value calculator
   double _responsiveValue(
@@ -43,8 +61,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isDarkMode = isDarkMode;
     });
-    // Here you can implement your theme switching logic
-    // You might want to use a state management solution like Provider
     print('Theme changed to: ${isDarkMode ? 'Dark' : 'Light'}');
   }
 
@@ -52,11 +68,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _currentLanguage = languageCode;
     });
-    // Here you can implement your language switching logic
-    // You might want to use a localization package like flutter_localizations
     print('Language changed to: $languageCode');
     
-    // For now, we'll just show a dialog suggesting app restart
     _showLanguageChangeDialog();
   }
 
@@ -103,20 +116,38 @@ class _HomePageState extends State<HomePage> {
           onHomeTap: () {
             // Already on home page
           },
-          onDemoTap: () {
+          onDemoTap: _currentUser != null ? null : () {
+            // زر الديمو يظهر فقط عند عدم تسجيل الدخول
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const DemoSystemPage()),
             );
           },
-          onProfileTap: () {
+          onDashboardTap: _currentUser != null ? () {
+            // زر الداشبورد يظهر فقط عند تسجيل الدخول
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => DashboardPage(user: _currentUser!)),
+            );
+          } : null,
+          onProfileTap: _currentUser != null ? () {
+            // زر البروفايل ينتقل لصفحة البروفايل إذا كان المستخدم مسجل الدخول
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePage(user: _currentUser!)),
+            );
+          } : () {
+            // إذا لم يكن مسجل الدخول، ينتقل لصفحة تسجيل الدخول
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const LoginPage()),
             );
-          }, 
-          onDashboardTap: () {  }, 
-          onMenuTap: () {  },
+          },
+          onMenuTap: () {
+            Scaffold.of(context).openEndDrawer();
+          },
+          // تمرير حالة المستخدم للبوتوم نافيغيشن
+          isUserLoggedIn: _currentUser != null,
         ),
       ),
     );
@@ -131,7 +162,7 @@ class _HomePageState extends State<HomePage> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Welcome text on LEFT
+          // Welcome text on LEFT - ديناميكي بناءً على حالة المستخدم
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -151,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Text(
-                'To vision ERP',
+                _currentUser != null ? _currentUser!.username : 'To vision ERP',
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: _responsiveValue(
@@ -268,8 +299,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSidebarMenu(BuildContext context) {
     return SidebarMenu(
-      userName: 'Welcome',
-      userRole: 'to Vision ERP',
+      user: _currentUser,
+      userName: _currentUser != null ? _currentUser!.username : 'Welcome',
+      userRole: _currentUser != null ? _currentUser!.role : 'to Vision ERP',
       onMyAccountTap: () {
         Navigator.pop(context);
         Navigator.push(
@@ -299,7 +331,15 @@ class _HomePageState extends State<HomePage> {
           ),
         );
       }, 
-      onDashboardTap: () {  },
+      onDashboardTap: () {
+        Navigator.pop(context);
+        if (_currentUser != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => DashboardPage(user: _currentUser!)),
+          );
+        }
+      },
       onThemeChanged: _handleThemeChanged,
       onLanguageChanged: _handleLanguageChanged,
     );

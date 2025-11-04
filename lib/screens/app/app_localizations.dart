@@ -414,6 +414,8 @@ class AppLocalizations {
   String get department {
     return _localizedValues[locale.languageCode]!['department']!;
   }
+
+  String get dashboard => _localizedValues[locale.languageCode]!['dashboard']!;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

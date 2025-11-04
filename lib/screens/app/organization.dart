@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/dashboard_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class OrganizationPage extends StatelessWidget {
-  const OrganizationPage({super.key});
+  final UserModel user;
+  final bool fromDashboard;
+  
+  const OrganizationPage({
+    super.key, 
+    required this.user,
+    this.fromDashboard = true,
+  });
 
   // Responsive value calculator
   double _responsiveValue(
@@ -22,6 +31,19 @@ class OrganizationPage extends StatelessWidget {
     }
   }
 
+  void _handleBackButton(BuildContext context) {
+    if (fromDashboard) {
+      // إذا كان من الداشبورد، ارجع للداشبورد
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DashboardPage(user: user)),
+      );
+    } else {
+      // إذا كان من مكان آخر، استخدم التنقل العادي
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,9 +56,7 @@ class OrganizationPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           color: AppColors.secondaryColor,
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => _handleBackButton(context),
         ),
         centerTitle: true,
         title: Text(
@@ -94,6 +114,7 @@ class OrganizationPage extends StatelessWidget {
     );
   }
 
+  // باقي الدوال تبقى كما هي...
   Widget _buildModernHeader(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -678,7 +699,7 @@ class OrganizationPage extends StatelessWidget {
           color: AppColors.primaryColor,
           letterSpacing: 0.5,
         ),
-      ),
+      )
     );
   }
 
