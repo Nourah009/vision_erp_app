@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class DashboardBottomNavigationBar extends StatelessWidget {
@@ -17,6 +18,8 @@ class DashboardBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       margin: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -52,18 +55,18 @@ class DashboardBottomNavigationBar extends StatelessWidget {
                 break;
             }
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: appLocalizations.home,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              label: appLocalizations.dashboard,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'Profile',
+              label: appLocalizations.profile,
             ),
           ],
         ),

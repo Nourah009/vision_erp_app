@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -23,6 +24,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       margin: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -64,22 +67,22 @@ class CustomBottomNavigationBar extends StatelessWidget {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: appLocalizations.home,
             ),
             // زر ديناميكي يعتمد على حالة المستخدم
             if (!isUserLoggedIn)
               BottomNavigationBarItem(
                 icon: Icon(Icons.app_registration),
-                label: 'Demo',
+                label: appLocalizations.demo,
               )
             else
               BottomNavigationBarItem(
                 icon: Icon(Icons.dashboard),
-                label: 'Dashboard',
+                label: appLocalizations.dashboard,
               ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'Profile',
+              label: appLocalizations.profile,
             ),
           ],
         ),

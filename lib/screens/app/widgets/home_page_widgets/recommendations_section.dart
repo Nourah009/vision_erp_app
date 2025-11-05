@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class RecommendationsSection extends StatelessWidget {
@@ -14,22 +15,25 @@ class RecommendationsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    
     // List of all 14 categories with their icons
     final List<Map<String, dynamic>> categories = [
-      {'title': 'Human Resources', 'icon': Icons.people},
-      {'title': 'Materials and\nwarehouse', 'icon': Icons.warehouse},
-      {'title': 'Fixed assets', 'icon': Icons.business},
-      {'title': 'Customer\nRelations', 'icon': Icons.person},
-      {'title': 'Analysis and\nreports', 'icon': Icons.analytics},
-      {'title': 'Value Added\nTax', 'icon': Icons.attach_money},
-      {'title': 'Projects', 'icon': Icons.assignment},
-      {'title': 'Website', 'icon': Icons.language},
-      {'title': 'Manufacturing', 'icon': Icons.build},
-      {'title': 'Sales', 'icon': Icons.shopping_cart},
-      {'title': 'Purchasing', 'icon': Icons.shopping_bag},
-      {'title': 'Accounting', 'icon': Icons.account_balance},
-      {'title': 'Inventory', 'icon': Icons.inventory},
-      {'title': 'Quality\nControl', 'icon': Icons.verified},
+      {'title': isEnglish ? 'Human Resources' : 'الموارد البشرية', 'icon': Icons.people},
+      {'title': isEnglish ? 'Materials and\nwarehouse' : 'المواد\nوالمستودعات', 'icon': Icons.warehouse},
+      {'title': isEnglish ? 'Fixed assets' : 'الأصول الثابتة', 'icon': Icons.business},
+      {'title': isEnglish ? 'Customer\nRelations' : 'علاقات\nالعملاء', 'icon': Icons.person},
+      {'title': isEnglish ? 'Analysis and\nreports' : 'التحليل\nوالتقارير', 'icon': Icons.analytics},
+      {'title': isEnglish ? 'Value Added\nTax' : 'ضريبة القيمة\nالمضافة', 'icon': Icons.attach_money},
+      {'title': isEnglish ? 'Projects' : 'المشاريع', 'icon': Icons.assignment},
+      {'title': isEnglish ? 'Website' : 'الموقع الإلكتروني', 'icon': Icons.language},
+      {'title': isEnglish ? 'Manufacturing' : 'التصنيع', 'icon': Icons.build},
+      {'title': isEnglish ? 'Sales' : 'المبيعات', 'icon': Icons.shopping_cart},
+      {'title': isEnglish ? 'Purchasing' : 'المشتريات', 'icon': Icons.shopping_bag},
+      {'title': isEnglish ? 'Accounting' : 'المحاسبة', 'icon': Icons.account_balance},
+      {'title': isEnglish ? 'Inventory' : 'المخزون', 'icon': Icons.inventory},
+      {'title': isEnglish ? 'Quality\nControl' : 'مراقبة\nالجودة', 'icon': Icons.verified},
     ];
 
     return Container(
@@ -41,7 +45,7 @@ class RecommendationsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recommendations for you',
+            appLocalizations.recommendationsForYou,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: responsiveValue(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
@@ -20,6 +21,8 @@ class UserProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations() = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(

@@ -1,38 +1,47 @@
-// services/localization_service.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LocalizationService with ChangeNotifier {
-  static const String _languageKey = 'app_language';
-  
+class LocalizationService extends ChangeNotifier {
   Locale _locale = const Locale('en', 'US');
-  
+  static const String _localeKey = 'selected_locale';
+
   Locale get locale => _locale;
-  String get languageCode => _locale.languageCode;
 
   LocalizationService() {
-    _loadLanguage();
-  }
-
-  Future<void> _loadLanguage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final languageCode = prefs.getString(_languageKey) ?? 'en';
-    _locale = Locale(languageCode);
-    notifyListeners();
-  }
-
-  Future<void> setLanguage(String languageCode) async {
-    _locale = Locale(languageCode);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_languageKey, languageCode);
-    notifyListeners();
-  }
-
-  Future<void> toggleLanguage() async {
-    final newLanguage = _locale.languageCode == 'en' ? 'ar' : 'en';
-    await setLanguage(newLanguage);
+    _loadSavedLocale();
   }
 
   bool isEnglish() => _locale.languageCode == 'en';
   bool isArabic() => _locale.languageCode == 'ar';
+
+  Future<void> _loadSavedLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLocale = prefs.getString(_localeKey);
+    
+    if (savedLocale != null) {
+      _locale = Locale(savedLocale, savedLocale == 'en' ? 'US' : 'SA');
+      notifyListeners();
+    }
+  }
+
+  Future<void> setLocale(Locale newLocale) async {
+    if (!['en', 'ar'].contains(newLocale.languageCode)) return;
+    
+    _locale = newLocale;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_localeKey, newLocale.languageCode);
+  }
+
+  Future<void> toggleLanguage() async {
+    final newLocale = isEnglish() ? const Locale('ar', 'SA') : const Locale('en', 'US');
+    await setLocale(newLocale);
+  }
+
+  // Directionality helper
+  TextDirection get textDirection => isEnglish() ? TextDirection.ltr : TextDirection.rtl;
+
+  // Alignment helper for RTL support
+  Alignment get alignment => isEnglish() ? Alignment.centerLeft : Alignment.centerRight;
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 
 class ProfilePage extends StatelessWidget {
   final UserModel user;
@@ -27,8 +30,12 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.secondaryColor,
@@ -43,7 +50,7 @@ class ProfilePage extends StatelessWidget {
         ),
         centerTitle: true,
         title: Text(
-          'Profile',
+          appLocalizations.profile,
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: _responsiveValue(context, mobile: 18, tablet: 20, desktop: 22),
@@ -66,25 +73,25 @@ class ProfilePage extends StatelessWidget {
             SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 20, desktop: 24)),
             
             // PROFILE Section
-            _buildSectionHeader('PROFILE', context),
+            _buildSectionHeader(appLocalizations.profile, context),
             SizedBox(height: _responsiveValue(context, mobile: 6, tablet: 8, desktop: 10)),
             _buildProfileOptions(context),
             SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 20, desktop: 24)),
             
             // BANK DETAIL Section
-            _buildSectionHeader('BANK DETAIL', context),
+            _buildSectionHeader(appLocalizations.bankDetail, context),
             SizedBox(height: _responsiveValue(context, mobile: 6, tablet: 8, desktop: 10)),
             _buildBankDetailOption(context),
             SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 20, desktop: 24)),
             
             // NOTIFICATIONS Section
-            _buildSectionHeader('NOTIFICATIONS', context),
+            _buildSectionHeader(appLocalizations.notification, context),
             SizedBox(height: _responsiveValue(context, mobile: 6, tablet: 8, desktop: 10)),
             _buildNotificationOptions(context),
             SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 20, desktop: 24)),
             
             // SECURITY Section
-            _buildSectionHeader('SECURITY', context),
+            _buildSectionHeader(appLocalizations.security, context),
             SizedBox(height: _responsiveValue(context, mobile: 6, tablet: 8, desktop: 10)),
             _buildSecurityOptions(context),
           ],
@@ -161,7 +168,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // باقي الدوال تبقى كما هي بدون تغيير...
   Widget _buildSectionHeader(String title, BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: _responsiveValue(context, mobile: 4, tablet: 6, desktop: 8)),
@@ -179,6 +185,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileOptions(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -200,22 +208,22 @@ class ProfilePage extends StatelessWidget {
           _buildOptionItem(
             context: context,
             icon: Icons.account_circle_outlined,
-            title: 'Account details',
+            title: appLocalizations.accountDetails,
             hasSwitch: false,
           ),
           _buildDivider(context),
           _buildOptionItem(
             context: context,
             icon: Icons.description_outlined,
-            title: 'Documents',
+            title: appLocalizations.documents,
             hasSwitch: false,
           ),
           _buildDivider(context),
           _buildOptionItem(
             context: context,
             icon: Icons.location_on_outlined,
-            title: 'Turn your location',
-            subtitle: 'This will expose face of target',
+            title: appLocalizations.turnYourLocation,
+            subtitle: appLocalizations.locationSubtitle,
             hasSwitch: true,
             switchValue: true,
           ),
@@ -225,6 +233,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildBankDetailOption(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -244,13 +254,15 @@ class ProfilePage extends StatelessWidget {
       child: _buildOptionItem(
         context: context,
         icon: Icons.account_balance_outlined,
-        title: 'Bank Account',
+        title: appLocalizations.bankAccount,
         hasSwitch: false,
       ),
     );
   }
 
   Widget _buildNotificationOptions(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -272,8 +284,8 @@ class ProfilePage extends StatelessWidget {
           _buildOptionItem(
             context: context,
             icon: Icons.notifications_active_outlined,
-            title: 'Activities notifications',
-            subtitle: 'Payment facades, links and other activities',
+            title: appLocalizations.activitiesNotifications,
+            subtitle: appLocalizations.activitiesSubtitle,
             hasSwitch: true,
             switchValue: true,
           ),
@@ -281,7 +293,7 @@ class ProfilePage extends StatelessWidget {
           _buildOptionItem(
             context: context,
             icon: Icons.email_outlined,
-            title: 'Email notification',
+            title: appLocalizations.emailNotification,
             hasSwitch: true,
             switchValue: false,
           ),
@@ -291,6 +303,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildSecurityOptions(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -312,7 +326,7 @@ class ProfilePage extends StatelessWidget {
           _buildOptionItem(
             context: context,
             icon: Icons.fingerprint_outlined,
-            title: 'Sign in with touch ID',
+            title: appLocalizations.signInWithTouchID,
             hasSwitch: true,
             switchValue: true,
           ),
@@ -320,7 +334,7 @@ class ProfilePage extends StatelessWidget {
           _buildOptionItem(
             context: context,
             icon: Icons.lock_outlined,
-            title: 'Change password',
+            title: appLocalizations.changePassword,
             hasSwitch: false,
           ),
         ],

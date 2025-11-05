@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
+import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
 import '../models/theme_model.dart';
 
@@ -12,6 +16,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // Responsive value calculator
+  double _responsiveValue(BuildContext context, 
+      {required double mobile, double? tablet, double? desktop}) {
+    final width = MediaQuery.of(context).size.width;
+    
+    if (width >= 1200 && desktop != null) {
+      return desktop;
+    } else if (width >= 600 && tablet != null) {
+      return tablet;
+    } else {
+      return mobile;
+    }
+  }
   bool _rememberMe = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -26,50 +43,47 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // أضف هذا في دالة _login
-Future<void> _login() async {
-  if (_usernameController.text.isEmpty) {
-    _showError('Please enter your username');
-    return;
-  }
-  
-  if (_passwordController.text.isEmpty) {
-    _showError('Please enter your password');
-    return;
-  }
-
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
-
-    // استخدام خدمة المصادقة مع خاصية تذكرني
-    final result = await AuthService.login(username, password, _rememberMe);
-    
-    if (result['success'] == true) {
-      final user = result['user'] as UserModel;
-      _handleSuccessfulLogin(user);
-    } else {
-      _showError(result['message'] as String);
+  Future<void> _login() async {
+    if (_usernameController.text.isEmpty) {
+      _showError(AppLocalizations.of(context)!.userName.isEmpty ? 'Please enter your username' : 'يرجى إدخال اسم المستخدم');
+      return;
     }
-  } catch (e) {
-    // في حالة الخطأ، انتقل مباشرة للداشبورد مع حفظ الجلسة
-    final user = UserModel.fromLogin(_usernameController.text.trim());
-    // Use the public session-saving method (remove leading underscore)
-    await AuthService.saveUserSession(user, _rememberMe);
-    _handleSuccessfulLogin(user);
-  } finally {
+  
+    if (_passwordController.text.isEmpty) {
+      _showError(AppLocalizations.of(context)!.password.isEmpty ? 'Please enter your password' : 'يرجى إدخال كلمة المرور');
+      return;
+    }
+
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
+
+    try {
+      final username = _usernameController.text.trim();
+      final password = _passwordController.text.trim();
+
+      final result = await AuthService.login(username, password, _rememberMe);
+    
+      if (result['success'] == true) {
+        final user = result['user'] as UserModel;
+        _handleSuccessfulLogin(user);
+      } else {
+        _showError(result['message'] as String);
+      }
+    } catch (e) {
+      final user = UserModel.fromLogin(_usernameController.text.trim());
+      await AuthService.saveUserSession(user, _rememberMe);
+      _handleSuccessfulLogin(user);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-}
 
   void _handleSuccessfulLogin(UserModel user) {
-    _showSuccess('Login successful! Welcome ${user.username}');
+    final appLocalizations = AppLocalizations.of(context)!;
+    _showSuccess('${appLocalizations.login} ${appLocalizations.login.toLowerCase().contains('successful') ? 'successful' : 'ناجح'}! ${appLocalizations.welcome} ${user.username}');
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => DashboardPage(user: user)),
@@ -104,10 +118,45 @@ Future<void> _login() async {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
     final size = MediaQuery.of(context).size;
+    final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F5),
+      backgroundColor:isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: AppColors.secondaryColor, // Changed to secondary color
+        elevation: 0,
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: AppColors.secondaryColor, // Changed to secondary color
+          onPressed: () {
+            // العودة إلى HomePage بدلاً من Intro pages
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),
+        title: Text(
+          'Demo System',
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: _responsiveValue(
+              context,
+              mobile: 18,
+              tablet: 20,
+              desktop: 22,
+            ),
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryColor,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -116,7 +165,7 @@ Future<void> _login() async {
               width: double.infinity,
               height: size.height * 0.50,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor,
+                color: isDarkMode ? Colors.grey[800] : AppColors.primaryColor,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -124,7 +173,7 @@ Future<void> _login() async {
                   const Icon(Icons.shield_outlined, color: Colors.white, size: 40),
                   const SizedBox(height: 10),
                   Text(
-                    'Login into your\nAccount',
+                    appLocalizations.loginIntoAccount,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -135,7 +184,7 @@ Future<void> _login() async {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Enter your user name and password to log in',
+                    appLocalizations.enterCredentials,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white70,
@@ -168,10 +217,11 @@ Future<void> _login() async {
                       // حقل اسم المستخدم
                       TextField(
                         controller: _usernameController,
+                        textDirection: isEnglish ? TextDirection.ltr : TextDirection.rtl,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 18, horizontal: 15),
-                          hintText: 'User Name',
+                          hintText: appLocalizations.userName,
                           prefixIcon: Icon(Icons.person_outline,
                               color: AppColors.primaryColor),
                           border: OutlineInputBorder(
@@ -194,10 +244,11 @@ Future<void> _login() async {
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
+                        textDirection: isEnglish ? TextDirection.ltr : TextDirection.rtl,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 18, horizontal: 15),
-                          hintText: 'Password',
+                          hintText: appLocalizations.password,
                           prefixIcon: Icon(Icons.lock_outline,
                               color: AppColors.primaryColor),
                           suffixIcon: IconButton(
@@ -255,7 +306,7 @@ Future<void> _login() async {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Remember me',
+                                  appLocalizations.rememberMe,
                                   style: TextStyle(
                                     color: Colors.grey.shade800,
                                     fontSize: 13,
@@ -270,12 +321,14 @@ Future<void> _login() async {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Forgot Password'),
-                                  content: const Text('Please contact your administrator to reset your password.'),
+                                  title: Text(appLocalizations.forgotPassword),
+                                  content: Text(isEnglish 
+                                    ? 'Please contact your administrator to reset your password.'
+                                    : 'يرجى التواصل مع المسؤول لإعادة تعيين كلمة المرور.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(context),
-                                      child: const Text('OK'),
+                                      child: Text(isEnglish ? 'OK' : 'موافق'),
                                     ),
                                   ],
                                 ),
@@ -287,7 +340,7 @@ Future<void> _login() async {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             ),
                             child: Text(
-                              'Forgot Password?',
+                              appLocalizations.forgotPassword,
                               style: TextStyle(
                                 color: _isLoading ? Colors.grey : AppColors.primaryColor,
                                 fontSize: 13,
@@ -329,8 +382,8 @@ Future<void> _login() async {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Login',
+                      : Text(
+                          appLocalizations.login,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -349,8 +402,8 @@ Future<void> _login() async {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Don't have an account? ",
+                  Text(
+                    appLocalizations.dontHaveAccount,
                     style: TextStyle(color: Colors.black54),
                   ),
                   TextButton(
@@ -358,12 +411,14 @@ Future<void> _login() async {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Sign Up'),
-                          content: const Text('Please contact your administrator to create a new account.'),
+                          title: Text(appLocalizations.signUp),
+                          content: Text(isEnglish
+                            ? 'Please contact your administrator to create a new account.'
+                            : 'يرجى التواصل مع المسؤول لإنشاء حساب جديد.'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text('OK'),
+                              child: Text(isEnglish ? 'OK' : 'موافق'),
                             ),
                           ],
                         ),
@@ -374,7 +429,7 @@ Future<void> _login() async {
                       padding: EdgeInsets.zero,
                     ),
                     child: Text(
-                      'Sign Up',
+                      appLocalizations.signUp,
                       style: TextStyle(
                         color: _isLoading ? Colors.grey : AppColors.primaryColor,
                         fontWeight: FontWeight.bold,

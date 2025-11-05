@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
 
@@ -22,6 +23,9 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations() = AppLocalizations.of(context)!;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: AppColors.primaryColor,
@@ -36,7 +40,7 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Hello,',
+                isEnglish ? 'Hello,' : 'مرحباً،',
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: responsiveValue(

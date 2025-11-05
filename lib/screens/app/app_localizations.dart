@@ -1,4 +1,4 @@
-// l10n/app_localizations.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -6,8 +6,8 @@ class AppLocalizations {
 
   AppLocalizations(this.locale);
 
-  static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
@@ -15,407 +15,229 @@ class AppLocalizations {
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
       'welcome': 'Welcome',
-      'to_vision_erp': 'To Vision ERP',
-      'move_towards_better_future': 'Move towards a better future',
-      'my_account': 'My Account',
+      'toVisionERP': 'To Vision ERP',
+      'RecommendationsForYou': 'Recommendations for You',
+      'moveTowardsBetterFuture': 'Move towards a better future',
+      'PlanPricing': 'Plan & Pricing',
+      'home': 'Home',
+      'demo': 'Demo',
+      'dashboard': 'Dashboard',
+      'profile': 'Profile',
+      'menu': 'Menu',
+      'loginIntoAccount': 'Login into your\nAccount',
+      'enterCredentials': 'Enter your user name and password to log in',
+      'userName': 'User Name',
+      'password': 'Password',
+      'rememberMe': 'Remember me',
+      'forgotPassword': 'Forgot Password?',
+      'login': 'Login',
+      'dontHaveAccount': "Don't have an account? ",
+      'signUp': 'Sign Up',
+      'myAccount': 'My Account',
       'notification': 'Notification',
-      'my_subscription': 'My Subscription',
+      'mySubscription': 'My Subscription',
       'language': 'Language',
-      'about_us': 'About Us',
+      'resetIntro': 'Reset Intro',
+      'aboutUs': 'About Us',
       'logout': 'Logout',
-      'light_mode': 'Light Mode ON',
-      'dark_mode': 'Dark Mode ON',
       'english': 'English',
       'arabic': 'Arabic',
-      'reset_intro': 'Reset Intro (Testing)',
-      'profile': 'Profile',
+      'darkMode': 'Dark Mode',
+      'lightMode': 'Light Mode',
+      'main': 'MAIN',
+      'settings': 'SETTINGS',
+      'moreInfo': 'MORE INFO',
       'organization': 'Organization',
-      'demo_system': 'Demo System',
-      'live_system_login': 'Live System Login',
-      'credentials': 'Credentials',
-      'system_url': 'System URL',
-      'username': 'Username',
-      'password': 'Password',
-      'go_to_demo_system': 'Go to Demo System',
-      'you_will_be_redirected': 'You will be redirected to the external demo system',
-      'demo_system_information': 'Demo System Information',
-      'demo_system_description': 'This demo system contains sample data for demonstration purposes. You can explore the features but changes will not be saved.',
-      'company_overview': 'Company Overview',
-      'key_information': 'Key Information',
-      'contact_location': 'Contact & Location',
-      'our_teams': 'Our Teams',
-      'company_type': 'Company Type',
-      'headquarters': 'Headquarters',
-      'operating_in': 'Operating In',
-      'certifications': 'Certifications',
-      'business_hours': 'Business Hours',
-      'email': 'Email',
-      'phone': 'Phone',
-      'website': 'Website',
-      'engineering': 'Engineering',
-      'product': 'Product',
-      'sales': 'Sales',
-      'marketing': 'Marketing',
-      'support': 'Support',
-      'finance': 'Finance',
-      'hr': 'HR',
-      'operations': 'Operations',
-      'employees': 'Employees',
-      'projects': 'Projects',
-      'clients': 'Clients',
-      'countries': 'Countries',
-      'account_details': 'Account Details',
+      'accountDetails': 'Account details',
       'documents': 'Documents',
-      'turn_your_location': 'Turn your location',
-      'location_description': 'This will expose face of target',
-      'bank_account': 'Bank Account',
-      'activities_notifications': 'Activities notifications',
-      'notifications_description': 'Payment facades, links and other activities',
-      'email_notification': 'Email notification',
-      'sign_in_touch_id': 'Sign in with touch ID',
-      'change_password': 'Change password',
-      'edit_profile': 'Edit Profile',
-      'settings': 'Settings',
-      'name': 'Name',
-      'role': 'Role',
-      'location': 'Location',
-      'department': 'Department',
+      'turnYourLocation': 'Turn your location',
+      'locationSubtitle': 'This will expose face of target',
+      'bankDetail': 'BANK DETAIL',
+      'bankAccount': 'Bank Account',
+      'notifications': 'NOTIFICATIONS',
+      'activitiesNotifications': 'Activities notifications',
+      'activitiesSubtitle': 'Payment facades, links and other activities',
+      'emailNotification': 'Email notification',
+      'security': 'SECURITY',
+      'signInWithTouchID': 'Sign in with touch ID',
+      'changePassword': 'Change password',
+      'recentActivity': 'Recent Activity',
+      'taskSchedule': 'Task Schedule',
+      'viewAll': 'View All',
+      'upcomingTasks': 'Upcoming Tasks',
+      'seeAll': 'See All',
+      'planAndPricing': 'Plan and Pricing',
+      'recommendationsForYou': 'Recommendations for you',
+      'visionERP': 'Vision ERP',
+      'integratingEveryDepartment': 'Integrating every department for seamless data flow and clarity',
+      'contractDuration': 'Contract duration',
+      'leaveBalance': 'Leave balance',
+      'theAudience': 'The Audience',
+      'tasks': 'Tasks',
+      'visualAuditoryCheck': 'Visual & Auditory Check',
+      'visualAuditoryDesc': 'Listen for operation. Check for error lights.',
+      'feelTheAuthor': 'Feel the Author',
+      'feelTheAuthorDesc': 'Confirm airflow from fresh air supply vents.',
+      'checkControlSetting': 'Check the Control Setting',
+      'checkControlDesc': 'Ensure unit is on in "Auto" or desired mode.',
+      'checkExteriorVents': 'Check Exterior Vents',
+      'checkExteriorDesc': 'Ensure outdoor intake/exhaust hoods are not blocked.',
+      'done': 'Done',
+      'inProgress': 'In Progress',
+      'toDo': 'To Do',
     },
     'ar': {
       'welcome': 'مرحباً',
-      'to_vision_erp': 'في نظام Vision ERP',
-      'move_towards_better_future': 'انطلق نحو مستقبل أفضل',
-      'my_account': 'حسابي',
+      'toVisionERP': 'في Vision ERP',
+      'RecommendationsForYou': 'التوصيات لك',
+      'moveTowardsBetterFuture': 'انطلق نحو مستقبل أفضل',
+      'PlanPricing': 'الخطة والتكلفة',
+      'home': 'الرئيسية',
+      'demo': 'تجريبي',
+      'dashboard': 'لوحة التحكم',
+      'profile': 'الملف الشخصي',
+      'menu': 'القائمة',
+      'loginIntoAccount': 'تسجيل الدخول إلى\nحسابك',
+      'enterCredentials': 'أدخل اسم المستخدم وكلمة المرور لتسجيل الدخول',
+      'userName': 'اسم المستخدم',
+      'password': 'كلمة المرور',
+      'rememberMe': 'تذكرني',
+      'forgotPassword': 'نسيت كلمة المرور؟',
+      'login': 'تسجيل الدخول',
+      'dontHaveAccount': 'ليس لديك حساب؟ ',
+      'signUp': 'إنشاء حساب',
+      'myAccount': 'حسابي',
       'notification': 'الإشعارات',
-      'my_subscription': 'اشتراكي',
+      'mySubscription': 'اشتراكي',
       'language': 'اللغة',
-      'about_us': 'من نحن',
+      'resetIntro': 'إعادة التعريف',
+      'aboutUs': 'من نحن',
       'logout': 'تسجيل الخروج',
-      'light_mode': 'الوضع المضيء',
-      'dark_mode': 'الوضع الداكن',
       'english': 'الإنجليزية',
       'arabic': 'العربية',
-      'reset_intro': 'إعادة التعريف (اختبار)',
-      'profile': 'الملف الشخصي',
-      'organization': 'المؤسسة',
-      'demo_system': 'النظام التجريبي',
-      'live_system_login': 'تسجيل الدخول للنظام المباشر',
-      'credentials': 'بيانات الدخول',
-      'system_url': 'رابط النظام',
-      'username': 'اسم المستخدم',
-      'password': 'كلمة المرور',
-      'go_to_demo_system': 'الذهاب للنظام التجريبي',
-      'you_will_be_redirected': 'سيتم توجيهك إلى النظام التجريبي الخارجي',
-      'demo_system_information': 'معلومات النظام التجريبي',
-      'demo_system_description': 'يحتوي هذا النظام التجريبي على بيانات نموذجية لأغراض العرض. يمكنك استكشاف الميزات ولكن التغييرات لن يتم حفظها.',
-      'company_overview': 'نظرة عامة على الشركة',
-      'key_information': 'المعلومات الرئيسية',
-      'contact_location': 'الاتصال والموقع',
-      'our_teams': 'فرقنا',
-      'company_type': 'نوع الشركة',
-      'headquarters': 'المقر الرئيسي',
-      'operating_in': 'نشطة في',
-      'certifications': 'الشهادات',
-      'business_hours': 'ساعات العمل',
-      'email': 'البريد الإلكتروني',
-      'phone': 'الهاتف',
-      'website': 'الموقع الإلكتروني',
-      'engineering': 'الهندسة',
-      'product': 'المنتج',
-      'sales': 'المبيعات',
-      'marketing': 'التسويق',
-      'support': 'الدعم',
-      'finance': 'المالية',
-      'hr': 'الموارد البشرية',
-      'operations': 'العمليات',
-      'employees': 'الموظفين',
-      'projects': 'المشاريع',
-      'clients': 'العملاء',
-      'countries': 'الدول',
-      'account_details': 'تفاصيل الحساب',
-      'documents': 'المستندات',
-      'turn_your_location': 'تشغيل موقعك',
-      'location_description': 'هذا سيكشف وجه الهدف',
-      'bank_account': 'الحساب البنكي',
-      'activities_notifications': 'إشعارات الأنشطة',
-      'notifications_description': 'واجهات الدفع، الروابط والأنشطة الأخرى',
-      'email_notification': 'إشعارات البريد الإلكتروني',
-      'sign_in_touch_id': 'تسجيل الدخول ببصمة الإصبع',
-      'change_password': 'تغيير كلمة المرور',
-      'edit_profile': 'تعديل الملف الشخصي',
+      'darkMode': 'الوضع الداكن',
+      'lightMode': 'الوضع الفاتح',
+      'main': 'الرئيسي',
       'settings': 'الإعدادات',
-      'name': 'الاسم',
-      'role': 'المسمى الوظيفي',
-      'location': 'الموقع',
-      'department': 'القسم',
+      'moreInfo': 'معلومات أكثر',
+      'organization': 'المؤسسة',
+      'accountDetails': 'تفاصيل الحساب',
+      'documents': 'المستندات',
+      'turnYourLocation': 'تشغيل موقعك',
+      'locationSubtitle': 'هذا سيكشف وجه الهدف',
+      'bankDetail': 'تفاصيل البنك',
+      'bankAccount': 'الحساب البنكي',
+      'notifications': 'الإشعارات',
+      'activitiesNotifications': 'إشعارات الأنشطة',
+      'activitiesSubtitle': 'واجهات الدفع، الروابط والأنشطة الأخرى',
+      'emailNotification': 'إشعارات البريد الإلكتروني',
+      'security': 'الأمان',
+      'signInWithTouchID': 'تسجيل الدخول بالبصمة',
+      'changePassword': 'تغيير كلمة المرور',
+      'recentActivity': 'النشاط الأخير',
+      'taskSchedule': 'جدول المهام',
+      'viewAll': 'عرض الكل',
+      'upcomingTasks': 'المهام القادمة',
+      'seeAll': 'رؤية الكل',
+      'planAndPricing': 'الخطط والأسعار',
+      'recommendationsForYou': 'التوصيات لك',
+      'visionERP': 'فيجن ERP',
+      'integratingEveryDepartment': 'دمج كل قسم لتدفق بيانات سلس ووضوح',
+      'contractDuration': 'مدة العقد',
+      'leaveBalance': 'رصيد الإجازات',
+      'theAudience': 'الجمهور',
+      'tasks': 'المهام',
+      'visualAuditoryCheck': 'فحص بصري وسمعي',
+      'visualAuditoryDesc': 'الاستماع للتشغيل. التحقق من أضواء الخطأ.',
+      'feelTheAuthor': 'الشعور بالمؤلف',
+      'feelTheAuthorDesc': 'تأكيد تدفق الهواء من فتحات إمداد الهواء النقي.',
+      'checkControlSetting': 'فحص إعدادات التحكم',
+      'checkControlDesc': 'تأكد من أن الوحدة في وضع "تلقائي" أو الوضع المطلوب.',
+      'checkExteriorVents': 'فحص فتحات التهوية الخارجية',
+      'checkExteriorDesc': 'تأكد من أن مداخل ومخارج الهواء الخارجية غير مسدودة.',
+      'done': 'مكتمل',
+      'inProgress': 'قيد التنفيذ',
+      'toDo': 'للقيام',
     },
   };
 
-  String get welcome {
-    return _localizedValues[locale.languageCode]!['welcome']!;
-  }
-
-  String get toVisionERP {
-    return _localizedValues[locale.languageCode]!['to_vision_erp']!;
-  }
-
-  String get moveTowardsBetterFuture {
-    return _localizedValues[locale.languageCode]!['move_towards_better_future']!;
-  }
-
-  String get myAccount {
-    return _localizedValues[locale.languageCode]!['my_account']!;
-  }
-
-  String get notification {
-    return _localizedValues[locale.languageCode]!['notification']!;
-  }
-
-  String get mySubscription {
-    return _localizedValues[locale.languageCode]!['my_subscription']!;
-  }
-
-  String get language {
-    return _localizedValues[locale.languageCode]!['language']!;
-  }
-
-  String get aboutUs {
-    return _localizedValues[locale.languageCode]!['about_us']!;
-  }
-
-  String get logout {
-    return _localizedValues[locale.languageCode]!['logout']!;
-  }
-
-  String get lightMode {
-    return _localizedValues[locale.languageCode]!['light_mode']!;
-  }
-
-  String get darkMode {
-    return _localizedValues[locale.languageCode]!['dark_mode']!;
-  }
-
-  String get english {
-    return _localizedValues[locale.languageCode]!['english']!;
-  }
-
-  String get arabic {
-    return _localizedValues[locale.languageCode]!['arabic']!;
-  }
-
-  String get resetIntro {
-    return _localizedValues[locale.languageCode]!['reset_intro']!;
-  }
-
-  String get profile {
-    return _localizedValues[locale.languageCode]!['profile']!;
-  }
-
-  String get organization {
-    return _localizedValues[locale.languageCode]!['organization']!;
-  }
-
-  String get demoSytem {
-    return _localizedValues[locale.languageCode]!['demo_system']!;
-  }
-
-  String get liveSystemLogin {
-    return _localizedValues[locale.languageCode]!['live_system_login']!;
-  }
-
-  String get credentials {
-    return _localizedValues[locale.languageCode]!['credentials']!;
-  }
-
-  String get systemUrl {
-    return _localizedValues[locale.languageCode]!['system_url']!;
-  }
-
-  String get username {
-    return _localizedValues[locale.languageCode]!['username']!;
-  }
-
-  String get password {
-    return _localizedValues[locale.languageCode]!['password']!;
-  }
-
-  String get goToDemoSystem {
-    return _localizedValues[locale.languageCode]!['go_to_demo_system']!;
-  }
-
-  String get youWillBeRedirected {
-    return _localizedValues[locale.languageCode]!['you_will_be_redirected']!;
-  }
-
-  String get demoSystemInformation {
-    return _localizedValues[locale.languageCode]!['demo_system_information']!;
-  }
-
-  String get demoSystemDescription {
-    return _localizedValues[locale.languageCode]!['demo_system_description']!;
-  }
-
-  String get companyOverview {
-    return _localizedValues[locale.languageCode]!['company_overview']!;
-  }
-
-  String get keyInformation {
-    return _localizedValues[locale.languageCode]!['key_information']!;
-  }
-
-  String get contactLocation {
-    return _localizedValues[locale.languageCode]!['contact_location']!;
-  }
-
-  String get ourTeams {
-    return _localizedValues[locale.languageCode]!['our_teams']!;
-  }
-
-  String get companyType {
-    return _localizedValues[locale.languageCode]!['company_type']!;
-  }
-
-  String get headquarters {
-    return _localizedValues[locale.languageCode]!['headquarters']!;
-  }
-
-  String get operatingIn {
-    return _localizedValues[locale.languageCode]!['operating_in']!;
-  }
-
-  String get certifications {
-    return _localizedValues[locale.languageCode]!['certifications']!;
-  }
-
-  String get businessHours {
-    return _localizedValues[locale.languageCode]!['business_hours']!;
-  }
-
-  String get email {
-    return _localizedValues[locale.languageCode]!['email']!;
-  }
-
-  String get phone {
-    return _localizedValues[locale.languageCode]!['phone']!;
-  }
-
-  String get website {
-    return _localizedValues[locale.languageCode]!['website']!;
-  }
-
-  String get engineering {
-    return _localizedValues[locale.languageCode]!['engineering']!;
-  }
-
-  String get product {
-    return _localizedValues[locale.languageCode]!['product']!;
-  }
-
-  String get sales {
-    return _localizedValues[locale.languageCode]!['sales']!;
-  }
-
-  String get marketing {
-    return _localizedValues[locale.languageCode]!['marketing']!;
-  }
-
-  String get support {
-    return _localizedValues[locale.languageCode]!['support']!;
-  }
-
-  String get finance {
-    return _localizedValues[locale.languageCode]!['finance']!;
-  }
-
-  String get hr {
-    return _localizedValues[locale.languageCode]!['hr']!;
-  }
-
-  String get operations {
-    return _localizedValues[locale.languageCode]!['operations']!;
-  }
-
-  String get employees {
-    return _localizedValues[locale.languageCode]!['employees']!;
-  }
-
-  String get projects {
-    return _localizedValues[locale.languageCode]!['projects']!;
-  }
-
-  String get clients {
-    return _localizedValues[locale.languageCode]!['clients']!;
-  }
-
-  String get countries {
-    return _localizedValues[locale.languageCode]!['countries']!;
-  }
-
-  String get accountDetails {
-    return _localizedValues[locale.languageCode]!['account_details']!;
-  }
-
-  String get documents {
-    return _localizedValues[locale.languageCode]!['documents']!;
-  }
-
-  String get turnYourLocation {
-    return _localizedValues[locale.languageCode]!['turn_your_location']!;
-  }
-
-  String get locationDescription {
-    return _localizedValues[locale.languageCode]!['location_description']!;
-  }
-
-  String get bankAccount {
-    return _localizedValues[locale.languageCode]!['bank_account']!;
-  }
-
-  String get activitiesNotifications {
-    return _localizedValues[locale.languageCode]!['activities_notifications']!;
-  }
-
-  String get notificationsDescription {
-    return _localizedValues[locale.languageCode]!['notifications_description']!;
-  }
-
-  String get emailNotification {
-    return _localizedValues[locale.languageCode]!['email_notification']!;
-  }
-
-  String get signInTouchId {
-    return _localizedValues[locale.languageCode]!['sign_in_touch_id']!;
-  }
-
-  String get changePassword {
-    return _localizedValues[locale.languageCode]!['change_password']!;
-  }
-
-  String get editProfile {
-    return _localizedValues[locale.languageCode]!['edit_profile']!;
-  }
-
-  String get settings {
-    return _localizedValues[locale.languageCode]!['settings']!;
-  }
-
-  String get name {
-    return _localizedValues[locale.languageCode]!['name']!;
-  }
-
-  String get role {
-    return _localizedValues[locale.languageCode]!['role']!;
-  }
-
-  String get location {
-    return _localizedValues[locale.languageCode]!['location']!;
-  }
-
-  String get department {
-    return _localizedValues[locale.languageCode]!['department']!;
-  }
-
-  String get dashboard => _localizedValues[locale.languageCode]!['dashboard']!;
+  var PlanPricing;
+
+  var RecommendationsForYou;
+
+  String? _getText(String key) {
+    return _localizedValues[locale.languageCode]?[key];
+  }
+
+  // Getters for all translated texts
+  String get welcome => _getText('welcome') ?? 'Welcome';
+  String get toVisionERP => _getText('toVisionERP') ?? 'To Vision ERP';
+  String get moveTowardsBetterFuture => _getText('moveTowardsBetterFuture') ?? 'Move towards a better future';
+  String get home => _getText('home') ?? 'Home';
+  String get demo => _getText('demo') ?? 'Demo';
+  String get dashboard => _getText('dashboard') ?? 'Dashboard';
+  String get profile => _getText('profile') ?? 'Profile';
+  String get menu => _getText('menu') ?? 'Menu';
+  String get loginIntoAccount => _getText('loginIntoAccount') ?? 'Login into your\nAccount';
+  String get enterCredentials => _getText('enterCredentials') ?? 'Enter your user name and password to log in';
+  String get userName => _getText('userName') ?? 'User Name';
+  String get password => _getText('password') ?? 'Password';
+  String get rememberMe => _getText('rememberMe') ?? 'Remember me';
+  String get forgotPassword => _getText('forgotPassword') ?? 'Forgot Password?';
+  String get login => _getText('login') ?? 'Login';
+  String get dontHaveAccount => _getText('dontHaveAccount') ?? "Don't have an account? ";
+  String get signUp => _getText('signUp') ?? 'Sign Up';
+  String get myAccount => _getText('myAccount') ?? 'My Account';
+  String get notification => _getText('notification') ?? 'Notification';
+  String get mySubscription => _getText('mySubscription') ?? 'My Subscription';
+  String get language => _getText('language') ?? 'Language';
+  String get resetIntro => _getText('resetIntro') ?? 'Reset Intro';
+  String get aboutUs => _getText('aboutUs') ?? 'About Us';
+  String get logout => _getText('logout') ?? 'Logout';
+  String get english => _getText('english') ?? 'English';
+  String get arabic => _getText('arabic') ?? 'Arabic';
+  String get darkMode => _getText('darkMode') ?? 'Dark Mode';
+  String get lightMode => _getText('lightMode') ?? 'Light Mode';
+  String get main => _getText('main') ?? 'MAIN';
+  String get settings => _getText('settings') ?? 'SETTINGS';
+  String get moreInfo => _getText('moreInfo') ?? 'MORE INFO';
+  String get organization => _getText('organization') ?? 'Organization';
+  String get accountDetails => _getText('accountDetails') ?? 'Account details';
+  String get documents => _getText('documents') ?? 'Documents';
+  String get turnYourLocation => _getText('turnYourLocation') ?? 'Turn your location';
+  String get locationSubtitle => _getText('locationSubtitle') ?? 'This will expose face of target';
+  String get bankDetail => _getText('bankDetail') ?? 'BANK DETAIL';
+  String get bankAccount => _getText('bankAccount') ?? 'Bank Account';
+  String get activitiesNotifications => _getText('activitiesNotifications') ?? 'Activities notifications';
+  String get activitiesSubtitle => _getText('activitiesSubtitle') ?? 'Payment facades, links and other activities';
+  String get emailNotification => _getText('emailNotification') ?? 'Email notification';
+  String get security => _getText('security') ?? 'SECURITY';
+  String get signInWithTouchID => _getText('signInWithTouchID') ?? 'Sign in with touch ID';
+  String get changePassword => _getText('changePassword') ?? 'Change password';
+  String get recentActivity => _getText('recentActivity') ?? 'Recent Activity';
+  String get taskSchedule => _getText('taskSchedule') ?? 'Task Schedule';
+  String get viewAll => _getText('viewAll') ?? 'View All';
+  String get upcomingTasks => _getText('upcomingTasks') ?? 'Upcoming Tasks';
+  String get seeAll => _getText('seeAll') ?? 'See All';
+  String get planAndPricing => _getText('planAndPricing') ?? 'Plan and Pricing';
+  String get recommendationsForYou => _getText('recommendationsForYou') ?? 'Recommendations for you';
+  String get visionERP => _getText('visionERP') ?? 'Vision ERP';
+  String get integratingEveryDepartment => _getText('integratingEveryDepartment') ?? 'Integrating every department for seamless data flow and clarity';
+  String get contractDuration => _getText('contractDuration') ?? 'Contract duration';
+  String get leaveBalance => _getText('leaveBalance') ?? 'Leave balance';
+  String get theAudience => _getText('theAudience') ?? 'The Audience';
+  String get tasks => _getText('tasks') ?? 'Tasks';
+  String get visualAuditoryCheck => _getText('visualAuditoryCheck') ?? 'Visual & Auditory Check';
+  String get visualAuditoryDesc => _getText('visualAuditoryDesc') ?? 'Listen for operation. Check for error lights.';
+  String get feelTheAuthor => _getText('feelTheAuthor') ?? 'Feel the Author';
+  String get feelTheAuthorDesc => _getText('feelTheAuthorDesc') ?? 'Confirm airflow from fresh air supply vents.';
+  String get checkControlSetting => _getText('checkControlSetting') ?? 'Check the Control Setting';
+  String get checkControlDesc => _getText('checkControlDesc') ?? 'Ensure unit is on in "Auto" or desired mode.';
+  String get checkExteriorVents => _getText('checkExteriorVents') ?? 'Check Exterior Vents';
+  String get checkExteriorDesc => _getText('checkExteriorDesc') ?? 'Ensure outdoor intake/exhaust hoods are not blocked.';
+  String get done => _getText('done') ?? 'Done';
+  String get inProgress => _getText('inProgress') ?? 'In Progress';
+  String get toDo => _getText('toDo') ?? 'To Do';
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
@@ -427,8 +249,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  Future<AppLocalizations> load(Locale locale) async {
-    return AppLocalizations(locale);
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(AppLocalizations(locale));
   }
 
   @override

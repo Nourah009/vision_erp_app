@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
-import 'package:vision_erp_app/screens/app/home_page.dart'; // تأكد من استيراد HomePage
+import 'package:vision_erp_app/screens/app/home_page.dart';
+import 'package:vision_erp_app/screens/providers/theme_notifier.dart'; // تأكد من استيراد HomePage
 
 class DemoSystemPage extends StatelessWidget {
   const DemoSystemPage({super.key});
@@ -95,8 +97,10 @@ class DemoSystemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.secondaryColor, // Changed to secondary color

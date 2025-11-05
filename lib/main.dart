@@ -1,3 +1,4 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -25,9 +26,9 @@ class MyApp extends StatelessWidget {
         builder: (context, themeNotifier, localizationService, child) {
           return MaterialApp(
             title: 'Vision ERP',
-            theme: themeNotifier.themeData,
+            theme: ThemeCollection.lightTheme.themeData,
             darkTheme: ThemeCollection.darkTheme.themeData,
-            themeMode: themeNotifier.themeMode,
+            themeMode: themeNotifier.themeMode, // الربط مع الـ Provider
             locale: localizationService.locale,
             localizationsDelegates: const [
               AppLocalizations.delegate,
@@ -36,8 +37,8 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [
-              Locale('en', 'US'), // English
-              Locale('ar', 'SA'), // Arabic
+              Locale('en', 'US'),
+              Locale('ar', 'SA'),
             ],
             home: const SplashScreen(),
             debugShowCheckedModeBanner: false,

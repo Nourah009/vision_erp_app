@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class PlanPricingSection extends StatelessWidget {
@@ -14,53 +15,56 @@ class PlanPricingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    
     // List of pricing plans
     final List<Map<String, dynamic>> plans = [
       {
         'title': 'Master',
-        'subtitle': 'Ideal for small projects',
-        'price': 'Free',
+        'subtitle': isEnglish ? 'Ideal for small projects' : 'مثالي للمشاريع الصغيرة',
+        'price': isEnglish ? 'Free' : 'مجاني',
         'features': [
-          'Unlimited personal files',
-          'Email support',
-          'CSV data export',
-          'Basic analytics dashboard',
-          '1,000 API calls per month',
+          isEnglish ? 'Unlimited personal files' : 'ملفات شخصية غير محدودة',
+          isEnglish ? 'Email support' : 'دعم عبر البريد الإلكتروني',
+          isEnglish ? 'CSV data export' : 'تصدير بيانات CSV',
+          isEnglish ? 'Basic analytics dashboard' : 'لوحة تحليل أساسية',
+          isEnglish ? '1,000 API calls per month' : '1000 استدعاء API شهرياً',
         ],
         'isPopular': false,
-        'buttonText': 'Get started',
+        'buttonText': isEnglish ? 'Get started' : 'ابدأ الآن',
         'buttonColor': AppColors.secondaryColor,
       },
       {
-        'title': 'Project plan',
-        'subtitle': 'All starter features +',
+        'title': isEnglish ? 'Project plan' : 'خطة المشروع',
+        'subtitle': isEnglish ? 'All starter features +' : 'جميع ميزات البداية +',
         'price': '',
         'features': [
-          'Up to 5 user accounts',
-          'Team collaboration tools',
-          'Custom dashboards',
-          'Multiple data export formats',
-          'Basic custom integrations',
+          isEnglish ? 'Up to 5 user accounts' : 'حتى 5 حسابات مستخدمين',
+          isEnglish ? 'Team collaboration tools' : 'أدوات التعاون الجماعي',
+          isEnglish ? 'Custom dashboards' : 'لوحات تحكم مخصصة',
+          isEnglish ? 'Multiple data export formats' : 'تنسيقات متعددة لتصدير البيانات',
+          isEnglish ? 'Basic custom integrations' : 'تكاملات مخصصة أساسية',
         ],
         'isPopular': true,
-        'buttonText': 'Select plan',
+        'buttonText': isEnglish ? 'Select plan' : 'اختر الخطة',
         'buttonColor': AppColors.primaryColor,
       },
       {
-        'title': 'Organization',
-        'subtitle': 'For fast-growing businesses',
-        'price': '\$30 /per user',
+        'title': isEnglish ? 'Organization' : 'المؤسسة',
+        'subtitle': isEnglish ? 'For fast-growing businesses' : 'للشركات سريعة النمو',
+        'price': isEnglish ? '\$30 /per user' : '30 / لكل مستخدم',
         'features': [
-          'All professional features +',
-          'Enterprise security suite',
-          'Single Sign-On (SSO)',
-          'Custom contract terms',
-          'Dedicated phone support',
-          'Custom integration support',
-          'Compliance tools',
+          isEnglish ? 'All professional features +' : 'جميع الميزات المهنية +',
+          isEnglish ? 'Enterprise security suite' : 'مجموعة أمان المؤسسة',
+          isEnglish ? 'Single Sign-On (SSO)' : 'تسجيل دخول موحد (SSO)',
+          isEnglish ? 'Custom contract terms' : 'شروط عقد مخصصة',
+          isEnglish ? 'Dedicated phone support' : 'دعم هاتفي مخصص',
+          isEnglish ? 'Custom integration support' : 'دعم تكامل مخصص',
+          isEnglish ? 'Compliance tools' : 'أدوات الامتثال',
         ],
         'isPopular': false,
-        'buttonText': 'Select plan',
+        'buttonText': isEnglish ? 'Select plan' : 'اختر الخطة',
         'buttonColor': AppColors.secondaryColor,
       },
     ];
@@ -76,7 +80,7 @@ class PlanPricingSection extends StatelessWidget {
           // Plan and Pricing title - centered
           Center(
             child: Text(
-              'Plan and Pricing',
+              appLocalizations.planAndPricing,
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: responsiveValue(
@@ -133,6 +137,8 @@ class PlanPricingSection extends StatelessWidget {
   }
 
   Widget _buildPlanCard(BuildContext context, Map<String, dynamic> plan) {
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    
     return Container(
       padding: EdgeInsets.all(
         responsiveValue(context, mobile: 12, tablet: 14, desktop: 16),
@@ -171,7 +177,7 @@ class PlanPricingSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  'MOST POPULAR PLAN',
+                  isEnglish ? 'MOST POPULAR PLAN' : 'الخطة الأكثر شيوعاً',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: responsiveValue(

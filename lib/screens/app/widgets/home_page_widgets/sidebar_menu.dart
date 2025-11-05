@@ -63,11 +63,12 @@ class _SidebarMenuState extends State<SidebarMenu> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final localizationService = Provider.of<LocalizationService>(context);
-    final appLocalizations = AppLocalizations.of(context);
+    final appLocalizations = AppLocalizations.of(context)!;
+    final isDarkMode = themeNotifier.isDarkMode;
 
     return Drawer(
       width: 280,
-      backgroundColor: themeNotifier.isDarkMode ? Colors.grey[900] : Colors.white,
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -82,7 +83,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
           children: [
             _buildUserProfile(context, appLocalizations),
             Expanded(child: _buildMenuItems(context, themeNotifier, localizationService, appLocalizations)),
-            _buildLogoutButton(context, appLocalizations),
+            _buildLogoutButton(context, appLocalizations, _handleLogout),
           ],
         ),
       ),
@@ -94,7 +95,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
     final hasUser = widget.user != null;
     final username = hasUser ? (widget.user!.username.isNotEmpty ? widget.user!.username : 'User') : widget.userName;
     final role = hasUser ? (widget.user!.role.isNotEmpty ? widget.user!.role : 'User Role') : widget.userRole;
-    final department = hasUser ? (widget.user!.department?.isNotEmpty == true ? widget.user!.department : '') : '';
+    final department = hasUser ? (widget.user!.department.isNotEmpty == true ? widget.user!.department : '') : '';
 
     return GestureDetector(
       onTap: () {
@@ -157,6 +158,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                      // ignore: unnecessary_null_comparison
                       if (department != null && department.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
@@ -198,51 +200,51 @@ class _SidebarMenuState extends State<SidebarMenu> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildMenuSectionHeader('MAIN', themeNotifier.isDarkMode),
+        _buildMenuSectionHeader(appLocalizations.main, themeNotifier.isDarkMode),
         _buildMenuOption(
           Icons.dashboard, 
-          'Dashboard', 
+          appLocalizations.dashboard, 
           widget.onDashboardTap,
           themeNotifier.isDarkMode
         ),
         _buildMenuOption(
           Icons.account_circle, 
-          'My Account', 
+          appLocalizations.myAccount, 
           widget.onMyAccountTap,
           themeNotifier.isDarkMode
         ),
         _buildMenuOption(
           Icons.notifications, 
-          'Notification', 
+          appLocalizations.notification, 
           widget.onNotificationTap,
           themeNotifier.isDarkMode
         ),
         _buildMenuOption(
           Icons.card_membership, 
-          'My Subscription', 
+          appLocalizations.mySubscription, 
           widget.onMySubscriptionTap,
           themeNotifier.isDarkMode
         ),
 
         const SizedBox(height: 20),
 
-        _buildMenuSectionHeader('SETTINGS', themeNotifier.isDarkMode),
+        _buildMenuSectionHeader(appLocalizations.settings, themeNotifier.isDarkMode),
         _buildLanguageOption(context, localizationService, appLocalizations, themeNotifier.isDarkMode),
         _buildThemeToggle(context, themeNotifier, appLocalizations),
 
         _buildMenuOption(
           Icons.refresh, 
-          'Reset Intro', 
+          appLocalizations.resetIntro, 
           widget.onResetIntroTap,
           themeNotifier.isDarkMode
         ),
 
         const SizedBox(height: 20),
 
-        _buildMenuSectionHeader('MORE INFO', themeNotifier.isDarkMode),
+        _buildMenuSectionHeader(appLocalizations.moreInfo, themeNotifier.isDarkMode),
         _buildMenuOption(
           Icons.info, 
-          'About Us', 
+          appLocalizations.aboutUs, 
           widget.onAboutUsTap,
           themeNotifier.isDarkMode
         ),
@@ -293,7 +295,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
         size: 20
       ),
       title: Text(
-        'Language',
+        appLocalizations.language,
         style: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 14,
@@ -310,7 +312,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
           ),
         ),
         child: Text(
-          localizationService.isEnglish() ? 'English' : 'Arabic',
+          localizationService.isEnglish() ? appLocalizations.english : appLocalizations.arabic,
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: 12,
@@ -331,16 +333,16 @@ class _SidebarMenuState extends State<SidebarMenu> {
 
   Widget _buildThemeToggle(BuildContext context, ThemeNotifier themeNotifier, AppLocalizations appLocalizations) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               Icon(
-                themeNotifier.isDarkMode ? Icons.dark_mode : Icons.light_mode, 
-                color: AppColors.primaryColor, 
-                size: 20
+                themeNotifier.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                color: Theme.of(context).primaryColor,
+                size: 20,
               ),
               const SizedBox(width: 10),
               Text(
@@ -348,7 +350,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 14,
-                  color: themeNotifier.isDarkMode ? Colors.white : AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
             ],
@@ -356,18 +358,22 @@ class _SidebarMenuState extends State<SidebarMenu> {
           Switch(
             value: themeNotifier.isDarkMode,
             onChanged: (value) {
-              widget.onThemeChanged(value);
+              // تفعيل/تعطيل الوضع الداكن
+              if (value) {
+                themeNotifier.setDarkTheme();
+              } else {
+                themeNotifier.setLightTheme();
+              }
             },
-            activeThumbColor: AppColors.primaryColor,
-            activeTrackColor: AppColors.primaryColor.withOpacity(0.5),
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            activeColor: Theme.of(context).primaryColor,
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildLogoutButton(BuildContext context, AppLocalizations appLocalizations) {
+  Widget _buildLogoutButton(BuildContext context, AppLocalizations appLocalizations, VoidCallback? _handleLogout) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: SizedBox(
@@ -384,8 +390,8 @@ class _SidebarMenuState extends State<SidebarMenu> {
             ),
           ),
           icon: const Icon(Icons.logout, size: 18),
-          label: const Text(
-            'Logout',
+          label: Text(
+            appLocalizations.logout,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
@@ -396,4 +402,3 @@ class _SidebarMenuState extends State<SidebarMenu> {
       ),
     );
   }
-}

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/demo_system_page.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
@@ -11,7 +12,9 @@ import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/sidebar_men
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/vision_erp_section.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
+import 'package:vision_erp_app/services/localization_service.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -65,48 +68,60 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleLanguageChanged(String languageCode) {
-    setState(() {
-      _currentLanguage = languageCode;
-    });
-    print('Language changed to: $languageCode');
-    
-    _showLanguageChangeDialog();
-  }
+  // الحصول على خدمة الترجمة من الـ Provider
+  final localizationService = Provider.of<LocalizationService>(context, listen: false);
+  
+  // تغيير اللغة فورياً
+  localizationService.setLocale(Locale(languageCode, languageCode == 'en' ? 'US' : 'SA'));
+  
+  setState(() {
+    _currentLanguage = languageCode;
+  });
+  
+  print('Language changed to: $languageCode');
+  
+  // لا حاجة لحوار التأكيد مع التغيير الفوري
+  _showLanguageChangeSuccessDialog();
+}
 
-  void _showLanguageChangeDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          _currentLanguage == 'en' ? 'Language Changed' : 'تم تغيير اللغة',
-          style: TextStyle(fontFamily: 'Cairo'),
-        ),
-        content: Text(
-          _currentLanguage == 'en' 
-            ? 'Please restart the app to see all text in the new language.'
-            : 'يرجى إعادة تشغيل التطبيق لرؤية جميع النصوص باللغة الجديدة.',
-          style: TextStyle(fontFamily: 'Cairo'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              _currentLanguage == 'en' ? 'OK' : 'موافق',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                color: AppColors.primaryColor,
-              ),
+void _showLanguageChangeSuccessDialog() {
+  final isEnglish = _currentLanguage == 'en';
+  
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(
+        isEnglish ? 'Language Changed' : 'تم تغيير اللغة',
+        style: TextStyle(fontFamily: 'Cairo'),
+      ),
+      content: Text(
+        isEnglish 
+          ? 'The language has been changed successfully!'
+          : 'تم تغيير اللغة بنجاح!',
+        style: TextStyle(fontFamily: 'Cairo'),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            isEnglish ? 'OK' : 'موافق',
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              color: AppColors.primaryColor,
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor:  isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
       endDrawer: _buildSidebarMenu(context),
       appBar: _buildAppBar(context),
       body: _buildBody(context),
@@ -142,7 +157,7 @@ class _HomePageState extends State<HomePage> {
               context,
               MaterialPageRoute(builder: (context) => const LoginPage()),
             );
-          },
+          }, 
           onMenuTap: () {
             Scaffold.of(context).openEndDrawer();
           },
@@ -304,10 +319,19 @@ class _HomePageState extends State<HomePage> {
       userRole: _currentUser != null ? _currentUser!.role : 'to Vision ERP',
       onMyAccountTap: () {
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
+        if (_currentUser != null) {
+          // الانتقال لصفحة البروفايل إذا كان مسجل الدخول
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(user: _currentUser!)),
+          );
+        } else {
+          // الانتقال لتسجيل الدخول إذا لم يكن مسجل الدخول
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        }
       },
       onNotificationTap: () {
         Navigator.pop(context);
@@ -347,7 +371,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<bool>('_isDarkMode', _isDarkMode));
-  }
+  super.debugFillProperties(properties);
+  properties.add(DiagnosticsProperty<bool>('_isDarkMode', _isDarkMode));
+  properties.add(DiagnosticsProperty<String>('_currentLanguage', _currentLanguage));
+  properties.add(DiagnosticsProperty<UserModel?>('_currentUser', _currentUser));
+}
 }

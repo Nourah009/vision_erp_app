@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class VisionERPSection extends StatelessWidget {
@@ -14,6 +15,8 @@ class VisionERPSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(
@@ -38,7 +41,7 @@ class VisionERPSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Vision ERP',
+            appLocalizations.visionERP,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: responsiveValue(
@@ -53,7 +56,7 @@ class VisionERPSection extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            'Integrating every department for seamless data flow and clarity',
+            appLocalizations.integratingEveryDepartment,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: responsiveValue(

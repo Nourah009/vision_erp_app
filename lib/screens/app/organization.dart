@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 
 class OrganizationPage extends StatelessWidget {
   final UserModel user;
@@ -46,8 +48,10 @@ class OrganizationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.secondaryColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class RecentActivitySection extends StatelessWidget {
@@ -15,6 +16,8 @@ class RecentActivitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(
@@ -24,7 +27,7 @@ class RecentActivitySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recent Activity',
+            appLocalizations.recentActivity,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: responsiveValue(
@@ -50,7 +53,7 @@ class RecentActivitySection extends StatelessWidget {
             children: [
               _buildActivityBox(
                 context,
-                title: 'Contract duration',
+                title: appLocalizations.contractDuration,
                 value: '25 Day-2 Years',
                 icon: Icons.assignment,
                 chartType: 'pie',
@@ -59,7 +62,7 @@ class RecentActivitySection extends StatelessWidget {
               ),
               _buildActivityBox(
                 context,
-                title: 'Leave balance',
+                title: appLocalizations.leaveBalance,
                 value: '30 Day',
                 icon: Icons.beach_access,
                 chartType: 'line',
@@ -68,7 +71,7 @@ class RecentActivitySection extends StatelessWidget {
               ),
               _buildActivityBox(
                 context,
-                title: 'The Audience',
+                title: appLocalizations.theAudience,
                 value: '80%',
                 icon: Icons.people,
                 chartType: 'pie',
@@ -77,7 +80,7 @@ class RecentActivitySection extends StatelessWidget {
               ),
               _buildActivityBox(
                 context,
-                title: 'Tasks',
+                title: appLocalizations.tasks,
                 value: '3/7 Tasks',
                 icon: Icons.task,
                 chartType: 'line',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class TaskScheduleSection extends StatelessWidget {
@@ -15,28 +16,30 @@ class TaskScheduleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     final List<Map<String, dynamic>> tasks = [
       {
-        'title': 'Visual & Auditory Check',
-        'description': 'Listen for operation. Check for error lights.',
+        'title': appLocalizations.visualAuditoryCheck,
+        'description': appLocalizations.visualAuditoryDesc,
         'time': '10:00 AM',
         'status': 'done',
       },
       {
-        'title': 'Feel the Author',
-        'description': 'Confirm airflow from fresh air supply vents.',
+        'title': appLocalizations.feelTheAuthor,
+        'description': appLocalizations.feelTheAuthorDesc,
         'time': '12:00 PM',
         'status': 'in-progress',
       },
       {
-        'title': 'Check the Control Setting',
-        'description': 'Ensure unit is on in "Auto" or desired mode.',
+        'title': appLocalizations.checkControlSetting,
+        'description': appLocalizations.checkControlDesc,
         'time': '07:00 PM',
         'status': 'todo',
       },
       {
-        'title': 'Check Exterior Vents',
-        'description': 'Ensure outdoor intake/exhaust hoods are not blocked.',
+        'title': appLocalizations.checkExteriorVents,
+        'description': appLocalizations.checkExteriorDesc,
         'time': '07:00 PM',
         'status': 'todo',
       },
@@ -51,7 +54,7 @@ class TaskScheduleSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Task schedule',
+            appLocalizations.taskSchedule,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: responsiveValue(
@@ -155,7 +158,7 @@ class TaskScheduleSection extends StatelessWidget {
                       SizedBox(width: 12),
 
                       // Right side - Status indicator
-                      _buildTaskStatus(task['status']),
+                      _buildTaskStatus(task['status'], context),
                     ],
                   ),
                 ),
@@ -166,7 +169,9 @@ class TaskScheduleSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskStatus(String status) {
+  Widget _buildTaskStatus(String status, BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    
     Color statusColor;
     String statusText;
     IconData statusIcon;
@@ -174,22 +179,22 @@ class TaskScheduleSection extends StatelessWidget {
     switch (status) {
       case 'done':
         statusColor = Colors.green;
-        statusText = 'Done';
+        statusText = appLocalizations.done;
         statusIcon = Icons.check_circle;
         break;
       case 'in-progress':
         statusColor = Colors.orange;
-        statusText = 'In Progress';
+        statusText = appLocalizations.inProgress;
         statusIcon = Icons.access_time;
         break;
       case 'todo':
         statusColor = Colors.grey;
-        statusText = 'To Do';
+        statusText = appLocalizations.toDo;
         statusIcon = Icons.radio_button_unchecked;
         break;
       default:
         statusColor = Colors.grey;
-        statusText = 'To Do';
+        statusText = appLocalizations.toDo;
         statusIcon = Icons.radio_button_unchecked;
     }
 
