@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
         title: Text(
-          'Demo System',
+          'Login Page',
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: _responsiveValue(

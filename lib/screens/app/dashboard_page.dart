@@ -4,9 +4,9 @@ import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/app/organization.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
+import 'package:vision_erp_app/screens/app/sidebar_menu.dart';
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/dashboard_app_bar.dart';
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/dashboard_bottom_navigation_bar.dart';
-import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/dashboard_sidebar_menu.dart';
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/recent_activity_section.dart';
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/task_schedule_section.dart';
 import 'package:vision_erp_app/screens/app/widgets/dashboard_page_widgets/user_profile_section.dart';
@@ -124,7 +124,7 @@ class DashboardPage extends StatelessWidget {
   Widget _buildSidebarMenu(BuildContext context) {
     final AppLocalizations() = AppLocalizations.of(context)!;
     
-    return DashboardSidebarMenu(
+    return SidebarMenu(
       user: user,
       onOrganizationTap: () {
         Navigator.pop(context);

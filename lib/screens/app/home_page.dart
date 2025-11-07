@@ -8,7 +8,6 @@ import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/bottom_navigation_bar.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/plan_pricing_section.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/recommendations_section.dart';
-import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/sidebar_menu.dart';
 import 'package:vision_erp_app/screens/app/widgets/home_page_widgets/vision_erp_section.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
@@ -16,7 +15,7 @@ import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
 import 'package:vision_erp_app/services/localization_service.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
-
+import 'package:vision_erp_app/screens/app/sidebar_menu.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -365,7 +364,7 @@ void _showLanguageChangeSuccessDialog() {
         }
       },
       onThemeChanged: _handleThemeChanged,
-      onLanguageChanged: _handleLanguageChanged,
+      onLanguageChanged: _handleLanguageChanged, onOrganizationTap: () {  },
     );
   }
 

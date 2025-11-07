@@ -3,12 +3,15 @@ import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
+import 'package:vision_erp_app/screens/app/profile_page.dart';
+import 'package:vision_erp_app/screens/app/organization.dart'; // ✅ إضافة: لصفحة الشركة
+import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
 import 'package:vision_erp_app/services/localization_service.dart';
 import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 
-class DashboardSidebarMenu extends StatefulWidget {
+class SidebarMenu extends StatefulWidget {
   final UserModel? user;
   final String userName;
   final String userRole;
@@ -19,11 +22,11 @@ class DashboardSidebarMenu extends StatefulWidget {
   final VoidCallback onAboutUsTap;
   final VoidCallback onResetIntroTap;
   final VoidCallback onDashboardTap;
-  final VoidCallback onOrganizationTap;
+  final VoidCallback onOrganizationTap; // ✅ إضافة: لدالة Organization
   final Function(bool) onThemeChanged;
   final Function(String) onLanguageChanged;
 
-  const DashboardSidebarMenu({
+  const SidebarMenu({
     super.key,
     this.user,
     required this.userName,
@@ -35,42 +38,50 @@ class DashboardSidebarMenu extends StatefulWidget {
     required this.onAboutUsTap,
     required this.onResetIntroTap,
     required this.onDashboardTap,
-    required this.onOrganizationTap,
+    required this.onOrganizationTap, // ✅ إضافة: باراميتر Organization
     required this.onThemeChanged,
     required this.onLanguageChanged,
   });
 
   @override
-  State<DashboardSidebarMenu> createState() => _DashboardSidebarMenuState();
+  State<SidebarMenu> createState() => _SidebarMenuState();
 }
 
-class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
+class _SidebarMenuState extends State<SidebarMenu> {
   Future<void> _handleLogout() async {
-    // إغلاق السايدبار أولاً
     Navigator.pop(context);
-    
-    // تسجيل الخروج من الخدمة
     await AuthService.logout();
-    
-    // الانتقال إلى صفحة الهوم بيج
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
-      (route) => false, // إزالة جميع الصفحات من الستاك
+      (route) => false,
     );
+  }
+
+  // ✅ إضافة: دالة للانتقال لصفحة Organization
+  void _handleOrganizationTap() {
+    Navigator.pop(context); // إغلاق السايدبار أولاً
+    
+    if (widget.user != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => OrganizationPage(user: widget.user!)),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    // ✅ إضافة: جعل السايدبار يستمع لتغييرات اللغة
     final localizationService = Provider.of<LocalizationService>(context);
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     final appLocalizations = AppLocalizations.of(context)!;
     final isDarkMode = themeNotifier.isDarkMode;
 
     return Drawer(
       width: 280,
-      backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -82,17 +93,16 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUserProfile(context, appLocalizations, isDarkMode),
-            Expanded(child: _buildMenuItems(context, themeNotifier, localizationService, appLocalizations, isDarkMode)),
-            _buildLogoutButton(context, appLocalizations, isDarkMode),
+            _buildUserProfile(context, appLocalizations),
+            Expanded(child: _buildMenuItems(context, themeNotifier, localizationService, appLocalizations)),
+            _buildLogoutButton(context, appLocalizations, _handleLogout),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserProfile(BuildContext context, AppLocalizations appLocalizations, bool isDarkMode) {
-    // التحقق الآمن من وجود المستخدم
+  Widget _buildUserProfile(BuildContext context, AppLocalizations appLocalizations) {
     final hasUser = widget.user != null;
     final username = hasUser ? (widget.user!.username.isNotEmpty ? widget.user!.username : 'User') : widget.userName;
     final role = hasUser ? (widget.user!.role.isNotEmpty ? widget.user!.role : 'User Role') : widget.userRole;
@@ -101,14 +111,16 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
+        
         if (hasUser) {
-          // إذا كان مسجل الدخول، انتقل للبروفايل
-          widget.onMyAccountTap();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user!)),
+          );
         } else {
-          // إذا لم يكن مسجل الدخول، انتقل لتسجيل الدخول
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         }
       },
@@ -118,7 +130,7 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: AppColors.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -127,7 +139,7 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  color: AppColors.primaryColor,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.person, color: Colors.white, size: 24),
@@ -137,25 +149,23 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // عرض اسم المستخدم
                     Text(
                       username,
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // عرض الرتبة والقسم إذا كان مسجل الدخول
                     if (hasUser) ...[
                       Text(
                         role,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -167,19 +177,17 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
                           style: TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 11,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                            fontStyle: FontStyle.italic,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
                     ] else ...[
-                      // إذا لم يكن مسجل الدخول، عرض النص الافتراضي
                       Text(
                         widget.userRole,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -188,7 +196,7 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: Theme.of(context).primaryColor,
+                color: AppColors.primaryColor,
                 size: 16,
               ),
             ],
@@ -198,73 +206,91 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
     );
   }
 
-  Widget _buildMenuItems(BuildContext context, ThemeNotifier themeNotifier, 
-      LocalizationService localizationService, AppLocalizations appLocalizations, bool isDarkMode) {
-    final hasUser = widget.user != null;
+  Widget _buildMenuItems(BuildContext context, ThemeNotifier themeNotifier, LocalizationService localizationService, AppLocalizations appLocalizations) {
+    final hasUser = widget.user != null; // ✅ التحقق من وجود مستخدم مسجل
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildMenuSectionHeader(appLocalizations.main, isDarkMode),
+        _buildMenuSectionHeader(appLocalizations.main, themeNotifier.isDarkMode),
         
-        // Dashboard option - show for all users
+        // ✅ إضافة: عنصر Dashboard
         _buildMenuOption(
           Icons.dashboard, 
           appLocalizations.dashboard, 
           widget.onDashboardTap,
-          isDarkMode
+          themeNotifier.isDarkMode
         ),
 
-        // Organization option - only for logged in users
+        // ✅ إضافة: عنصر Organization (يظهر فقط بعد تسجيل الدخول)
         if (hasUser) ...[
           _buildMenuOption(
-            Icons.business, 
+            Icons.business, // أيقونة الشركة
             appLocalizations.organization, 
-            widget.onOrganizationTap,
-            isDarkMode
+            _handleOrganizationTap, // استخدام الدالة الجديدة
+            themeNotifier.isDarkMode
           ),
         ],
 
         _buildMenuOption(
           Icons.account_circle, 
           appLocalizations.myAccount, 
-          widget.onMyAccountTap,
-          isDarkMode
+          () {
+            Navigator.pop(context);
+            
+            if (widget.user != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user!)),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            }
+          },
+          themeNotifier.isDarkMode
         ),
+
         _buildMenuOption(
           Icons.notifications, 
           appLocalizations.notification, 
           widget.onNotificationTap,
-          isDarkMode
+          themeNotifier.isDarkMode
         ),
+
         _buildMenuOption(
           Icons.card_membership, 
           appLocalizations.mySubscription, 
           widget.onMySubscriptionTap,
-          isDarkMode
+          themeNotifier.isDarkMode
         ),
 
         const SizedBox(height: 20),
 
-        _buildMenuSectionHeader(appLocalizations.settings, isDarkMode),
-        _buildLanguageOption(context, localizationService, appLocalizations, isDarkMode),
-        _buildThemeToggle(context, themeNotifier, appLocalizations, isDarkMode),
+        _buildMenuSectionHeader(appLocalizations.settings, themeNotifier.isDarkMode),
+        
+        // ✅ إضافة: عنصر اللغة مع تحديث تلقائي
+        _buildLanguageOption(context, localizationService, appLocalizations, themeNotifier.isDarkMode),
+        
+        _buildThemeToggle(context, themeNotifier, appLocalizations),
 
         _buildMenuOption(
           Icons.refresh, 
           appLocalizations.resetIntro, 
           widget.onResetIntroTap,
-          isDarkMode
+          themeNotifier.isDarkMode
         ),
 
         const SizedBox(height: 20),
 
-        _buildMenuSectionHeader(appLocalizations.moreInfo, isDarkMode),
+        _buildMenuSectionHeader(appLocalizations.moreInfo, themeNotifier.isDarkMode),
         _buildMenuOption(
           Icons.info, 
           appLocalizations.aboutUs, 
           widget.onAboutUsTap,
-          isDarkMode
+          themeNotifier.isDarkMode
         ),
       ],
     );
@@ -279,7 +305,7 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
           fontFamily: 'Cairo',
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: isDarkMode ? Colors.white70 : AppColors.textSecondary,
           letterSpacing: 1.2,
         ),
       ),
@@ -288,13 +314,13 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
 
   Widget _buildMenuOption(IconData icon, String title, VoidCallback onTap, bool isDarkMode) {
     return ListTile(
-      leading: Icon(icon, color: Theme.of(context).primaryColor, size: 20),
+      leading: Icon(icon, color: AppColors.primaryColor, size: 20),
       title: Text(
         title,
         style: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 14,
-          color: Theme.of(context).colorScheme.onSurface,
+          color: isDarkMode ? Colors.white : AppColors.textPrimary,
         ),
       ),
       onTap: onTap,
@@ -305,12 +331,11 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
     );
   }
 
-  Widget _buildLanguageOption(BuildContext context, LocalizationService localizationService, 
-      AppLocalizations appLocalizations, bool isDarkMode) {
+  Widget _buildLanguageOption(BuildContext context, LocalizationService localizationService, AppLocalizations appLocalizations, bool isDarkMode) {
     return ListTile(
       leading: Icon(
         Icons.language, 
-        color: Theme.of(context).primaryColor,
+        color: AppColors.primaryColor,
         size: 20
       ),
       title: Text(
@@ -318,16 +343,16 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
         style: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 14,
-          color: Theme.of(context).colorScheme.onSurface,
+          color: isDarkMode ? Colors.white : AppColors.textPrimary,
         ),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.1),
+          color: AppColors.primaryColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            color: AppColors.primaryColor.withOpacity(0.3),
           ),
         ),
         child: Text(
@@ -336,7 +361,7 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
             fontFamily: 'Cairo',
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+            color: AppColors.primaryColor,
           ),
         ),
       ),
@@ -350,10 +375,9 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
     );
   }
 
-  Widget _buildThemeToggle(BuildContext context, ThemeNotifier themeNotifier, 
-      AppLocalizations appLocalizations, bool isDarkMode) {
+  Widget _buildThemeToggle(BuildContext context, ThemeNotifier themeNotifier, AppLocalizations appLocalizations) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -366,11 +390,11 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
               ),
               const SizedBox(width: 10),
               Text(
-                themeNotifier.isDarkMode ? appLocalizations.darkMode : appLocalizations.lightMode,
+                themeNotifier.isDarkMode ? appLocalizations.darkMode : appLocalizations.lightMode, // ✅ نص مترجم
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
             ],
@@ -383,26 +407,24 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
               } else {
                 themeNotifier.setLightTheme();
               }
-              widget.onThemeChanged(value);
             },
-            activeColor: Theme.of(context).primaryColor,
-            activeTrackColor: Theme.of(context).primaryColor.withOpacity(0.5),
+            activeThumbColor: Theme.of(context).primaryColor,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context, AppLocalizations appLocalizations, bool isDarkMode) {
+  Widget _buildLogoutButton(BuildContext context, AppLocalizations appLocalizations, VoidCallback? handleLogout) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: SizedBox(
         width: double.infinity,
         height: 44,
         child: ElevatedButton.icon(
-          onPressed: _handleLogout,
+          onPressed: handleLogout,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.secondary,
+            backgroundColor: AppColors.secondaryColor,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             shape: RoundedRectangleBorder(
@@ -412,7 +434,7 @@ class _DashboardSidebarMenuState extends State<DashboardSidebarMenu> {
           icon: const Icon(Icons.logout, size: 18),
           label: Text(
             appLocalizations.logout,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
               fontWeight: FontWeight.bold,
