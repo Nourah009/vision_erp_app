@@ -4,7 +4,8 @@ import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
-import 'package:vision_erp_app/screens/app/organization.dart'; // ✅ إضافة: لصفحة الشركة
+import 'package:vision_erp_app/screens/app/organization.dart';
+import 'package:vision_erp_app/screens/app/notifications_page.dart'; // ✅ إضافة: لصفحة الإشعارات
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
@@ -22,7 +23,7 @@ class SidebarMenu extends StatefulWidget {
   final VoidCallback onAboutUsTap;
   final VoidCallback onResetIntroTap;
   final VoidCallback onDashboardTap;
-  final VoidCallback onOrganizationTap; // ✅ إضافة: لدالة Organization
+  final VoidCallback onOrganizationTap;
   final Function(bool) onThemeChanged;
   final Function(String) onLanguageChanged;
 
@@ -38,7 +39,7 @@ class SidebarMenu extends StatefulWidget {
     required this.onAboutUsTap,
     required this.onResetIntroTap,
     required this.onDashboardTap,
-    required this.onOrganizationTap, // ✅ إضافة: باراميتر Organization
+    required this.onOrganizationTap,
     required this.onThemeChanged,
     required this.onLanguageChanged,
   });
@@ -58,9 +59,8 @@ class _SidebarMenuState extends State<SidebarMenu> {
     );
   }
 
-  // ✅ إضافة: دالة للانتقال لصفحة Organization
   void _handleOrganizationTap() {
-    Navigator.pop(context); // إغلاق السايدبار أولاً
+    Navigator.pop(context);
     
     if (widget.user != null) {
       Navigator.push(
@@ -70,9 +70,17 @@ class _SidebarMenuState extends State<SidebarMenu> {
     }
   }
 
+  // ✅ إضافة: دالة للانتقال لصفحة الإشعارات
+  void _handleNotificationsTap() {
+    Navigator.pop(context); // إغلاق السايدبار أولاً
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NotificationsPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ✅ إضافة: جعل السايدبار يستمع لتغييرات اللغة
     final localizationService = Provider.of<LocalizationService>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final appLocalizations = AppLocalizations.of(context)!;
@@ -207,14 +215,13 @@ class _SidebarMenuState extends State<SidebarMenu> {
   }
 
   Widget _buildMenuItems(BuildContext context, ThemeNotifier themeNotifier, LocalizationService localizationService, AppLocalizations appLocalizations) {
-    final hasUser = widget.user != null; // ✅ التحقق من وجود مستخدم مسجل
+    final hasUser = widget.user != null;
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildMenuSectionHeader(appLocalizations.main, themeNotifier.isDarkMode),
         
-        // ✅ إضافة: عنصر Dashboard
         _buildMenuOption(
           Icons.dashboard, 
           appLocalizations.dashboard, 
@@ -222,12 +229,11 @@ class _SidebarMenuState extends State<SidebarMenu> {
           themeNotifier.isDarkMode
         ),
 
-        // ✅ إضافة: عنصر Organization (يظهر فقط بعد تسجيل الدخول)
         if (hasUser) ...[
           _buildMenuOption(
-            Icons.business, // أيقونة الشركة
+            Icons.business,
             appLocalizations.organization, 
-            _handleOrganizationTap, // استخدام الدالة الجديدة
+            _handleOrganizationTap,
             themeNotifier.isDarkMode
           ),
         ],
@@ -253,10 +259,11 @@ class _SidebarMenuState extends State<SidebarMenu> {
           themeNotifier.isDarkMode
         ),
 
+        // ✅ التعديل: استخدام الدالة الجديدة للإشعارات
         _buildMenuOption(
           Icons.notifications, 
           appLocalizations.notification, 
-          widget.onNotificationTap,
+          _handleNotificationsTap, // ✅ استخدام الدالة الجديدة
           themeNotifier.isDarkMode
         ),
 
@@ -271,7 +278,6 @@ class _SidebarMenuState extends State<SidebarMenu> {
 
         _buildMenuSectionHeader(appLocalizations.settings, themeNotifier.isDarkMode),
         
-        // ✅ إضافة: عنصر اللغة مع تحديث تلقائي
         _buildLanguageOption(context, localizationService, appLocalizations, themeNotifier.isDarkMode),
         
         _buildThemeToggle(context, themeNotifier, appLocalizations),
@@ -390,7 +396,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
               ),
               const SizedBox(width: 10),
               Text(
-                themeNotifier.isDarkMode ? appLocalizations.darkMode : appLocalizations.lightMode, // ✅ نص مترجم
+                themeNotifier.isDarkMode ? appLocalizations.darkMode : appLocalizations.lightMode,
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 14,

@@ -1,3 +1,4 @@
+// services/localization_service.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +7,9 @@ class LocalizationService extends ChangeNotifier {
   static const String _localeKey = 'selected_locale';
 
   Locale get locale => _locale;
+  
+  // ✅ إصلاح: خاصية currentLocale يجب أن ترجع _locale وليس null
+  Locale get currentLocale => _locale;
 
   LocalizationService() {
     _loadSavedLocale();
@@ -15,12 +19,16 @@ class LocalizationService extends ChangeNotifier {
   bool isArabic() => _locale.languageCode == 'ar';
 
   Future<void> _loadSavedLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedLocale = prefs.getString(_localeKey);
-    
-    if (savedLocale != null) {
-      _locale = Locale(savedLocale, savedLocale == 'en' ? 'US' : 'SA');
-      notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedLocale = prefs.getString(_localeKey);
+      
+      if (savedLocale != null) {
+        _locale = Locale(savedLocale, savedLocale == 'en' ? 'US' : 'SA');
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error loading saved locale: $e');
     }
   }
 
@@ -30,8 +38,12 @@ class LocalizationService extends ChangeNotifier {
     _locale = newLocale;
     notifyListeners();
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey, newLocale.languageCode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_localeKey, newLocale.languageCode);
+    } catch (e) {
+      print('Error saving locale: $e');
+    }
   }
 
   Future<void> toggleLanguage() async {
