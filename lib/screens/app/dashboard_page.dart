@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
+import 'package:vision_erp_app/screens/app/floating_messages_button.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/app/notification_dropdown.dart';
 import 'package:vision_erp_app/screens/app/organization.dart';
@@ -119,6 +120,7 @@ class _DashboardPageState extends State<DashboardPage> {
               onNotificationRead: _onNotificationRead,
               onViewAll: _navigateToAllNotifications,
             ),
+            const FloatingMessagesButton(),
         ],
       ),
       bottomNavigationBar: Builder(

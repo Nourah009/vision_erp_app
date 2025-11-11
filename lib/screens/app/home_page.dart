@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/demo_system_page.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
+import 'package:vision_erp_app/screens/app/floating_messages_button.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
 import 'package:vision_erp_app/screens/app/notification_dropdown.dart';
 import 'package:vision_erp_app/screens/app/notifications_page.dart';
@@ -198,6 +199,7 @@ void _navigateToAllNotifications() {
         },
         onViewAll: _navigateToAllNotifications, // ✅ استخدام الدالة الجديدة
       ),
+      const FloatingMessagesButton(),
   ],
 ),
       bottomNavigationBar: Builder(

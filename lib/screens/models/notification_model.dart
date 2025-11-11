@@ -1,5 +1,4 @@
 // models/notification_model.dart
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class NotificationModel {
