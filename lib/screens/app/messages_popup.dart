@@ -9,11 +9,13 @@ import 'package:vision_erp_app/services/localization_service.dart';
 class MessagesPopup extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onMessageRead;
+  final VoidCallback? onViewAllChats;
 
   const MessagesPopup({
     super.key,
     required this.onClose,
     required this.onMessageRead,
+    this.onViewAllChats,
   });
 
   @override
@@ -87,7 +89,6 @@ class _MessagesPopupState extends State<MessagesPopup> {
   void _sendReply() {
     if (_replyController.text.trim().isEmpty || _selectedSender == null) return;
 
-    // البحث عن أي رسالة من المرسل للحصول على معلوماته
     final senderMessages = _messageService.getAllMessages().where(
       (message) => message.senderId == _selectedSender
     ).toList();
@@ -147,7 +148,6 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
     final localizationService = Provider.of<LocalizationService>(context, listen: false);
     final languageCode = localizationService.locale.languageCode;
-    localizationService.setLocale(Locale(languageCode, languageCode == 'en' ? 'US' : 'SA'));
 
     showDialog(
       context: context,
@@ -183,6 +183,13 @@ class _MessagesPopupState extends State<MessagesPopup> {
     );
   }
 
+  void _handleViewAllChats() {
+    if (widget.onViewAllChats != null) {
+      widget.onClose(); // إغلاق الـ popup أولاً
+      widget.onViewAllChats!(); // ثم استدعاء دالة الانتقال
+    }
+  }
+
   String _getCategoryDisplayName(String category, bool isEnglish) {
     final categoryMap = {
       'All': isEnglish ? 'All' : 'الكل',
@@ -212,7 +219,6 @@ class _MessagesPopupState extends State<MessagesPopup> {
   Widget build(BuildContext context) {
     final localizationService = Provider.of<LocalizationService>(context);
     final languageCode = localizationService.locale.languageCode;
-    localizationService.setLocale(Locale(languageCode, languageCode == 'en' ? 'US' : 'SA'));
 
     return Container(
       width: 350,
@@ -247,6 +253,9 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
         // Messages List
         _buildMessagesList(context, isEnglish),
+
+        // زر "View All Chats" في الأسفل
+        if (_filteredMessages.isNotEmpty) _buildViewAllChatsButton(isEnglish),
       ],
     );
   }
@@ -359,6 +368,52 @@ class _MessagesPopupState extends State<MessagesPopup> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildViewAllChatsButton(bool isEnglish) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: _handleViewAllChats, // ✅ استخدام الدالة المعدلة
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.secondaryColor,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 2,
+          ),
+          icon: const Icon(
+            Icons.forum,
+            size: 18,
+          ),
+          label: Text(
+            isEnglish ? 'View All Chats' : 'عرض جميع المحادثات',
+            style: const TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -544,7 +599,8 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      color: isUnread ? AppColors.accentBlue.withOpacity(0.1) : Theme.of(context).cardColor,
+      // ✅ التحديث: استخدام اللون الرمادي الفاتح للرسائل غير المقروءة
+      color: isUnread ? Colors.grey[100] : Theme.of(context).cardColor,
       elevation: 1,
       child: ListTile(
         onTap: () => _onMessageTap(message),
@@ -562,10 +618,11 @@ class _MessagesPopupState extends State<MessagesPopup> {
             Expanded(
               child: Text(
                 message.senderName,
+                // ✅ التحديث: استخدام اللون الرمادي الداكن للنص في الرسائل غير المقروءة
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
-                  color: isUnread ? AppColors.primaryColor : Theme.of(context).colorScheme.onSurface,
+                  color: isUnread ? Colors.grey[800] : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -585,10 +642,11 @@ class _MessagesPopupState extends State<MessagesPopup> {
           children: [
             Text(
               message.content,
+              // ✅ التحديث: استخدام اللون الرمادي للنص الفرعي في الرسائل غير المقروءة
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: isUnread ? Colors.grey[600] : AppColors.textSecondary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -596,10 +654,11 @@ class _MessagesPopupState extends State<MessagesPopup> {
             const SizedBox(height: 4),
             Text(
               _formatTime(message.timestamp, isEnglish),
+              // ✅ التحديث: استخدام اللون الرمادي للوقت في الرسائل غير المقروءة
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 10,
-                color: AppColors.textSecondary,
+                color: isUnread ? Colors.grey[500] : AppColors.textSecondary,
               ),
             ),
           ],

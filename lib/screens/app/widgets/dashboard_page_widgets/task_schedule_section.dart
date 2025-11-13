@@ -17,31 +17,32 @@ class TaskScheduleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = appLocalizations.locale.languageCode == 'en'; 
     
     final List<Map<String, dynamic>> tasks = [
       {
         'title': appLocalizations.visualAuditoryCheck,
         'description': appLocalizations.visualAuditoryDesc,
-        'time': '10:00 AM',
-        'status': 'done',
+        'time': isEnglish ? '10:00 AM' : '10:00 ص',
+        'status':appLocalizations.done,
       },
       {
         'title': appLocalizations.feelTheAuthor,
         'description': appLocalizations.feelTheAuthorDesc,
-        'time': '12:00 PM',
-        'status': 'in-progress',
+        'time': isEnglish ? '12:00 PM' : '12:00 م',
+        'status': appLocalizations.inProgress,
       },
       {
         'title': appLocalizations.checkControlSetting,
         'description': appLocalizations.checkControlDesc,
-        'time': '07:00 PM',
-        'status': 'todo',
+        'time': isEnglish ? '07:00 PM' : '07:00 م',
+        'status': appLocalizations.toDo,
       },
       {
         'title': appLocalizations.checkExteriorVents,
         'description': appLocalizations.checkExteriorDesc,
-        'time': '07:00 PM',
-        'status': 'todo',
+        'time': isEnglish ? '07:00 PM' : '07:00 م',
+        'status': appLocalizations.toDo,
       },
     ];
 

@@ -17,6 +17,8 @@ class RecentActivitySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = appLocalizations.locale.languageCode == 'en';  
+
     
     return Container(
       width: double.infinity,
@@ -54,7 +56,7 @@ class RecentActivitySection extends StatelessWidget {
               _buildActivityBox(
                 context,
                 title: appLocalizations.contractDuration,
-                value: '25 Day-2 Years',
+                value: isEnglish ? '25 Day-2 Years' : '25 يوم-2 سنوات',
                 icon: Icons.assignment,
                 chartType: 'pie',
                 chartData: [70, 30],
@@ -63,7 +65,7 @@ class RecentActivitySection extends StatelessWidget {
               _buildActivityBox(
                 context,
                 title: appLocalizations.leaveBalance,
-                value: '30 Day',
+                value: isEnglish ? '30 Day' : '30 يوم',
                 icon: Icons.beach_access,
                 chartType: 'line',
                 chartData: [20, 35, 25, 40, 30, 45, 30],
@@ -72,7 +74,7 @@ class RecentActivitySection extends StatelessWidget {
               _buildActivityBox(
                 context,
                 title: appLocalizations.theAudience,
-                value: '80%',
+                value: isEnglish ? '80%' : '٨٠٪',
                 icon: Icons.people,
                 chartType: 'pie',
                 chartData: [80, 20],
@@ -81,7 +83,7 @@ class RecentActivitySection extends StatelessWidget {
               _buildActivityBox(
                 context,
                 title: appLocalizations.tasks,
-                value: '3/7 Tasks',
+                value: isEnglish? '3/7 Tasks' : '3/7 مهام',
                 icon: Icons.task,
                 chartType: 'line',
                 chartData: [1, 2, 1, 3, 2, 3, 3],

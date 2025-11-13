@@ -5,7 +5,6 @@ import 'package:vision_erp_app/screens/app/demo_system_page.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
 import 'package:vision_erp_app/screens/app/floating_messages_button.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
-import 'package:vision_erp_app/screens/app/messages_popup.dart';
 import 'package:vision_erp_app/screens/app/notification_dropdown.dart';
 import 'package:vision_erp_app/screens/app/notifications_page.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
@@ -18,15 +17,11 @@ import 'package:vision_erp_app/screens/models/user_model.dart';
 import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
 import 'package:vision_erp_app/services/localization_service.dart';
-import 'package:vision_erp_app/services/message_service.dart';
 import 'package:vision_erp_app/services/shared_preferences_service.dart';
 import 'package:vision_erp_app/screens/app/sidebar_menu.dart';
 // إضافة خدمات الإشعارات
 import 'package:vision_erp_app/services/notification_service.dart';
 import 'package:vision_erp_app/services/auto_notification_service.dart';
-// اضافة خدمة المحادثات 
-import 'package:vision_erp_app/screens/app/all_chats_page.dart'; // ✅ إضافة هذا الاستيراد
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,47 +33,21 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isDarkMode = false;
   bool _showNotifications = false;
-  bool _showMessages = false; // ✅ إضافة: متتبع حالة عرض الرسائل
   String _currentLanguage = 'en';
   UserModel? _currentUser;
   int _unreadNotificationsCount = 0; // عداد الإشعارات غير المقروءة
-  int _unreadMessagesCount = 0; // ✅ إضافة: عداد الرسائل غير المقروءة
 
   bool get isEnglish => _currentLanguage == 'en';
-
 
   @override
   void initState() {
     super.initState();
     _loadCurrentUser();
     _loadUnreadNotificationsCount();
-    _loadUnreadMessagesCount(); // ✅ إضافة: تحميل عدد الرسائل غير المقروءة
     _startAutoNotifications();
   }
-   // تحميل عدد الرسائل غير المقروءة
-  Future<void> _loadUnreadMessagesCount() async {
-    // يمكنك استبدال هذا بمنطق حقيقي من خدمة الرسائل
-    final messageService = MessageService();
-    final count = messageService.getUnreadCount();
-    setState(() {
-      _unreadMessagesCount = count;
-    });
-  }
 
-  // التعامل مع فتح/إغلاق قائمة الرسائل
-  void _toggleMessagesPopup() {
-    setState(() {
-      _showMessages = !_showMessages;
-    });
-  }
 
-  // ✅ إضافة: دالة الانتقال لصفحة جميع المحادثات
-  void _navigateToAllChats() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AllChatsPage()),
-    );
-  }
 
   @override
   void dispose() {
@@ -119,8 +88,6 @@ class _HomePageState extends State<HomePage> {
       _showNotifications = !_showNotifications;
     });
   }
-
-  // تحديث عداد الإشعارات عند قراءة إشعار
 
   // Responsive value calculator
   double _responsiveValue(
@@ -195,16 +162,16 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  // دالة الانتقال لصفحة جميع الإشعارات
-void _navigateToAllNotifications() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const NotificationsPage(),
-    ),
-  );
-}
 
+  // دالة الانتقال لصفحة جميع الإشعارات
+  void _navigateToAllNotifications() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificationsPage(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,46 +181,28 @@ void _navigateToAllNotifications() {
       backgroundColor:  isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
       endDrawer: _buildSidebarMenu(context),
       appBar: _buildAppBar(context),
-      body: 
-      Stack(
-  children: [
-    _buildBody(context),
-    if (_showNotifications)
-      NotificationDropdown(
-        onClose: () {
-          if (mounted) {
-            setState(() {
-              _showNotifications = false;
-            });
-          }
-        },
-        onNotificationRead: () {
-          if (mounted) {
-            _loadUnreadNotificationsCount();
-          }
-        },
-        onViewAll: _navigateToAllNotifications, // ✅ استخدام الدالة الجديدة
-      ),
-       // ✅ إضافة: MessagesPopup هنا
-          if (_showMessages)
-            MessagesPopup(
+      body: Stack(
+        children: [
+          _buildBody(context),
+          if (_showNotifications)
+            NotificationDropdown(
               onClose: () {
                 if (mounted) {
                   setState(() {
-                    _showMessages = false;
+                    _showNotifications = false;
                   });
                 }
               },
-              onMessageRead: () {
+              onNotificationRead: () {
                 if (mounted) {
-                  _loadUnreadMessagesCount();
+                  _loadUnreadNotificationsCount();
                 }
               },
-              onViewAllChats: _navigateToAllChats, // ✅ إضافة هذا
+              onViewAll: _navigateToAllNotifications, // ✅ استخدام الدالة الجديدة
             ),
           const FloatingMessagesButton(),
-  ],
-),
+        ],
+      ),
       bottomNavigationBar: Builder(
         builder: (context) => CustomBottomNavigationBar(
           currentIndex: 0,
@@ -341,46 +290,7 @@ void _navigateToAllNotifications() {
               ),
             ],
           ),
-          // Messages icon مع عداد الرسائل غير المقروءة
-          Stack(
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.message_outlined,
-                  color: AppColors.secondaryColor,
-                ),
-                onPressed: _toggleMessagesPopup, // فتح/إغلاق قائمة الرسائل
-              ),
-              if (_unreadMessagesCount > 0)
-                Positioned(
-                  right: 8,  // مسافة من الحافة اليمنى
-                  top: 8,    // مسافة من الحافة العلوية للأيقونة
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      _unreadMessagesCount > 99
-                          ? '99+'
-                          : _unreadMessagesCount.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          // Bell icon on RIGHT مع عداد الإشعارات
+          // ✅ إشعارات فقط - تم إزالة أيقونة الرسائل
           Stack(
             children: [
               IconButton(
@@ -393,7 +303,7 @@ void _navigateToAllNotifications() {
               if (_unreadNotificationsCount > 0)
                 Positioned(
                   right: 8,  // مسافة من الحافة اليمنى
-                  top: 8,    // مسافة من الحافة العلوية للأيقونة - ليست kToolbarHeight!
+                  top: 8,    // مسافة من الحافة العلوية للأيقونة
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
@@ -423,6 +333,7 @@ void _navigateToAllNotifications() {
       ),
     );
   }
+
   Widget _buildBody(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(

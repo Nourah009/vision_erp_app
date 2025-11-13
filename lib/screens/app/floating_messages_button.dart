@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vision_erp_app/screens/app/messages_popup.dart';
+import 'package:vision_erp_app/screens/app/all_chats_page.dart'; // ✅ إضافة الاستيراد
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/services/message_service.dart';
 import 'package:vision_erp_app/services/localization_service.dart';
@@ -38,6 +39,22 @@ class _FloatingMessagesButtonState extends State<FloatingMessagesButton> {
 
   void _onMessageRead() {
     _loadUnreadCount();
+  }
+
+  // ✅ إضافة: دالة الانتقال لصفحة جميع المحادثات
+  void _navigateToAllChats() {
+    // إغلاق الـ MessagesPopup أولاً
+    if (_showMessagesPopup) {
+      setState(() {
+        _showMessagesPopup = false;
+      });
+    }
+    
+    // ثم الانتقال لصفحة AllChatsPage
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AllChatsPage()),
+    );
   }
 
   @override
@@ -106,12 +123,12 @@ class _FloatingMessagesButtonState extends State<FloatingMessagesButton> {
         // Messages Popup
         if (_showMessagesPopup)
           Positioned(
-            bottom: 150, // فوق الزر
-            right: languageCode == 'en' ? 20 : null,
-            left: languageCode == 'en' ? null : 20,
+            bottom: 15, // فوق الزر
+            right: 80,
             child: MessagesPopup(
               onClose: _toggleMessagesPopup,
               onMessageRead: _onMessageRead,
+              onViewAllChats: _navigateToAllChats, // ✅ تمرير الدالة الجديدة
             ),
           ),
       ],

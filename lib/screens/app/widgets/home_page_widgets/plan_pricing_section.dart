@@ -21,7 +21,7 @@ class PlanPricingSection extends StatelessWidget {
     // List of pricing plans
     final List<Map<String, dynamic>> plans = [
       {
-        'title': 'Master',
+        'title': isEnglish ?'Master' : 'الماستر',
         'subtitle': isEnglish ? 'Ideal for small projects' : 'مثالي للمشاريع الصغيرة',
         'price': isEnglish ? 'Free' : 'مجاني',
         'features': [

@@ -8,14 +8,20 @@ class VisionERPSection extends StatelessWidget {
     required double mobile,
     double? tablet,
     double? desktop,
+
   })
+  
   responsiveValue;
 
   const VisionERPSection({super.key, required this.responsiveValue});
+  
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = appLocalizations.locale.languageCode == 'en'; // ← أضف هذا
+
+    
     
     return Container(
       width: double.infinity,
@@ -91,7 +97,7 @@ class VisionERPSection extends StatelessWidget {
             children: [
               // Date on the left
               Text(
-                'Sunday, 12 June',
+                isEnglish ? 'Sunday, 12 June' : 'الأحد، 12 يونيو',
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: responsiveValue(

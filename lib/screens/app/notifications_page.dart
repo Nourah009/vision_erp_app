@@ -1,10 +1,9 @@
 // screens/app/notifications_page.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/notification_model.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
-import 'package:vision_erp_app/services/localization_service.dart';
 import 'package:vision_erp_app/services/notification_service.dart';
 
 class NotificationsPage extends StatefulWidget {
@@ -15,7 +14,6 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> with SingleTickerProviderStateMixin {
-  
   late TabController _tabController;
   List<NotificationModel> _allNotifications = [];
   List<NotificationModel> _unreadNotifications = [];
@@ -37,7 +35,16 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
 
   Future<void> _loadNotifications() async {
     try {
-      final notifications = await NotificationService.getNotifications();
+      final appLocalizations = AppLocalizations.of(context);
+      if (appLocalizations == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      
+      final languageCode = appLocalizations.locale.languageCode;
+      final notifications = await NotificationService.getTranslatedNotifications(languageCode);
       
       setState(() {
         _allNotifications = notifications;
@@ -55,17 +62,41 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
 
   Future<void> _markAsRead(String notificationId) async {
     await NotificationService.markAsRead(notificationId);
-    _loadNotifications(); // إعادة تحميل البيانات
+    _loadNotifications();
   }
 
   Future<void> _markAllAsRead() async {
     await NotificationService.markAllAsRead();
-    _loadNotifications(); // إعادة تحميل البيانات
+    _loadNotifications();
+    
+    final appLocalizations = AppLocalizations.of(context);
+    final isEnglish = appLocalizations?.locale.languageCode == 'en';
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isEnglish ? 'All notifications marked as read' : 'تم تعيين جميع الإشعارات كمقروءة'
+        ),
+        backgroundColor: AppColors.primaryColor,
+      ),
+    );
   }
 
   Future<void> _deleteNotification(String notificationId) async {
     await NotificationService.deleteNotification(notificationId);
-    _loadNotifications(); // إعادة تحميل البيانات
+    _loadNotifications();
+    
+    final appLocalizations = AppLocalizations.of(context);
+    final isEnglish = appLocalizations?.locale.languageCode == 'en';
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isEnglish ? 'Notification deleted' : 'تم حذف الإشعار'
+        ),
+        backgroundColor: AppColors.secondaryColor,
+      ),
+    );
   }
 
   void _handleNotificationTap(NotificationModel notification) {
@@ -76,40 +107,55 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    final localizationService = Provider.of<LocalizationService>(context);
-    final isEnglish = localizationService.isEnglish();
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final isEnglish = appLocalizations.locale.languageCode == 'en';
 
     return Scaffold(
       backgroundColor: Colors.white,
-       // screens/app/notifications_page.dart
-appBar: AppBar(
-  backgroundColor: AppColors.primaryColor,
-  foregroundColor: Colors.white,
-  elevation: 0,
-  automaticallyImplyLeading: true,
-  leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    color: AppColors.secondaryColor,
-    onPressed: () {
-      Navigator.pop(context); // ✅ الرجوع فقط للصفحة السابقة
-    },
-  ),
-  title: Text(
-    isEnglish ? 'Notifications' : 'الإشعارات',
-    style: const TextStyle(
-      fontFamily: 'Cairo',
-      color: Colors.white,
-    ),
-  ),
-  actions: [
-    if (_unreadNotifications.isNotEmpty)
-      IconButton(
-        icon: const Icon(Icons.check_circle_outline),
-        onPressed: _markAllAsRead,
-        tooltip: isEnglish ? 'Mark all as read' : 'تعيين الكل كمقروء',
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: Colors.white,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          isEnglish ? 'Notifications' : 'الإشعارات',
+          style: const TextStyle(
+            fontFamily: 'Cairo',
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          if (_unreadNotifications.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline),
+              onPressed: _markAllAsRead,
+              tooltip: isEnglish ? 'Mark all as read' : 'تعيين الكل كمقروء',
+              color: Colors.white,
+            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadNotifications,
+            tooltip: isEnglish ? 'Refresh' : 'تحديث',
+            color: Colors.white,
+          ),
+        ],
       ),
-  ],
-),
       body: Column(
         children: [
           // تبويبات الأعلى
@@ -123,13 +169,13 @@ appBar: AppBar(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: Colors.white
               ),
               unselectedLabelStyle: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 14,
-                color: Colors.white
               ),
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
               tabs: [
                 Tab(
                   text: isEnglish ? 
@@ -165,7 +211,9 @@ appBar: AppBar(
   Widget _buildNotificationsList(List<NotificationModel> notifications, bool isEnglish, bool isReadTab) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+        ),
       );
     }
 
@@ -188,6 +236,7 @@ appBar: AppBar(
                 fontFamily: 'Cairo',
                 color: Colors.grey[600],
                 fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
@@ -201,6 +250,25 @@ appBar: AppBar(
                 fontSize: 14,
               ),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _loadNotifications,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              icon: const Icon(Icons.refresh),
+              label: Text(
+                isEnglish ? 'Refresh' : 'تحديث',
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ],
         ),
       );
@@ -208,6 +276,8 @@ appBar: AppBar(
 
     return RefreshIndicator(
       onRefresh: _loadNotifications,
+      backgroundColor: AppColors.primaryColor,
+      color: Colors.white,
       child: ListView.builder(
         itemCount: notifications.length,
         itemBuilder: (context, index) {
@@ -272,7 +342,7 @@ appBar: AppBar(
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  _formatDate(notification.timestamp),
+                  _formatDate(notification.timestamp, isEnglish),
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 11,
@@ -280,13 +350,20 @@ appBar: AppBar(
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  _getTypeText(notification.type, isEnglish),
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 11,
-                    color: notification.type.color,
-                    fontWeight: FontWeight.w600,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: notification.type.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    _getTypeText(notification.type, isEnglish),
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 10,
+                      color: notification.type.color,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -298,15 +375,21 @@ appBar: AppBar(
           children: [
             if (!isReadTab)
               IconButton(
-                icon: const Icon(Icons.mark_as_unread, size: 20),
+                icon: Icon(
+                  Icons.mark_email_read,
+                  size: 20,
+                  color: AppColors.primaryColor,
+                ),
                 onPressed: () => _markAsRead(notification.id),
-                color: AppColors.primaryColor,
                 tooltip: isEnglish ? 'Mark as read' : 'تعيين كمقروء',
               ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20),
+              icon: const Icon(
+                Icons.delete_outline,
+                size: 20,
+                color: Colors.red,
+              ),
               onPressed: () => _showDeleteDialog(notification, isEnglish),
-              color: Colors.red,
               tooltip: isEnglish ? 'Delete' : 'حذف',
             ),
           ],
@@ -322,7 +405,10 @@ appBar: AppBar(
       builder: (context) => AlertDialog(
         title: Text(
           isEnglish ? 'Delete Notification' : 'حذف الإشعار',
-          style: const TextStyle(fontFamily: 'Cairo'),
+          style: const TextStyle(
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           isEnglish ? 
@@ -335,27 +421,23 @@ appBar: AppBar(
             onPressed: () => Navigator.pop(context),
             child: Text(
               isEnglish ? 'Cancel' : 'إلغاء',
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                color: Colors.grey,
+              ),
             ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteNotification(notification.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    isEnglish ? 'Notification deleted' : 'تم حذف الإشعار',
-                  ),
-                  backgroundColor: AppColors.secondaryColor,
-                ),
-              );
             },
             child: Text(
               isEnglish ? 'Delete' : 'حذف',
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 color: Colors.red,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -364,21 +446,32 @@ appBar: AppBar(
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, bool isEnglish) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
       if (difference.inHours == 0) {
-        return '${difference.inMinutes} min ago';
+        if (difference.inMinutes < 1) {
+          return isEnglish ? 'Just now' : 'الآن';
+        }
+        return isEnglish 
+          ? '${difference.inMinutes} min ago'
+          : 'منذ ${difference.inMinutes} دقيقة';
       }
-      return '${difference.inHours} h ago';
+      return isEnglish
+        ? '${difference.inHours} h ago'
+        : 'منذ ${difference.inHours} ساعة';
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return isEnglish ? 'Yesterday' : 'أمس';
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return isEnglish
+        ? '${difference.inDays} days ago'
+        : 'منذ ${difference.inDays} يوم';
     } else {
-      return '${date.day}/${date.month}/${date.year}';
+      return isEnglish
+        ? '${date.day}/${date.month}/${date.year}'
+        : '${date.day}/${date.month}/${date.year}';
     }
   }
 
@@ -407,5 +500,8 @@ appBar: AppBar(
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(IterableProperty<NotificationModel>('_allNotifications', _allNotifications));
+    properties.add(IterableProperty<NotificationModel>('_unreadNotifications', _unreadNotifications));
+    properties.add(IterableProperty<NotificationModel>('_readNotifications', _readNotifications));
+    properties.add(DiagnosticsProperty<bool>('_isLoading', _isLoading));
   }
 }

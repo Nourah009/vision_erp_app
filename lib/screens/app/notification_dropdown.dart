@@ -249,8 +249,8 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
         ),
         
         Positioned(
-          top: kToolbarHeight - 10,
-          right: 16,
+          top: 4,
+          right: 15,
           child: Material(
             elevation: 8,
             borderRadius: BorderRadius.circular(12),

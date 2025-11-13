@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/dashboard_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
@@ -35,21 +36,22 @@ class OrganizationPage extends StatelessWidget {
 
   void _handleBackButton(BuildContext context) {
     if (fromDashboard) {
-      // إذا كان من الداشبورد، ارجع للداشبورد
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => DashboardPage(user: user)),
       );
     } else {
-      // إذا كان من مكان آخر، استخدم التنقل العادي
       Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    final isEnglish = appLocalizations.locale.languageCode == 'en'; 
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final isDarkMode = themeNotifier.isDarkMode;
+    
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
       appBar: AppBar(
@@ -64,7 +66,7 @@ class OrganizationPage extends StatelessWidget {
         ),
         centerTitle: true,
         title: Text(
-          'Organization',
+          appLocalizations.organization,
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: _responsiveValue(context, mobile: 18, tablet: 20, desktop: 22),
@@ -83,43 +85,42 @@ class OrganizationPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Modern Company Header
-            _buildModernHeader(context),
+            _buildModernHeader(context, isEnglish),
             SizedBox(height: _responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
             
             // Quick Stats Section
-            _buildStatsGrid(context),
+            _buildStatsGrid(context, appLocalizations),
             SizedBox(height: _responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
             
             // Company Overview
-            _buildSectionHeader('Company Overview', context),
+            _buildSectionHeader(appLocalizations.companyOverview, context),
             SizedBox(height: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
-            _buildOverviewCard(context),
+            _buildOverviewCard(context, appLocalizations),
             SizedBox(height: _responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
             
             // Key Information
-            _buildSectionHeader('Key Information', context),
+            _buildSectionHeader(appLocalizations.keyInformation, context),
             SizedBox(height: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
-            _buildKeyInfoCard(context),
+            _buildKeyInfoCard(context, appLocalizations, isEnglish),
             SizedBox(height: _responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
             
             // Contact & Location
-            _buildSectionHeader('Contact & Location', context),
+            _buildSectionHeader(appLocalizations.contactLocation, context),
             SizedBox(height: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
-            _buildContactCard(context),
+            _buildContactCard(context, appLocalizations, isEnglish),
             SizedBox(height: _responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
             
             // Departments
-            _buildSectionHeader('Our Teams', context),
+            _buildSectionHeader(appLocalizations.ourTeams, context),
             SizedBox(height: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
-            _buildTeamsCard(context),
+            _buildTeamsCard(context, appLocalizations, isEnglish),
           ],
         ),
       ),
     );
   }
 
-  // باقي الدوال تبقى كما هي...
-  Widget _buildModernHeader(BuildContext context) {
+  Widget _buildModernHeader(BuildContext context, bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(_responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
@@ -161,7 +162,7 @@ class OrganizationPage extends StatelessWidget {
           SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
           // Company Name
           Text(
-            'VISION ERP',
+            isEnglish ? 'VISION ERP' : 'فيجن إي آر بي',
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: _responsiveValue(context, mobile: 24, tablet: 28, desktop: 32),
@@ -173,7 +174,7 @@ class OrganizationPage extends StatelessWidget {
           SizedBox(height: 8),
           // Tagline
           Text(
-            'Digital Transformation Leaders',
+            isEnglish ? 'Digital Transformation Leaders' : 'رواد التحول الرقمي',
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: _responsiveValue(context, mobile: 16, tablet: 17, desktop: 18),
@@ -205,7 +206,7 @@ class OrganizationPage extends StatelessWidget {
                 ),
                 SizedBox(width: 8),
                 Text(
-                  'Active • Since 2018',
+                  isEnglish ? 'Active • Since 2018' : 'نشط • منذ 2018',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: _responsiveValue(context, mobile: 12, tablet: 13, desktop: 14),
@@ -221,7 +222,7 @@ class OrganizationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsGrid(BuildContext context) {
+  Widget _buildStatsGrid(BuildContext context, AppLocalizations appLocalizations) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -232,28 +233,28 @@ class OrganizationPage extends StatelessWidget {
       children: [
         _buildStatCard(
           context,
-          title: 'Employees',
+          title: appLocalizations.employees,
           value: '150+',
           icon: Icons.people_alt,
           color: AppColors.primaryColor,
         ),
         _buildStatCard(
           context,
-          title: 'Projects',
+          title: appLocalizations.projects,
           value: '240+',
           icon: Icons.work,
           color: AppColors.secondaryColor,
         ),
         _buildStatCard(
           context,
-          title: 'Clients',
+          title: appLocalizations.clients,
           value: '85+',
           icon: Icons.business_center,
           color: AppColors.accentBlue,
         ),
         _buildStatCard(
           context,
-          title: 'Countries',
+          title: appLocalizations.countries,
           value: '12',
           icon: Icons.public,
           color: AppColors.secondaryColor,
@@ -262,7 +263,7 @@ class OrganizationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOverviewCard(BuildContext context) {
+  Widget _buildOverviewCard(BuildContext context, AppLocalizations appLocalizations) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(_responsiveValue(context, mobile: 20, tablet: 24, desktop: 28)),
@@ -289,7 +290,7 @@ class OrganizationPage extends StatelessWidget {
               ),
               SizedBox(width: 12),
               Text(
-                'Company Overview',
+                appLocalizations.companyOverview,
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
@@ -301,9 +302,7 @@ class OrganizationPage extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text(
-            'Vision ERP is a leading technology company specializing in enterprise resource planning solutions. '
-            'We empower businesses with cutting-edge software that streamlines operations, enhances productivity, '
-            'and drives digital transformation across various industries.',
+            appLocalizations.companyDescription,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
@@ -317,7 +316,7 @@ class OrganizationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildKeyInfoCard(BuildContext context) {
+  Widget _buildKeyInfoCard(BuildContext context, AppLocalizations appLocalizations, bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(_responsiveValue(context, mobile: 20, tablet: 24, desktop: 28)),
@@ -337,32 +336,32 @@ class OrganizationPage extends StatelessWidget {
           _buildModernInfoItem(
             context,
             icon: Icons.business,
-            title: 'Company Type',
-            value: 'Technology Solutions',
+            title: appLocalizations.companyType,
+            value: isEnglish ? 'Technology Solutions' : 'حلول تقنية',
             color: AppColors.primaryColor,
           ),
           _buildDivider(context),
           _buildModernInfoItem(
             context,
             icon: Icons.location_city,
-            title: 'Headquarters',
-            value: 'Riyadh, Saudi Arabia',
+            title: appLocalizations.headquarters,
+            value: isEnglish ? 'Riyadh, Saudi Arabia' : 'الرياض، المملكة العربية السعودية',
             color: AppColors.accentBlue,
           ),
           _buildDivider(context),
           _buildModernInfoItem(
             context,
             icon: Icons.flag,
-            title: 'Operating In',
-            value: '12 Countries',
+            title: appLocalizations.operatingIn,
+            value: isEnglish ? '12 Countries' : '12 دولة',
             color: AppColors.secondaryColor,
           ),
           _buildDivider(context),
           _buildModernInfoItem(
             context,
             icon: Icons.verified,
-            title: 'Certifications',
-            value: 'ISO 9001, ISO 27001',
+            title: appLocalizations.certifications,
+            value: isEnglish ? 'ISO 9001, ISO 27001' : 'آيزو 9001، آيزو 27001',
             color: Colors.green,
           ),
         ],
@@ -370,7 +369,7 @@ class OrganizationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactCard(BuildContext context) {
+  Widget _buildContactCard(BuildContext context, AppLocalizations appLocalizations, bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(_responsiveValue(context, mobile: 20, tablet: 24, desktop: 28)),
@@ -390,7 +389,7 @@ class OrganizationPage extends StatelessWidget {
           _buildModernContactItem(
             context,
             icon: Icons.email,
-            title: 'Email',
+            title: appLocalizations.email,
             value: 'contact@visionerp.com',
             onTap: () {},
           ),
@@ -398,7 +397,7 @@ class OrganizationPage extends StatelessWidget {
           _buildModernContactItem(
             context,
             icon: Icons.phone,
-            title: 'Phone',
+            title: appLocalizations.phone,
             value: '+966 11 123 4567',
             onTap: () {},
           ),
@@ -406,7 +405,7 @@ class OrganizationPage extends StatelessWidget {
           _buildModernContactItem(
             context,
             icon: Icons.language,
-            title: 'Website',
+            title: appLocalizations.website,
             value: 'www.visionerp.com',
             onTap: () {},
           ),
@@ -414,8 +413,8 @@ class OrganizationPage extends StatelessWidget {
           _buildModernContactItem(
             context,
             icon: Icons.access_time,
-            title: 'Business Hours',
-            value: 'Sun - Thu: 8:00 AM - 6:00 PM',
+            title: appLocalizations.businessHours,
+            value: isEnglish ? 'Sun - Thu: 8:00 AM - 6:00 PM' : 'الأحد - الخميس: 8:00 صباحًا - 6:00 مساءً',
             onTap: () {},
           ),
         ],
@@ -423,7 +422,7 @@ class OrganizationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamsCard(BuildContext context) {
+  Widget _buildTeamsCard(BuildContext context, AppLocalizations appLocalizations, bool isEnglish) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(_responsiveValue(context, mobile: 20, tablet: 24, desktop: 28)),
@@ -442,7 +441,7 @@ class OrganizationPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Our Teams',
+            appLocalizations.ourTeams,
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
@@ -455,14 +454,14 @@ class OrganizationPage extends StatelessWidget {
             spacing: 12,
             runSpacing: 12,
             children: [
-              _buildTeamChip('Engineering', Icons.engineering, AppColors.primaryColor),
-              _buildTeamChip('Product', Icons.design_services, AppColors.secondaryColor),
-              _buildTeamChip('Sales', Icons.shopping_cart, AppColors.accentBlue),
-              _buildTeamChip('Marketing', Icons.campaign, Colors.purple),
-              _buildTeamChip('Support', Icons.support_agent, Colors.green),
-              _buildTeamChip('Finance', Icons.attach_money, Colors.orange),
-              _buildTeamChip('HR', Icons.people_alt, Colors.pink),
-              _buildTeamChip('Operations', Icons.settings, Colors.teal),
+              _buildTeamChip(isEnglish ? 'Engineering' : 'الهندسة', Icons.engineering, AppColors.primaryColor),
+              _buildTeamChip(isEnglish ? 'Product' : 'المنتج', Icons.design_services, AppColors.secondaryColor),
+              _buildTeamChip(isEnglish ? 'Sales' : 'المبيعات', Icons.shopping_cart, AppColors.accentBlue),
+              _buildTeamChip(isEnglish ? 'Marketing' : 'التسويق', Icons.campaign, Colors.purple),
+              _buildTeamChip(isEnglish ? 'Support' : 'الدعم', Icons.support_agent, Colors.green),
+              _buildTeamChip(isEnglish ? 'Finance' : 'المالية', Icons.attach_money, Colors.orange),
+              _buildTeamChip(isEnglish ? 'HR' : 'الموارد البشرية', Icons.people_alt, Colors.pink),
+              _buildTeamChip(isEnglish ? 'Operations' : 'العمليات', Icons.settings, Colors.teal),
             ],
           ),
         ],

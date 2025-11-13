@@ -85,6 +85,23 @@ class AppLocalizations {
       'done': 'Done',
       'inProgress': 'In Progress',
       'toDo': 'To Do',
+      'companyOverview': 'companyOverview',
+      'keyInformation': 'keyInformation',
+      'contactLocation': 'contactLocation',
+      'ourTeams': 'ourTeams',
+      'employees': 'employees',
+      'projects': 'projects',
+      'clients': 'clients',
+      'countries': 'countries',
+      'companyType': 'companyType',
+      'headquarters': 'headquarters',
+      'operatingIn': 'operatingIn',
+      'certifications': 'certifications',
+      'email': 'email',
+      'phone': 'phone',
+      'website': 'website',
+      'businessHours': 'businessHours',
+      'companyDescription': 'companyDescription',
     },
     'ar': {
       'welcome': 'مرحباً',
@@ -158,6 +175,23 @@ class AppLocalizations {
       'done': 'مكتمل',
       'inProgress': 'قيد التنفيذ',
       'toDo': 'للقيام',
+      'companyOverview': 'نظرة عامة على الشركة',
+      'keyInformation': 'المعلومات الرئيسية',
+      'contactLocation': 'الاتصال والموقع',
+      'ourTeams': 'فرقنا',
+      'employees': 'الموظفين',
+      'projects': 'المشاريع',
+      'clients': 'العملاء',
+      'countries': 'الدول',
+      'companyType': 'نوع الشركة',
+      'headquarters': 'المقر الرئيسي',
+      'operatingIn': 'نشطة في',
+      'certifications': 'الشهادات',
+      'email': 'البريد الإلكتروني',
+      'phone': 'الهاتف',
+      'website': 'الموقع الإلكتروني',
+      'businessHours': 'ساعات العمل',
+      'companyDescription': 'فجن إي آر بي هي شركة رائدة في مجال التكنولوجيا متخصصة في حلول تخطيط موارد المؤسسات. نحن نمكّن الشركات ببرامج متطورة تبسط العمليات وتعزز الإنتاجية وتقود التحول الرقمي عبر مختلف الصناعات.',
     },
   };
 
@@ -238,6 +272,25 @@ class AppLocalizations {
   String get done => _getText('done') ?? 'Done';
   String get inProgress => _getText('inProgress') ?? 'In Progress';
   String get toDo => _getText('toDo') ?? 'To Do';
+   // إضافة الـ getters الجديدة
+  String get companyOverview => _getText('companyOverview') ?? 'Company Overview';
+  String get keyInformation => _getText('keyInformation') ?? 'Key Information';
+  String get contactLocation => _getText('contactLocation') ?? 'Contact & Location';
+  String get ourTeams => _getText('ourTeams') ?? 'Our Teams';
+  String get employees => _getText('employees') ?? 'Employees';
+  String get projects => _getText('projects') ?? 'Projects';
+  String get clients => _getText('clients') ?? 'Clients';
+  String get countries => _getText('countries') ?? 'Countries';
+  String get companyType => _getText('companyType') ?? 'Company Type';
+  String get headquarters => _getText('headquarters') ?? 'Headquarters';
+  String get operatingIn => _getText('operatingIn') ?? 'Operating In';
+  String get certifications => _getText('certifications') ?? 'Certifications';
+  String get email => _getText('email') ?? 'Email';
+  String get phone => _getText('phone') ?? 'Phone';
+  String get website => _getText('website') ?? 'Website';
+  String get businessHours => _getText('businessHours') ?? 'Business Hours';
+  String get companyDescription => _getText('companyDescription') ?? 'Company Description';
+  
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

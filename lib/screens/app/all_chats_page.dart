@@ -5,6 +5,7 @@ import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/services/localization_service.dart';
 import 'package:vision_erp_app/services/message_service.dart';
 import 'package:vision_erp_app/screens/models/message_model.dart';
+import 'package:vision_erp_app/screens/app/home_page.dart'; // ✅ إضافة استيراد HomePage
 
 class AllChatsPage extends StatefulWidget {
   const AllChatsPage({super.key});
@@ -17,14 +18,18 @@ class _AllChatsPageState extends State<AllChatsPage> {
   final MessageService _messageService = MessageService();
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _newMessageController = TextEditingController();
+  final TextEditingController _chatMessageController = TextEditingController();
   
   List<String> _categories = [];
   String _selectedCategory = 'All';
   List<MessageModel> _filteredMessages = [];
   List<String> _uniqueSenders = [];
   bool _showNewMessageDialog = false;
+  bool _showChatDialog = false;
   String _newMessageReceiver = '';
   String _newMessageContent = '';
+  String _currentChatSenderId = '';
+  String _currentChatSenderName = '';
   MessageType _selectedMessageType = MessageType.direct;
 
   @override
@@ -38,6 +43,7 @@ class _AllChatsPageState extends State<AllChatsPage> {
   void dispose() {
     _searchController.dispose();
     _newMessageController.dispose();
+    _chatMessageController.dispose();
     super.dispose();
   }
 
@@ -114,7 +120,9 @@ class _AllChatsPageState extends State<AllChatsPage> {
       isIncoming: true,
       type: MessageType.direct,
       category: 'Direct',
-      status: MessageStatus.read, senderRole: '', receiverName: '',
+      status: MessageStatus.read, 
+      senderRole: '', 
+      receiverName: '',
     );
   }
 
@@ -166,6 +174,44 @@ class _AllChatsPageState extends State<AllChatsPage> {
         backgroundColor: AppColors.primaryColor,
       ),
     );
+  }
+
+  // ✅ إضافة: دالة فتح محادثة
+  void _openChat(String senderId, String senderName) {
+    setState(() {
+      _showChatDialog = true;
+      _currentChatSenderId = senderId;
+      _currentChatSenderName = senderName;
+      _chatMessageController.clear();
+    });
+  }
+
+  // ✅ إضافة: دالة إرسال رسالة في المحادثة
+  void _sendChatMessage() {
+    if (_chatMessageController.text.trim().isEmpty || _currentChatSenderId.isEmpty) return;
+
+    _messageService.sendMessage(
+      receiverId: _currentChatSenderId,
+      receiverName: _currentChatSenderName,
+      content: _chatMessageController.text.trim(),
+      type: MessageType.direct,
+      category: 'Direct',
+    );
+
+    _chatMessageController.clear();
+    setState(() {});
+    
+    // إعادة تحميل المحادثات
+    _filterMessages();
+  }
+
+  // ✅ إضافة: دالة إغلاق المحادثة
+  void _closeChat() {
+    setState(() {
+      _showChatDialog = false;
+      _currentChatSenderId = '';
+      _currentChatSenderName = '';
+    });
   }
 
   String _getCategoryFromType(MessageType type) {
@@ -306,6 +352,68 @@ class _AllChatsPageState extends State<AllChatsPage> {
     }
   }
 
+  // ✅ إضافة: دالة بناء رسالة المحادثة
+  Widget _buildChatMessage(MessageModel message, BuildContext context, bool isEnglish) {
+    final isMe = !message.isIncoming;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!isMe) ...[
+            const CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.primaryColor,
+              child: Icon(Icons.person, size: 16, color: Colors.white),
+            ),
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isMe ? AppColors.secondaryColor : AppColors.accentBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                message.content,
+                style: TextStyle(
+                  color: isMe ? Colors.white : AppColors.textPrimary,
+                  fontFamily: 'Cairo',
+                ),
+              ),
+            ),
+          ),
+          if (isMe) ...[
+            const SizedBox(width: 8),
+            PopupMenuButton<String>(
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.delete, color: Colors.red, size: 18),
+                      const SizedBox(width: 8),
+                      Text(isEnglish ? 'Delete' : 'حذف'),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (value) {
+                if (value == 'delete') {
+                  _messageService.deleteMessage(message.id);
+                  setState(() {});
+                }
+              },
+              child: const Icon(Icons.more_vert, size: 16, color: Colors.grey),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizationService = Provider.of<LocalizationService>(context);
@@ -319,6 +427,17 @@ class _AllChatsPageState extends State<AllChatsPage> {
             backgroundColor: AppColors.primaryColor,
             foregroundColor: Colors.white,
             elevation: 0,
+            leading: IconButton( // ✅ إضافة زر الرجوع في أعلى اليسار
+              icon: Icon(Icons.arrow_back),
+              color: AppColors.secondaryColor,
+              onPressed: () {
+                // العودة إلى HomePage
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+              },
+            ),
             title: Text(
               isEnglish ? 'All Chats' : 'جميع المحادثات',
               style: const TextStyle(
@@ -350,8 +469,12 @@ class _AllChatsPageState extends State<AllChatsPage> {
             ],
           ),
         ),
+
         // New Message Dialog
         if (_showNewMessageDialog) _buildNewMessageDialog(context, isEnglish),
+
+        // ✅ إضافة: Chat Dialog
+        if (_showChatDialog) _buildChatDialog(context, isEnglish),
       ],
     );
   }
@@ -502,7 +625,6 @@ class _AllChatsPageState extends State<AllChatsPage> {
         final senderId = _uniqueSenders[index];
         final lastMessage = _getLastMessage(senderId);
         final unreadCount = _getUnreadCount(senderId);
-        final conversation = _getConversation(senderId);
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -513,7 +635,7 @@ class _AllChatsPageState extends State<AllChatsPage> {
           child: ListTile(
             onTap: () {
               _markConversationAsRead(senderId);
-              _openChatDetail(conversation, lastMessage.senderName);
+              _openChat(senderId, lastMessage.senderName); // ✅ فتح المحادثة عند الضغط
             },
             leading: CircleAvatar(
               backgroundColor: _getCategoryColor(lastMessage.category),
@@ -609,6 +731,17 @@ class _AllChatsPageState extends State<AllChatsPage> {
             ),
             trailing: PopupMenuButton<String>(
               itemBuilder: (context) => [
+                // ✅ إضافة: خيار Open Chat
+                PopupMenuItem(
+                  value: 'chat',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.chat, size: 18),
+                      const SizedBox(width: 8),
+                      Text(isEnglish ? 'Open Chat' : 'فتح المحادثة'),
+                    ],
+                  ),
+                ),
                 PopupMenuItem(
                   value: 'delete',
                   child: Row(
@@ -621,7 +754,9 @@ class _AllChatsPageState extends State<AllChatsPage> {
                 ),
               ],
               onSelected: (value) {
-                if (value == 'delete') {
+                if (value == 'chat') {
+                  _openChat(senderId, lastMessage.senderName); // ✅ فتح المحادثة
+                } else if (value == 'delete') {
                   _deleteConversation(senderId);
                 }
               },
@@ -759,15 +894,121 @@ class _AllChatsPageState extends State<AllChatsPage> {
     );
   }
 
-  void _openChatDetail(List<MessageModel> conversation, String senderName) {
-    // هنا يمكنك إضافة التنقل لصفحة تفاصيل المحادثة
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDetailPage(...)));
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening chat with $senderName'),
-        backgroundColor: AppColors.primaryColor,
+  // ✅ إضافة: دالة بناء دايالوج المحادثة
+  Widget _buildChatDialog(BuildContext context, bool isEnglish) {
+    final conversation = _getConversation(_currentChatSenderId);
+
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-    );
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+        ),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: _closeChat,
+                  ),
+                  const SizedBox(width: 8),
+                  const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, color: AppColors.primaryColor),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _currentChatSenderName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: _closeChat,
+                  ),
+                ],
+              ),
+            ),
+
+            // Messages
+            Expanded(
+              child: conversation.isEmpty
+                  ? Center(
+                      child: Text(
+                        isEnglish ? 'No messages' : 'لا توجد رسائل',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: conversation.length,
+                      itemBuilder: (context, index) {
+                        final message = conversation[index];
+                        return _buildChatMessage(message, context, isEnglish);
+                      },
+                    ),
+            ),
+
+            // Input Field
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: AppColors.borderColor)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _chatMessageController,
+                      decoration: InputDecoration(
+                        hintText: isEnglish ? 'Type a message...' : 'اكتب رسالة...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    backgroundColor: AppColors.secondaryColor,
+                    child: IconButton(
+                      icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                      onPressed: _sendChatMessage,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );  
   }
 }

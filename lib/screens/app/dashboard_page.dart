@@ -17,6 +17,7 @@ import 'package:vision_erp_app/screens/models/user_model.dart';
 import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
 import 'package:vision_erp_app/services/notification_service.dart';
 import 'package:vision_erp_app/services/auto_notification_service.dart';
+import 'package:vision_erp_app/services/localization_service.dart'; // ✅ إضافة
 
 class DashboardPage extends StatefulWidget {
   final UserModel user;
@@ -30,18 +31,30 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   bool _showNotifications = false;
   int _unreadNotificationsCount = 0;
+  String _currentLanguage = 'en'; // ✅ إضافة: متتبع اللغة
+
+  bool get isEnglish => _currentLanguage == 'en'; // ✅ إضافة
 
   @override
   void initState() {
     super.initState();
     _loadUnreadNotificationsCount();
     _startAutoNotifications();
+    _loadCurrentLanguage(); // ✅ إضافة: تحميل اللغة الحالية
   }
 
   @override
   void dispose() {
     AutoNotificationService.stopAutoNotifications();
     super.dispose();
+  }
+
+  // ✅ إضافة: تحميل اللغة الحالية
+  void _loadCurrentLanguage() {
+    final localizationService = Provider.of<LocalizationService>(context, listen: false);
+    setState(() {
+      _currentLanguage = localizationService.currentLocale.languageCode;
+    });
   }
 
   Future<void> _loadUnreadNotificationsCount() async {
@@ -78,6 +91,58 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  // ✅ إضافة: دالة تغيير اللغة
+  void _handleLanguageChanged(String languageCode) {
+    final localizationService = Provider.of<LocalizationService>(context, listen: false);
+    
+    // تغيير اللغة فورياً
+    localizationService.setLocale(Locale(languageCode, languageCode == 'en' ? 'US' : 'SA'));
+    
+    setState(() {
+      _currentLanguage = languageCode;
+    });
+    
+    print('Language changed to: $languageCode');
+    
+    _showLanguageChangeSuccessDialog();
+  }
+
+  // ✅ إضافة: حوار نجاح تغيير اللغة
+  void _showLanguageChangeSuccessDialog() {
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) return;
+    
+    final isEnglish = _currentLanguage == 'en';
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          isEnglish ? 'Language Changed' : 'تم تغيير اللغة',
+          style: const TextStyle(fontFamily: 'Cairo'),
+        ),
+        content: Text(
+          isEnglish 
+            ? 'The language has been changed successfully!'
+            : 'تم تغيير اللغة بنجاح!',
+          style: const TextStyle(fontFamily: 'Cairo'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              isEnglish ? 'OK' : 'موافق',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                color: AppColors.primaryColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Responsive value calculator
   double _responsiveValue(
     BuildContext context, {
@@ -100,7 +165,6 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final isDarkMode = themeNotifier.isDarkMode;
-    final AppLocalizations() = AppLocalizations.of(context)!;
     
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.grey[900] : AppColors.backgroundColor,
@@ -109,7 +173,6 @@ class _DashboardPageState extends State<DashboardPage> {
       body: Stack(
         children: [
           _buildBody(context),
-          // ✅ إضافة: NotificationDropdown هنا
           if (_showNotifications)
             NotificationDropdown(
               onClose: () {
@@ -120,7 +183,7 @@ class _DashboardPageState extends State<DashboardPage> {
               onNotificationRead: _onNotificationRead,
               onViewAll: _navigateToAllNotifications,
             ),
-            const FloatingMessagesButton(),
+          const FloatingMessagesButton(),
         ],
       ),
       bottomNavigationBar: Builder(
@@ -147,8 +210,16 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    final AppLocalizations() = AppLocalizations.of(context)!;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) {
+      return AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: AppColors.primaryColor,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: const SizedBox(),
+      );
+    }
     
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -239,8 +310,6 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    final AppLocalizations() = AppLocalizations.of(context)!;
-    
     return SingleChildScrollView(
       padding: EdgeInsets.all(
         _responsiveValue(context, mobile: 16, tablet: 20, desktop: 24),
@@ -283,7 +352,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildSidebarMenu(BuildContext context) {
-    final AppLocalizations() = AppLocalizations.of(context)!;
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) {
+      return const SizedBox();
+    }
     
     return SidebarMenu(
       user: widget.user,
@@ -328,15 +400,13 @@ class _DashboardPageState extends State<DashboardPage> {
       onThemeChanged: (bool isDarkMode) {
         // يمكن إضافة تغيير الثيم هنا
       },
-      onLanguageChanged: (String languageCode) {
-        // يمكن إضافة تغيير اللغة هنا
-      },
+      onLanguageChanged: _handleLanguageChanged, // ✅ التصحيح: استخدام الدالة الصحيحة
     );
   }
 
   void _showSubscriptionDialog(BuildContext context) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) return;
     
     showDialog(
       context: context,
@@ -376,8 +446,8 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _showLanguageDialog(BuildContext context) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) return;
     
     showDialog(
       context: context,
@@ -417,8 +487,8 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _showAboutUsDialog(BuildContext context) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations == null) return;
     
     showDialog(
       context: context,
