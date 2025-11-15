@@ -9,13 +9,13 @@ import 'package:vision_erp_app/services/notification_service.dart';
 class NotificationDropdown extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onNotificationRead;
-  final VoidCallback? onViewAll; // ✅ إضافة: معامل اختياري لزر View All
+  final VoidCallback? onViewAll;
 
   const NotificationDropdown({
     super.key, 
     required this.onClose, 
     required this.onNotificationRead,
-    this.onViewAll, // ✅ إضافة: معامل اختياري
+    this.onViewAll,
   });
 
   @override
@@ -26,7 +26,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
   List<NotificationModel> _notifications = [];
   bool _isLoading = true;
   bool _isDisposed = false;
-  LocalizationService? _localizationService; // ✅ تخزين الـ Provider
+  LocalizationService? _localizationService;
 
   @override
   void initState() {
@@ -146,18 +146,18 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
       builder: (context) => AlertDialog(
         title: Text(
           notification.title,
-          style: const TextStyle(fontFamily: 'Cairo'),
+          style: const TextStyle(fontFamily: 'Cairo', fontSize: 16), // ✅ تصغير الخط
         ),
         content: Text(
           notification.message,
-          style: const TextStyle(fontFamily: 'Cairo'),
+          style: const TextStyle(fontFamily: 'Cairo', fontSize: 14), // ✅ تصغير الخط
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'Done',
-              style: TextStyle(fontFamily: 'Cairo'),
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 14), // ✅ تصغير الخط
             ),
           ),
         ],
@@ -173,11 +173,11 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(notification.type.icon, color: AppColors.primaryColor),
+            Icon(notification.type.icon, color: AppColors.primaryColor, size: 20), // ✅ تصغير الأيقونة
             const SizedBox(width: 8),
             Text(
               notification.title,
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: 16), // ✅ تصغير الخط
             ),
           ],
         ),
@@ -187,7 +187,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
           children: [
             Text(
               notification.message,
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: 14), // ✅ تصغير الخط
             ),
             const SizedBox(height: 8),
             Text(
@@ -195,7 +195,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
               style: TextStyle(
                 fontFamily: 'Cairo',
                 color: Colors.grey[600],
-                fontSize: 12,
+                fontSize: 12, // ✅ تصغير الخط
               ),
             ),
           ],
@@ -205,7 +205,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'إغلاق',
-              style: TextStyle(fontFamily: 'Cairo'),
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 14), // ✅ تصغير الخط
             ),
           ),
         ],
@@ -217,14 +217,13 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  // ✅ إضافة: دالة للتعامل مع زر "View All"
   void _handleViewAll() {
     if (_isDisposed || !mounted) return;
     
-    widget.onClose(); // إغلاق dropdown أولاً
+    widget.onClose();
     
     if (widget.onViewAll != null) {
-      widget.onViewAll!(); // الانتقال لصفحة جميع الإشعارات
+      widget.onViewAll!();
     }
   }
 
@@ -255,8 +254,8 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
             elevation: 8,
             borderRadius: BorderRadius.circular(12),
             child: Container(
-              width: 350,
-              height: 500, // ✅ زيادة الارتفاع لاستيعاب الزر الجديد
+              width: 320, // ✅ تصغير العرض من 350 إلى 320
+              height: 400, // ✅ تصغير الارتفاع من 500 إلى 400
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
@@ -272,7 +271,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                 children: [
                   // Header
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12), // ✅ تصغير padding
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor,
                       borderRadius: const BorderRadius.only(
@@ -288,7 +287,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                           style: const TextStyle(
                             fontFamily: 'Cairo',
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 16, // ✅ تصغير حجم الخط
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -300,7 +299,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                               style: const TextStyle(
                                 fontFamily: 'Cairo',
                                 color: Colors.white,
-                                fontSize: 12,
+                                fontSize: 10, // ✅ تصغير حجم الخط
                               ),
                             ),
                           ),
@@ -319,16 +318,16 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                                   children: [
                                     Icon(
                                       Icons.notifications_none,
-                                      size: 64,
+                                      size: 48, // ✅ تصغير حجم الأيقونة
                                       color: Colors.grey[400],
                                     ),
-                                    const SizedBox(height: 16),
+                                    const SizedBox(height: 12), // ✅ تصغير المسافة
                                     Text(
                                       isEnglish ? 'No notifications' : 'لا توجد إشعارات',
                                       style: TextStyle(
                                         fontFamily: 'Cairo',
                                         color: Colors.grey[600],
-                                        fontSize: 16,
+                                        fontSize: 14, // ✅ تصغير حجم الخط
                                       ),
                                     ),
                                   ],
@@ -343,7 +342,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                               ),
                   ),
 
-                  // ✅ إضافة: زر "View All" في الأسفل
+                  // زر "View All" في الأسفل
                   if (_notifications.isNotEmpty) _buildViewAllButton(isEnglish),
                 ],
               ),
@@ -354,10 +353,9 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
     );
   }
 
-  // ✅ إضافة: ويدجت زر "View All"
   Widget _buildViewAllButton(bool isEnglish) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8), // ✅ تصغير padding
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: const BorderRadius.only(
@@ -378,7 +376,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.secondaryColor,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12), // ✅ تصغير padding
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -386,13 +384,13 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
           ),
           icon: const Icon(
             Icons.list_alt,
-            size: 18,
+            size: 16, // ✅ تصغير حجم الأيقونة
           ),
           label: Text(
             isEnglish ? 'View All Notifications' : 'عرض جميع الإشعارات',
             style: const TextStyle(
               fontFamily: 'Cairo',
-              fontSize: 14,
+              fontSize: 12, // ✅ تصغير حجم الخط
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -408,14 +406,16 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 16),
-        child: const Icon(Icons.delete, color: Colors.white),
+        padding: const EdgeInsets.only(right: 12), // ✅ تصغير padding
+        child: const Icon(Icons.delete, color: Colors.white, size: 18), // ✅ تصغير الأيقونة
       ),
       onDismissed: (direction) => _deleteNotification(notification.id),
       child: ListTile(
+        dense: true, // ✅ جعل الـ ListTile أكثر كثافة
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // ✅ تصغير padding
         leading: Container(
-          width: 40,
-          height: 40,
+          width: 32, // ✅ تصغير الحجم
+          height: 32, // ✅ تصغير الحجم
           decoration: BoxDecoration(
             color: notification.type.color.withOpacity(0.1),
             shape: BoxShape.circle,
@@ -423,7 +423,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
           child: Icon(
             notification.type.icon,
             color: notification.type.color,
-            size: 20,
+            size: 16, // ✅ تصغير حجم الأيقونة
           ),
         ),
         title: Text(
@@ -432,6 +432,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
             fontFamily: 'Cairo',
             fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
             color: notification.isRead ? Colors.grey[600] : Colors.black,
+            fontSize: 12, // ✅ تصغير حجم الخط
           ),
         ),
         subtitle: Column(
@@ -441,18 +442,18 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
               notification.message,
               style: TextStyle(
                 fontFamily: 'Cairo',
-                fontSize: 12,
+                fontSize: 10, // ✅ تصغير حجم الخط
                 color: notification.isRead ? Colors.grey[500] : Colors.grey[700],
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2), // ✅ تصغير المسافة
             Text(
               _formatDate(notification.timestamp),
               style: TextStyle(
                 fontFamily: 'Cairo',
-                fontSize: 10,
+                fontSize: 8, // ✅ تصغير حجم الخط
                 color: Colors.grey[400],
               ),
             ),
@@ -460,8 +461,8 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
         ),
         trailing: !notification.isRead
             ? Container(
-                width: 8,
-                height: 8,
+                width: 6, // ✅ تصغير الحجم
+                height: 6, // ✅ تصغير الحجم
                 decoration: const BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,

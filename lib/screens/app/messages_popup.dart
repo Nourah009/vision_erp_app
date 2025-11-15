@@ -221,8 +221,8 @@ class _MessagesPopupState extends State<MessagesPopup> {
     final languageCode = localizationService.locale.languageCode;
 
     return Container(
-      width: 350,
-      height: 500,
+      width: 320, // ✅ تصغير العرض من 350 إلى 320
+      height: 400, // ✅ تصغير الارتفاع من 500 إلى 400
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -269,7 +269,7 @@ class _MessagesPopupState extends State<MessagesPopup> {
       children: [
         // Chat Header
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12), // ✅ تصغير padding
           decoration: BoxDecoration(
             color: AppColors.primaryColor,
             borderRadius: const BorderRadius.only(
@@ -280,7 +280,7 @@ class _MessagesPopupState extends State<MessagesPopup> {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20), // ✅ تصغير حجم الأيقونة
                 onPressed: () {
                   setState(() {
                     _showChatView = false;
@@ -288,25 +288,26 @@ class _MessagesPopupState extends State<MessagesPopup> {
                   });
                 },
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4), // ✅ تصغير المسافة
               const CircleAvatar(
+                radius: 16, // ✅ تصغير حجم الصورة
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: AppColors.primaryColor),
+                child: Icon(Icons.person, color: AppColors.primaryColor, size: 16), // ✅ تصغير الأيقونة
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8), // ✅ تصغير المسافة
               Expanded(
                 child: Text(
                   conversation.isNotEmpty ? conversation.first.senderName : 'Unknown',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14, // ✅ تصغير حجم الخط
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Cairo',
                   ),
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.white),
+                icon: const Icon(Icons.delete_outline, color: Colors.white, size: 18), // ✅ تصغير حجم الأيقونة
                 onPressed: _deleteConversation,
               ),
             ],
@@ -322,12 +323,13 @@ class _MessagesPopupState extends State<MessagesPopup> {
                     style: TextStyle(
                       fontFamily: 'Cairo',
                       color: AppColors.textSecondary,
+                      fontSize: 14, // ✅ تصغير حجم الخط
                     ),
                   ),
                 )
               : ListView.builder(
                   reverse: true,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12), // ✅ تصغير padding
                   itemCount: conversation.length,
                   itemBuilder: (context, index) {
                     final message = conversation[index];
@@ -338,7 +340,7 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
         // Reply Input
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8), // ✅ تصغير padding
           decoration: BoxDecoration(
             border: Border(top: BorderSide(color: AppColors.borderColor)),
           ),
@@ -350,17 +352,18 @@ class _MessagesPopupState extends State<MessagesPopup> {
                   decoration: InputDecoration(
                     hintText: isEnglish ? 'Type a message...' : 'اكتب رسالة...',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(20), // ✅ تصغير border radius
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // ✅ تصغير padding
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6), // ✅ تصغير المسافة
               CircleAvatar(
+                radius: 18, // ✅ تصغير حجم الزر
                 backgroundColor: AppColors.secondaryColor,
                 child: IconButton(
-                  icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                  icon: const Icon(Icons.send, color: Colors.white, size: 16), // ✅ تصغير الأيقونة
                   onPressed: _sendReply,
                 ),
               ),
@@ -373,7 +376,7 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
   Widget _buildViewAllChatsButton(bool isEnglish) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8), // ✅ تصغير padding
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: const BorderRadius.only(
@@ -390,11 +393,11 @@ class _MessagesPopupState extends State<MessagesPopup> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton.icon(
-          onPressed: _handleViewAllChats, // ✅ استخدام الدالة المعدلة
+          onPressed: _handleViewAllChats,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.secondaryColor,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12), // ✅ تصغير padding
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -402,13 +405,13 @@ class _MessagesPopupState extends State<MessagesPopup> {
           ),
           icon: const Icon(
             Icons.forum,
-            size: 18,
+            size: 16, // ✅ تصغير حجم الأيقونة
           ),
           label: Text(
             isEnglish ? 'View All Chats' : 'عرض جميع المحادثات',
             style: const TextStyle(
               fontFamily: 'Cairo',
-              fontSize: 14,
+              fontSize: 12, // ✅ تصغير حجم الخط
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -421,45 +424,47 @@ class _MessagesPopupState extends State<MessagesPopup> {
     final isMe = !message.isIncoming;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 2), // ✅ تصغير المسافة
       child: Row(
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isMe) ...[
             const CircleAvatar(
-              radius: 16,
+              radius: 12, // ✅ تصغير حجم الصورة
               backgroundColor: AppColors.primaryColor,
-              child: Icon(Icons.person, size: 16, color: Colors.white),
+              child: Icon(Icons.person, size: 12, color: Colors.white), // ✅ تصغير الأيقونة
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6), // ✅ تصغير المسافة
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8), // ✅ تصغير padding
               decoration: BoxDecoration(
                 color: isMe ? AppColors.secondaryColor : AppColors.accentBlue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12), // ✅ تصغير border radius
               ),
               child: Text(
                 message.content,
                 style: TextStyle(
                   color: isMe ? Colors.white : AppColors.textPrimary,
                   fontFamily: 'Cairo',
+                  fontSize: 12, // ✅ تصغير حجم الخط
                 ),
               ),
             ),
           ),
           if (isMe) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: 6), // ✅ تصغير المسافة
             PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, size: 14, color: Colors.grey), // ✅ تصغير الأيقونة
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      const Icon(Icons.delete, color: Colors.red, size: 18),
-                      const SizedBox(width: 8),
-                      Text(isEnglish ? 'Delete' : 'حذف'),
+                      const Icon(Icons.delete, color: Colors.red, size: 16), // ✅ تصغير الأيقونة
+                      const SizedBox(width: 6), // ✅ تصغير المسافة
+                      Text(isEnglish ? 'Delete' : 'حذف', style: const TextStyle(fontSize: 12)), // ✅ تصغير الخط
                     ],
                   ),
                 ),
@@ -469,7 +474,6 @@ class _MessagesPopupState extends State<MessagesPopup> {
                   _deleteMessage(message.id);
                 }
               },
-              child: const Icon(Icons.more_vert, size: 16, color: Colors.grey),
             ),
           ],
         ],
@@ -479,7 +483,7 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
   Widget _buildHeader(BuildContext context, bool isEnglish) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12), // ✅ تصغير padding
       decoration: BoxDecoration(
         color: AppColors.primaryColor,
         borderRadius: const BorderRadius.only(
@@ -494,13 +498,13 @@ class _MessagesPopupState extends State<MessagesPopup> {
             isEnglish ? 'Messages' : 'الرسائل',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: 16, // ✅ تصغير حجم الخط
               fontWeight: FontWeight.bold,
               fontFamily: 'Cairo',
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
+            icon: const Icon(Icons.close, color: Colors.white, size: 18), // ✅ تصغير حجم الأيقونة
             onPressed: widget.onClose,
           ),
         ],
@@ -510,8 +514,8 @@ class _MessagesPopupState extends State<MessagesPopup> {
 
   Widget _buildCategoryTabs(BuildContext context, bool isEnglish) {
     return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      height: 40, // ✅ تصغير الارتفاع
+      padding: const EdgeInsets.symmetric(horizontal: 6), // ✅ تصغير padding
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _categories.length,
@@ -524,29 +528,32 @@ class _MessagesPopupState extends State<MessagesPopup> {
               : unreadCounts[category] ?? 0;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 2), // ✅ تصغير المسافة
             child: FilterChip(
               label: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_getCategoryDisplayName(category, isEnglish)),
+                  Text(
+                    _getCategoryDisplayName(category, isEnglish),
+                    style: const TextStyle(fontSize: 10), // ✅ تصغير حجم الخط
+                  ),
                   if (unreadCount > 0) ...[
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 2), // ✅ تصغير المسافة
                     Container(
-                      padding: const EdgeInsets.all(2),
+                      padding: const EdgeInsets.all(1), // ✅ تصغير padding
                       decoration: BoxDecoration(
                         color: Colors.red,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(4), // ✅ تصغير border radius
                       ),
                       constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
+                        minWidth: 12, // ✅ تصغير العرض
+                        minHeight: 12, // ✅ تصغير الارتفاع
                       ),
                       child: Text(
-                        unreadCount.toString(),
+                        unreadCount > 9 ? '9+' : unreadCount.toString(),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
+                          fontSize: 8, // ✅ تصغير حجم الخط
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -562,7 +569,7 @@ class _MessagesPopupState extends State<MessagesPopup> {
               labelStyle: TextStyle(
                 color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                 fontFamily: 'Cairo',
-                fontSize: 12,
+                fontSize: 10, // ✅ تصغير حجم الخط
               ),
             ),
           );
@@ -580,11 +587,12 @@ class _MessagesPopupState extends State<MessagesPopup> {
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   color: AppColors.textSecondary,
+                  fontSize: 14, // ✅ تصغير حجم الخط
                 ),
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6), // ✅ تصغير padding
               itemCount: _filteredMessages.length,
               itemBuilder: (context, index) {
                 final message = _filteredMessages[index];
@@ -598,19 +606,20 @@ class _MessagesPopupState extends State<MessagesPopup> {
     final isUnread = message.isIncoming && message.status != MessageStatus.read;
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      // ✅ التحديث: استخدام اللون الرمادي الفاتح للرسائل غير المقروءة
-      color: isUnread ? Colors.grey[100] : Theme.of(context).cardColor,
+      margin: const EdgeInsets.symmetric(vertical: 2), // ✅ تصغير المسافة
       elevation: 1,
       child: ListTile(
+        dense: true, // ✅ جعل الـ ListTile أكثر كثافة
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // ✅ تصغير padding
         onTap: () => _onMessageTap(message),
         onLongPress: () => _openChat(message),
         leading: CircleAvatar(
+          radius: 16, // ✅ تصغير حجم الصورة
           backgroundColor: _getCategoryColor(message.category),
           child: Icon(
             _getCategoryIcon(message.type),
             color: Colors.white,
-            size: 20,
+            size: 14, // ✅ تصغير حجم الأيقونة
           ),
         ),
         title: Row(
@@ -618,18 +627,18 @@ class _MessagesPopupState extends State<MessagesPopup> {
             Expanded(
               child: Text(
                 message.senderName,
-                // ✅ التحديث: استخدام اللون الرمادي الداكن للنص في الرسائل غير المقروءة
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
                   color: isUnread ? Colors.grey[800] : Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12, // ✅ تصغير حجم الخط
                 ),
               ),
             ),
             if (isUnread)
               Container(
-                width: 8,
-                height: 8,
+                width: 6, // ✅ تصغير الحجم
+                height: 6, // ✅ تصغير الحجم
                 decoration: BoxDecoration(
                   color: AppColors.primaryColor,
                   shape: BoxShape.circle,
@@ -642,36 +651,35 @@ class _MessagesPopupState extends State<MessagesPopup> {
           children: [
             Text(
               message.content,
-              // ✅ التحديث: استخدام اللون الرمادي للنص الفرعي في الرسائل غير المقروءة
               style: TextStyle(
                 fontFamily: 'Cairo',
-                fontSize: 12,
+                fontSize: 10, // ✅ تصغير حجم الخط
                 color: isUnread ? Colors.grey[600] : AppColors.textSecondary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2), // ✅ تصغير المسافة
             Text(
               _formatTime(message.timestamp, isEnglish),
-              // ✅ التحديث: استخدام اللون الرمادي للوقت في الرسائل غير المقروءة
               style: TextStyle(
                 fontFamily: 'Cairo',
-                fontSize: 10,
+                fontSize: 8, // ✅ تصغير حجم الخط
                 color: isUnread ? Colors.grey[500] : AppColors.textSecondary,
               ),
             ),
           ],
         ),
         trailing: PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert, size: 16, color: Colors.grey), // ✅ تصغير الأيقونة
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'chat',
               child: Row(
                 children: [
-                  const Icon(Icons.chat, size: 18),
-                  const SizedBox(width: 8),
-                  Text(isEnglish ? 'Open Chat' : 'فتح المحادثة'),
+                  const Icon(Icons.chat, size: 16), // ✅ تصغير الأيقونة
+                  const SizedBox(width: 6), // ✅ تصغير المسافة
+                  Text(isEnglish ? 'Open Chat' : 'فتح المحادثة', style: const TextStyle(fontSize: 12)), // ✅ تصغير الخط
                 ],
               ),
             ),
@@ -679,9 +687,9 @@ class _MessagesPopupState extends State<MessagesPopup> {
               value: 'delete',
               child: Row(
                 children: [
-                  const Icon(Icons.delete, color: Colors.red, size: 18),
-                  const SizedBox(width: 8),
-                  Text(isEnglish ? 'Delete' : 'حذف'),
+                  const Icon(Icons.delete, color: Colors.red, size: 16), // ✅ تصغير الأيقونة
+                  const SizedBox(width: 6), // ✅ تصغير المسافة
+                  Text(isEnglish ? 'Delete' : 'حذف', style: const TextStyle(fontSize: 12)), // ✅ تصغير الخط
                 ],
               ),
             ),

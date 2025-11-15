@@ -806,7 +806,7 @@ class _AllChatsPageState extends State<AllChatsPage> {
             
             // Message Type
             DropdownButtonFormField<MessageType>(
-              value: _selectedMessageType,
+              initialValue: _selectedMessageType,
               onChanged: (value) => setState(() => _selectedMessageType = value!),
               items: MessageType.values.map((type) {
                 return DropdownMenuItem(

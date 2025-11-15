@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/about_us_screen.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/home_page.dart';
 import 'package:vision_erp_app/screens/app/login_page.dart';
 import 'package:vision_erp_app/screens/app/profile_page.dart';
 import 'package:vision_erp_app/screens/app/organization.dart';
 import 'package:vision_erp_app/screens/app/notifications_page.dart'; // ✅ إضافة: لصفحة الإشعارات
+import 'package:vision_erp_app/screens/app/subscription_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
@@ -268,11 +270,17 @@ class _SidebarMenuState extends State<SidebarMenu> {
         ),
 
         _buildMenuOption(
-          Icons.card_membership, 
-          appLocalizations.mySubscription, 
-          widget.onMySubscriptionTap,
-          themeNotifier.isDarkMode
-        ),
+  Icons.card_membership, 
+  appLocalizations.mySubscription, 
+  () {
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SubscriptionPage()),
+    );
+  },
+  themeNotifier.isDarkMode
+),
 
         const SizedBox(height: 20),
 
@@ -292,12 +300,18 @@ class _SidebarMenuState extends State<SidebarMenu> {
         const SizedBox(height: 20),
 
         _buildMenuSectionHeader(appLocalizations.moreInfo, themeNotifier.isDarkMode),
-        _buildMenuOption(
-          Icons.info, 
-          appLocalizations.aboutUs, 
-          widget.onAboutUsTap,
-          themeNotifier.isDarkMode
-        ),
+         _buildMenuOption(
+        Icons.info, 
+        appLocalizations.aboutUs, 
+        () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AboutUsScreen()),
+          );
+        },
+        themeNotifier.isDarkMode
+      ),
       ],
     );
   }
