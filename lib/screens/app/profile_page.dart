@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vision_erp_app/screens/app/account_details.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
@@ -210,6 +211,14 @@ class ProfilePage extends StatelessWidget {
             icon: Icons.account_circle_outlined,
             title: appLocalizations.accountDetails,
             hasSwitch: false,
+            onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AccountDetailsPage(user: user),
+              ),
+            );
+          },
           ),
           _buildDivider(context),
           _buildOptionItem(
@@ -349,8 +358,11 @@ class ProfilePage extends StatelessWidget {
     String? subtitle,
     required bool hasSwitch,
     bool switchValue = false,
+    GestureTapCallback? onTap,
   }) {
-    return Padding(
+    return GestureDetector(
+    onTap: onTap,
+    child: Padding(
       padding: EdgeInsets.symmetric(
         horizontal: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16),
         vertical: _responsiveValue(context, mobile: 10, tablet: 12, desktop: 14),
@@ -418,6 +430,7 @@ class ProfilePage extends StatelessWidget {
             ),
         ],
       ),
+    ),
     );
   }
 

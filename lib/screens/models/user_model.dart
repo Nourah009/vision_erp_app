@@ -11,7 +11,7 @@ class UserModel {
     required this.role,
     required this.department,
     this.email,
-    this.phone,
+    this.phone, required id,
   });
 
   // Create from login - أكثر مرونة
@@ -23,7 +23,7 @@ class UserModel {
       role: _getRoleFromUsername(username),
       department: _getDepartmentFromUsername(username),
       email: '$username@visionerp.com',
-      phone: '+966 55 123 4567',
+      phone: '+966 55 123 4567', id: null,
     );
   }
 
@@ -73,7 +73,9 @@ class UserModel {
       role: map['role'] ?? 'Employee',
       department: map['department'] ?? 'General Department',
       email: map['email'],
-      phone: map['phone'],
+      phone: map['phone'], id: null,
     );
   }
+
+  get id => null;
 }
