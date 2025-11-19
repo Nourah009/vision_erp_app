@@ -29,11 +29,12 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
 
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  String _currentLanguage = 'en';
+  final String _currentLanguage = 'en';
   bool get isEnglish => _currentLanguage == 'en';
 
   // Options for dropdowns with consistent values
   final Map<String, String> _positionOptions = {
+    
     'software_engineer': 'Software Engineer',
     'senior_developer': 'Senior Developer',
     'team_lead': 'Team Lead',
@@ -203,8 +204,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
               onPrimary: Colors.white,
               surface: Colors.white,
               onSurface: Colors.black,
-            ),
-            dialogBackgroundColor: Colors.white,
+            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
           ),
           child: child!,
         );
@@ -889,7 +889,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: DropdownButtonFormField<String>(
-              value: value,
+              initialValue: value,
               items: items.entries.map((entry) {
                 return DropdownMenuItem<String>(
                   value: entry.key,
