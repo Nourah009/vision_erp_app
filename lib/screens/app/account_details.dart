@@ -18,96 +18,19 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _mobileController;
-  late TextEditingController _dateOfBirthController;
-  late TextEditingController _joinDateController;
-  late TextEditingController _employeeIdController;
-
-  // Select option values - استخدام قيم محددة بدلاً من null
-  String _selectedPosition = 'software_engineer';
-  String _selectedDepartment = 'engineering';
-  String _selectedEmploymentStatus = 'active_head';
 
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final String _currentLanguage = 'en';
+  String _currentLanguage = 'en';
   bool get isEnglish => _currentLanguage == 'en';
 
-  // Options for dropdowns with consistent values
-  final Map<String, String> _positionOptions = {
-    
-    'software_engineer': 'Software Engineer',
-    'senior_developer': 'Senior Developer',
-    'team_lead': 'Team Lead',
-    'project_manager': 'Project Manager',
-    'product_manager': 'Product Manager',
-    'ui_ux_designer': 'UI/UX Designer',
-    'qa_engineer': 'QA Engineer',
-    'devops_engineer': 'DevOps Engineer',
-    'system_admin': 'System Administrator',
-    'data_analyst': 'Data Analyst'
-  };
-
-  final Map<String, String> _departmentOptions = {
-    'engineering': 'Engineering',
-    'product_development': 'Product Development',
-    'quality_assurance': 'Quality Assurance',
-    'design': 'Design',
-    'human_resources': 'Human Resources',
-    'finance': 'Finance',
-    'marketing': 'Marketing',
-    'sales': 'Sales',
-    'customer_support': 'Customer Support',
-    'operations': 'Operations'
-  };
-
-  final Map<String, String> _employmentStatusOptions = {
-    'active_head': 'Active - At the head of his job',
-    'active_remote': 'Active - Working remotely',
-    'active_vacation': 'Active - On vacation',
-    'active_sick': 'Active - On sick leave',
-    'probation': 'Probation period',
-    'inactive_resigned': 'Inactive - Resigned',
-    'inactive_terminated': 'Inactive - Terminated',
-    'inactive_retired': 'Inactive - Retired'
-  };
-
-  // Arabic translations for options
-  final Map<String, String> _positionOptionsAr = {
-    'software_engineer': 'مهندس برمجيات',
-    'senior_developer': 'مطور أول',
-    'team_lead': 'قائد فريق',
-    'project_manager': 'مدير مشروع',
-    'product_manager': 'مدير منتج',
-    'ui_ux_designer': 'مصمم واجهات',
-    'qa_engineer': 'مهندس ضمان الجودة',
-    'devops_engineer': 'مهندس ديفأوبس',
-    'system_admin': 'مسؤول أنظمة',
-    'data_analyst': 'محلل بيانات'
-  };
-
-  final Map<String, String> _departmentOptionsAr = {
-    'engineering': 'الهندسة',
-    'product_development': 'تطوير المنتج',
-    'quality_assurance': 'ضمان الجودة',
-    'design': 'التصميم',
-    'human_resources': 'الموارد البشرية',
-    'finance': 'المالية',
-    'marketing': 'التسويق',
-    'sales': 'المبيعات',
-    'customer_support': 'دعم العملاء',
-    'operations': 'العمليات'
-  };
-
-  final Map<String, String> _employmentStatusOptionsAr = {
-    'active_head': 'نشط - على رأس عمله',
-    'active_remote': 'نشط - يعمل عن بُعد',
-    'active_vacation': 'نشط - في إجازة',
-    'active_sick': 'نشط - في إجازة مرضية',
-    'probation': 'فترة تجريبية',
-    'inactive_resigned': 'غير نشط - مستقيل',
-    'inactive_terminated': 'غير نشط - مفصول',
-    'inactive_retired': 'غير نشط - متقاعد'
-  };
+  // Employee information (read-only)
+  String get _employeeId => 'EMP-${widget.user.id ?? '001'}';
+  String get _position => widget.user.role;
+  String get _department => widget.user.department;
+  String get _employmentStatus => isEnglish ? 'Active - At the head of his job' : 'نشط - على رأس عمله';
+  String get _dateOfBirth => '1990-01-01'; // Example data
+  String get _joinDate => '2020-03-15'; // Example data
 
   @override
   void initState() {
@@ -119,52 +42,6 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     _nameController = TextEditingController(text: widget.user.username);
     _emailController = TextEditingController(text: widget.user.email);
     _mobileController = TextEditingController(text: widget.user.phone ?? '+966500000000');
-    _dateOfBirthController = TextEditingController(text: '1990-01-01');
-    _joinDateController = TextEditingController(text: '2020-03-15');
-    _employeeIdController = TextEditingController(text: 'EMP-${widget.user.id ?? '001'}');
-
-    // Initialize dropdown values with safe defaults
-    _initializeDropdownValues();
-  }
-
-  void _initializeDropdownValues() {
-    // تحديد القيم الافتراضية بناءً على بيانات المستخدم
-    _selectedPosition = _findMatchingPosition(widget.user.role);
-    _selectedDepartment = _findMatchingDepartment(widget.user.department);
-    _selectedEmploymentStatus = 'active_head'; // القيمة الافتراضية
-  }
-
-  String _findMatchingPosition(String? userRole) {
-    if (userRole == null) return 'software_engineer';
-    
-    final role = userRole.toLowerCase();
-    if (role.contains('senior') || role.contains('مطور أول')) return 'senior_developer';
-    if (role.contains('lead') || role.contains('قائد')) return 'team_lead';
-    if (role.contains('manager') || role.contains('مدير')) return 'project_manager';
-    if (role.contains('design') || role.contains('مصمم')) return 'ui_ux_designer';
-    if (role.contains('qa') || role.contains('جودة')) return 'qa_engineer';
-    if (role.contains('devops')) return 'devops_engineer';
-    if (role.contains('admin') || role.contains('مسؤول')) return 'system_admin';
-    if (role.contains('analyst') || role.contains('محلل')) return 'data_analyst';
-    
-    return 'software_engineer'; // القيمة الافتراضية
-  }
-
-  String _findMatchingDepartment(String? userDepartment) {
-    if (userDepartment == null) return 'engineering';
-    
-    final dept = userDepartment.toLowerCase();
-    if (dept.contains('product') || dept.contains('منتج')) return 'product_development';
-    if (dept.contains('quality') || dept.contains('جودة')) return 'quality_assurance';
-    if (dept.contains('design') || dept.contains('تصميم')) return 'design';
-    if (dept.contains('human') || dept.contains('بشرية')) return 'human_resources';
-    if (dept.contains('finance') || dept.contains('مالية')) return 'finance';
-    if (dept.contains('marketing') || dept.contains('تسويق')) return 'marketing';
-    if (dept.contains('sales') || dept.contains('مبيعات')) return 'sales';
-    if (dept.contains('support') || dept.contains('دعم')) return 'customer_support';
-    if (dept.contains('operations') || dept.contains('عمليات')) return 'operations';
-    
-    return 'engineering'; // القيمة الافتراضية
   }
 
   @override
@@ -172,9 +49,6 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     _nameController.dispose();
     _emailController.dispose();
     _mobileController.dispose();
-    _dateOfBirthController.dispose();
-    _joinDateController.dispose();
-    _employeeIdController.dispose();
     super.dispose();
   }
 
@@ -188,39 +62,6 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     if (width >= 1200 && desktop != null) return desktop;
     if (width >= 600 && tablet != null) return tablet;
     return mobile;
-  }
-
-  Future<void> _selectDate(BuildContext context, String field) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryColor,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
-          ),
-          child: child!,
-        );
-      },
-    );
-    
-    if (picked != null) {
-      final formattedDate = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-      setState(() {
-        if (field == 'dob') {
-          _dateOfBirthController.text = formattedDate;
-        } else if (field == 'join') {
-          _joinDateController.text = formattedDate;
-        }
-      });
-    }
   }
 
   Future<void> _saveChanges() async {
@@ -466,14 +307,6 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   }
 
   Widget _buildEnhancedProfileSection(BuildContext context) {
-    final currentPosition = isEnglish 
-        ? _positionOptions[_selectedPosition]!
-        : _positionOptionsAr[_selectedPosition]!;
-    
-    final currentDepartment = isEnglish 
-        ? _departmentOptions[_selectedDepartment]!
-        : _departmentOptionsAr[_selectedDepartment]!;
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(_responsiveValue(context, mobile: 24, tablet: 28, desktop: 32)),
@@ -569,7 +402,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           ),
           SizedBox(height: _responsiveValue(context, mobile: 4, tablet: 6, desktop: 8)),
           Text(
-            '$currentPosition • $currentDepartment',
+            '$_position • $_department',
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
@@ -585,7 +418,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              isEnglish ? 'Employee ID: ${_employeeIdController.text}' : 'رقم الموظف: ${_employeeIdController.text}',
+              isEnglish ? 'Employee ID: $_employeeId' : 'رقم الموظف: $_employeeId',
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: _responsiveValue(context, mobile: 12, tablet: 13, desktop: 14),
@@ -666,11 +499,13 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   Widget _buildPersonalInfoForm(BuildContext context) {
     return Column(
       children: [
-        _buildEnhancedFormField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Full Name' : 'الاسم الكامل',
-          controller: _nameController,
+          value: _nameController.text,
           icon: Icons.person_outline,
+          isEditable: true,
+          controller: _nameController,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return isEnglish ? 'Please enter your name' : 'يرجى إدخال الاسم';
@@ -679,11 +514,13 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           },
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        _buildEnhancedFormField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Email Address' : 'البريد الإلكتروني',
-          controller: _emailController,
+          value: _emailController.text,
           icon: Icons.email_outlined,
+          isEditable: true,
+          controller: _emailController,
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -696,11 +533,13 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           },
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        _buildEnhancedFormField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Mobile Number' : 'رقم الجوال',
-          controller: _mobileController,
+          value: _mobileController.text,
           icon: Icons.phone_outlined,
+          isEditable: true,
+          controller: _mobileController,
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -710,11 +549,12 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           },
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        _buildDateField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Date of Birth' : 'تاريخ الميلاد',
-          controller: _dateOfBirthController,
-          onTap: () => _selectDate(context, 'dob'),
+          value: _dateOfBirth,
+          icon: Icons.cake_outlined,
+          isEditable: false,
         ),
       ],
     );
@@ -723,79 +563,57 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   Widget _buildWorkInfoForm(BuildContext context) {
     return Column(
       children: [
-        // Position Dropdown
-        _buildDropdownField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Position' : 'المنصب',
-          value: _selectedPosition,
-          items: isEnglish ? _positionOptions : _positionOptionsAr,
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedPosition = newValue!;
-            });
-          },
+          value: _position,
           icon: Icons.work_outline,
+          isEditable: false,
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        
-        // Department Dropdown
-        _buildDropdownField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Department' : 'القسم',
-          value: _selectedDepartment,
-          items: isEnglish ? _departmentOptions : _departmentOptionsAr,
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedDepartment = newValue!;
-            });
-          },
+          value: _department,
           icon: Icons.business_outlined,
+          isEditable: false,
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        
-        // Employee ID (Read-only)
-        _buildEnhancedFormField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Employee ID' : 'رقم الموظف',
-          controller: _employeeIdController,
+          value: _employeeId,
           icon: Icons.badge_outlined,
-          readOnly: true,
+          isEditable: false,
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        
-        // Employment Status Dropdown
-        _buildDropdownField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Employment Status' : 'حالة التوظيف',
-          value: _selectedEmploymentStatus,
-          items: isEnglish ? _employmentStatusOptions : _employmentStatusOptionsAr,
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedEmploymentStatus = newValue!;
-            });
-          },
+          value: _employmentStatus,
           icon: Icons.assignment_turned_in_outlined,
+          isEditable: false,
         ),
         SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
-        
-        // Join Date
-        _buildDateField(
+        _buildUniformField(
           context: context,
           label: isEnglish ? 'Join Date' : 'تاريخ الانضمام',
-          controller: _joinDateController,
-          onTap: () => _selectDate(context, 'join'),
+          value: _joinDate,
+          icon: Icons.calendar_today_outlined,
+          isEditable: false,
         ),
       ],
     );
   }
 
-  Widget _buildEnhancedFormField({
+  Widget _buildUniformField({
     required BuildContext context,
     required String label,
-    required TextEditingController controller,
+    required String value,
     required IconData icon,
+    required bool isEditable,
+    TextEditingController? controller,
     TextInputType keyboardType = TextInputType.text,
-    bool readOnly = false,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -812,200 +630,82 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         ),
         SizedBox(height: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12)),
         Container(
+          height: _responsiveValue(context, mobile: 56, tablet: 58, desktop: 60), // نفس الارتفاع لجميع الحقول
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: Colors.grey.withOpacity(0.3),
             ),
           ),
-          child: TextFormField(
-            controller: controller,
-            keyboardType: keyboardType,
-            readOnly: readOnly,
-            validator: validator,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
-              color: readOnly ? Colors.grey : AppColors.textPrimary,
-            ),
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
-                vertical: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
-              ),
-              prefixIcon: Container(
-                margin: const EdgeInsets.all(8),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: AppColors.primaryColor,
-                  size: 18,
-                ),
-              ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownField({
-    required BuildContext context,
-    required String label,
-    required String value,
-    required Map<String, String> items,
-    required ValueChanged<String?> onChanged,
-    required IconData icon,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        SizedBox(height: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12)),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey.withOpacity(0.3),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: DropdownButtonFormField<String>(
-              initialValue: value,
-              items: items.entries.map((entry) {
-                return DropdownMenuItem<String>(
-                  value: entry.key,
-                  child: Text(
-                    entry.value,
-                    style: const TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 14,
+          child: isEditable
+              ? TextFormField(
+                  controller: controller,
+                  keyboardType: keyboardType,
+                  validator: validator,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
+                    color: AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
+                      vertical: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
                     ),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12),
-                  vertical: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
-                ),
-                prefixIcon: Container(
-                  margin: const EdgeInsets.all(8),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    color: AppColors.primaryColor,
-                    size: 18,
-                  ),
-                ),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-              ),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: AppColors.primaryColor,
-              ),
-              isExpanded: true,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateField({
-    required BuildContext context,
-    required String label,
-    required TextEditingController controller,
-    required VoidCallback onTap,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        SizedBox(height: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12)),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              horizontal: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
-              vertical: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.grey.withOpacity(0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.calendar_today_outlined,
-                    color: AppColors.primaryColor,
-                    size: 18,
-                  ),
-                ),
-                SizedBox(width: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
-                Expanded(
-                  child: Text(
-                    controller.text.isEmpty 
-                      ? (isEnglish ? 'Select date' : 'اختر التاريخ')
-                      : controller.text,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
-                      color: controller.text.isEmpty 
-                        ? Colors.grey 
-                        : AppColors.textPrimary,
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        color: AppColors.primaryColor,
+                        size: 18,
+                      ),
                     ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                  ),
+                )
+              : Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          icon,
+                          color: AppColors.primaryColor,
+                          size: 18,
+                        ),
+                      ),
+                      SizedBox(width: _responsiveValue(context, mobile: 12, tablet: 14, desktop: 16)),
+                      Expanded(
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: _responsiveValue(context, mobile: 14, tablet: 15, desktop: 16),
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.grey,
-                ),
-              ],
-            ),
-          ),
         ),
       ],
     );
