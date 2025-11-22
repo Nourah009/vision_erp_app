@@ -31,6 +31,8 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   String get _employmentStatus => isEnglish ? 'Active - At the head of his job' : 'نشط - على رأس عمله';
   String get _dateOfBirth => '1990-01-01'; // Example data
   String get _joinDate => '2020-03-15'; // Example data
+  String get _gender => isEnglish ? 'Male' : 'ذكر'; // Example data
+  String get _age => '34'; // Example data - calculated from date of birth
 
   @override
   void initState() {
@@ -411,20 +413,41 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
             ),
           ),
           SizedBox(height: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12)),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              isEnglish ? 'Employee ID: $_employeeId' : 'رقم الموظف: $_employeeId',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: _responsiveValue(context, mobile: 12, tablet: 13, desktop: 14),
-                color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isEnglish ? 'Employee ID: $_employeeId' : 'رقم الموظف: $_employeeId',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: _responsiveValue(context, mobile: 12, tablet: 13, desktop: 14),
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
+              SizedBox(width: _responsiveValue(context, mobile: 8, tablet: 10, desktop: 12)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isEnglish ? 'Age: $_age' : 'العمر: $_age',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: _responsiveValue(context, mobile: 12, tablet: 13, desktop: 14),
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -556,6 +579,22 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           icon: Icons.cake_outlined,
           isEditable: false,
         ),
+        SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
+        _buildUniformField(
+          context: context,
+          label: isEnglish ? 'Gender' : 'الجنس',
+          value: _gender,
+          icon: Icons.transgender,
+          isEditable: false,
+        ),
+        SizedBox(height: _responsiveValue(context, mobile: 16, tablet: 18, desktop: 20)),
+        _buildUniformField(
+          context: context,
+          label: isEnglish ? 'Age' : 'العمر',
+          value: '$_age ${isEnglish ? 'Years' : 'سنة'}',
+          icon: Icons.calendar_today_outlined,
+          isEditable: false,
+        ),
       ],
     );
   }
@@ -599,7 +638,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           context: context,
           label: isEnglish ? 'Join Date' : 'تاريخ الانضمام',
           value: _joinDate,
-          icon: Icons.calendar_today_outlined,
+          icon: Icons.event_available_outlined,
           isEditable: false,
         ),
       ],
@@ -752,7 +791,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              elevation: 2,
+              elevation: 2
             ),
             child: _isLoading
                 ? SizedBox(
