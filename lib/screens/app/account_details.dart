@@ -791,7 +791,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              elevation: 2
+              elevation: 2,
             ),
             child: _isLoading
                 ? SizedBox(
