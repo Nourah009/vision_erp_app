@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
+import 'package:vision_erp_app/screens/app/human_resources.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class RecommendationsSection extends StatelessWidget {
@@ -87,7 +88,16 @@ class RecommendationsSection extends StatelessWidget {
   }
 
   Widget _buildCategoryBox(BuildContext context, String title, IconData icon) {
-    return Container(
+  return GestureDetector(
+    onTap: () {
+      if (title.contains('Human Resources') || title.contains('الموارد البشرية')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HumanResourcesPage()),
+        );
+      }
+    },
+    child: Container(
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -112,6 +122,7 @@ class RecommendationsSection extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
