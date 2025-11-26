@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/human_resources.dart';
+import 'package:vision_erp_app/screens/app/materials_warehouses_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 
 class RecommendationsSection extends StatelessWidget {
@@ -94,6 +95,12 @@ class RecommendationsSection extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const HumanResourcesPage()),
+        );
+      }else if (title.contains('Materials and\nwarehouse') || title.contains('المواد\nوالمستودعات')) {
+        // Navigate to Materials and Warehouse Page
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MaterialsWarehousesPage()),
         );
       }
     },
