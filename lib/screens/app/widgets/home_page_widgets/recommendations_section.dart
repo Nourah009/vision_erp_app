@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
+import 'package:vision_erp_app/screens/app/fixed_assets_page.dart';
 import 'package:vision_erp_app/screens/app/human_resources.dart';
 import 'package:vision_erp_app/screens/app/materials_warehouses_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
@@ -101,6 +102,11 @@ class RecommendationsSection extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MaterialsWarehousesPage()),
+        );
+      } else if (title.contains('Fixed assets') || title.contains('الأصول الثابتة')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FixedAssetsPage()),
         );
       }
     },
