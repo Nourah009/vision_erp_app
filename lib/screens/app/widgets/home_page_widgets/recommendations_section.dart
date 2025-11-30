@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/analysis_and_report_page.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/crm_page.dart';
 import 'package:vision_erp_app/screens/app/fixed_assets_page.dart';
@@ -110,12 +111,16 @@ class RecommendationsSection extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const FixedAssetsPage()),
         );
       } else if (title.contains('Customer\nRelations') || title.contains('علاقات\nالعملاء')) {
-          // التنقل إلى صفحة CRM
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => CustomerRelationsPage()),
           );
-        }
+        } else if (title.contains('Analysis and\nreports') || title.contains('التحليل\nوالتقارير')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AnalysisReportsPage()),
+        );
+      }
     },
     child: Container(
       width: 100,
