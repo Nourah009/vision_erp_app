@@ -1320,7 +1320,7 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
                 decoration: InputDecoration(labelText: 'Insurance Expiry (YYYY-MM-DD)'),
               ),
               DropdownButtonFormField(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 items: widget.categories
                     .map((category) => DropdownMenuItem(value: category['name'], child: Text(category['name'])))
                     .toList(),
@@ -1329,7 +1329,7 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
                 validator: (value) => value == null ? 'Please select category' : null,
               ),
               DropdownButtonFormField(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 items: ['Draft', 'Running', 'Paused', 'Sold', 'Disposed']
                     .map((status) => DropdownMenuItem(value: status, child: Text(status)))
                     .toList(),
@@ -1427,7 +1427,7 @@ class _AssetTransferDialogState extends State<AssetTransferDialog> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField(
-                value: _transferType,
+                initialValue: _transferType,
                 items: ['Department', 'Location', 'Employee'].map((type) {
                   return DropdownMenuItem(value: type, child: Text(type));
                 }).toList(),
@@ -1541,7 +1541,7 @@ class _MaintenanceRequestDialogState extends State<MaintenanceRequestDialog> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField(
-                value: _maintenanceType,
+                initialValue: _maintenanceType,
                 items: ['Preventive', 'Corrective', 'Emergency'].map((type) {
                   return DropdownMenuItem(value: type, child: Text(type));
                 }).toList(),
@@ -1550,7 +1550,7 @@ class _MaintenanceRequestDialogState extends State<MaintenanceRequestDialog> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField(
-                value: _priority,
+                initialValue: _priority,
                 items: ['Low', 'Medium', 'High', 'Critical'].map((priority) {
                   return DropdownMenuItem(value: priority, child: Text(priority));
                 }).toList(),
@@ -1650,7 +1650,7 @@ class _AssetDisposalDialogState extends State<AssetDisposalDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField(
-                value: _selectedAsset,
+                initialValue: _selectedAsset,
                 items: widget.assets.map((asset) {
                   return DropdownMenuItem(
                     value: asset['id'],
@@ -1663,7 +1663,7 @@ class _AssetDisposalDialogState extends State<AssetDisposalDialog> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField(
-                value: _disposalType,
+                initialValue: _disposalType,
                 items: ['Scrap', 'Sale', 'Donation', 'Lost/Stolen'].map((type) {
                   return DropdownMenuItem(value: type, child: Text(type));
                 }).toList(),
@@ -1774,7 +1774,7 @@ class _AssetRequestDialogState extends State<AssetRequestDialog> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField(
-                value: _priority,
+                initialValue: _priority,
                 items: ['Low', 'Medium', 'High', 'Critical'].map((priority) {
                   return DropdownMenuItem(value: priority, child: Text(priority));
                 }).toList(),
@@ -1862,7 +1862,7 @@ class _InsuranceDialogState extends State<InsuranceDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField(
-                value: _selectedAsset,
+                initialValue: _selectedAsset,
                 items: widget.assets.map((asset) {
                   return DropdownMenuItem(
                     value: asset['id'],

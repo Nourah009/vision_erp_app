@@ -284,19 +284,19 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
               title: Text('Auto Refresh', style: TextStyle(fontFamily: 'Cairo')),
               value: _autoRefresh,
               onChanged: (value) => setState(() => _autoRefresh = value),
-              activeColor: ThemeCollection.matisse,
+              activeThumbColor: ThemeCollection.matisse,
             ),
             SwitchListTile(
               title: Text('Show Annotations', style: TextStyle(fontFamily: 'Cairo')),
               value: true,
               onChanged: (value) {},
-              activeColor: ThemeCollection.matisse,
+              activeThumbColor: ThemeCollection.matisse,
             ),
             SwitchListTile(
               title: Text('Data Labels', style: TextStyle(fontFamily: 'Cairo')),
               value: true,
               onChanged: (value) {},
-              activeColor: ThemeCollection.matisse,
+              activeThumbColor: ThemeCollection.matisse,
             ),
           ],
         ),
@@ -545,8 +545,9 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
               child: Icon(Icons.more_vert, color: ThemeCollection.matisse, size: 20),
             ),
             onSelected: (value) {
-              if (value == 'export_pdf') _exportReport('PDF');
-              else if (value == 'export_excel') _exportReport('Excel');
+              if (value == 'export_pdf') {
+                _exportReport('PDF');
+              } else if (value == 'export_excel') _exportReport('Excel');
               else if (value == 'export_csv') _exportReport('CSV');
               else if (value == 'settings') _showReportSettings();
             },
@@ -730,7 +731,7 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
                 border: Border.all(color: ThemeCollection.matisse.withOpacity(0.3)),
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedDepartment,
+                initialValue: _selectedDepartment,
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                   border: InputBorder.none,
@@ -1108,11 +1109,11 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(ThemeCollection.matisse.withOpacity(0.05)),
+                headingRowColor: WidgetStateProperty.all(ThemeCollection.matisse.withOpacity(0.05)),
                 headingTextStyle: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: ThemeCollection.matisse),
-                dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.selected)) {
+                dataRowColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
                       return ThemeCollection.matisse.withOpacity(0.1);
                     }
                     return Colors.transparent;
@@ -1279,7 +1280,7 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
             Text('Recent Activity', 
               style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold, color: ThemeCollection.matisse)),
             const SizedBox(height: 16),
-            ...activities.map((activity) => _buildActivityItem(activity)).toList(),
+            ...activities.map((activity) => _buildActivityItem(activity)),
           ],
         ),
       ),
@@ -1428,7 +1429,7 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
               style: TextStyle(fontFamily: 'Cairo', color: ThemeCollection.jumbo)),
             const SizedBox(height: 16),
           ],
-          ...filteredReports.map((report) => _buildReportSection(report, _getIconForReport(report))).toList(),
+          ...filteredReports.map((report) => _buildReportSection(report, _getIconForReport(report))),
         ],
       ),
     );
@@ -1532,7 +1533,7 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
           
           // Chart Type
           DropdownButtonFormField(
-            value: _selectedChartType,
+            initialValue: _selectedChartType,
             decoration: InputDecoration(
               labelText: 'Chart Type',
               labelStyle: TextStyle(fontFamily: 'Cairo', color: ThemeCollection.matisse),
@@ -1555,7 +1556,7 @@ class _AnalysisReportsPageState extends State<AnalysisReportsPage>
           
           // Report Type
           DropdownButtonFormField(
-            value: _selectedReportType,
+            initialValue: _selectedReportType,
             decoration: InputDecoration(
               labelText: 'Report Type',
               labelStyle: TextStyle(fontFamily: 'Cairo', color: ThemeCollection.matisse),

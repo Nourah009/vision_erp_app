@@ -21,7 +21,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
 
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  String _currentLanguage = 'en';
+  final String _currentLanguage = 'en';
   bool get isEnglish => _currentLanguage == 'en';
 
   // Employee information (read-only)

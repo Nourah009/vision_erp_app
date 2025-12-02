@@ -202,7 +202,7 @@ class _MaterialsWarehousesPageState extends State<MaterialsWarehousesPage> with 
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Stock Movements', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
-        content: Container(
+        content: SizedBox(
           width: double.maxFinite,
           child: ListView.separated(
             shrinkWrap: true,
@@ -1328,7 +1328,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
                 decoration: InputDecoration(labelText: 'Vendor'),
               ),
               DropdownButtonFormField(
-                value: _selectedType,
+                initialValue: _selectedType,
                 items: ['Storable', 'Consumable', 'Service']
                     .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                     .toList(),
@@ -1336,7 +1336,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
                 decoration: InputDecoration(labelText: 'Product Type'),
               ),
               DropdownButtonFormField(
-                value: _selectedTracking,
+                initialValue: _selectedTracking,
                 items: ['None', 'Lot', 'Serial']
                     .map((tracking) => DropdownMenuItem(value: tracking, child: Text(tracking)))
                     .toList(),
@@ -1344,7 +1344,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
                 decoration: InputDecoration(labelText: 'Tracking'),
               ),
               DropdownButtonFormField(
-                value: _selectedUOM,
+                initialValue: _selectedUOM,
                 items: ['Unit', 'Pack', 'Box', 'Pallet', 'Kg', 'Liter']
                     .map((uom) => DropdownMenuItem(value: uom, child: Text(uom)))
                     .toList(),
@@ -1428,7 +1428,7 @@ class _InventoryTransferFormState extends State<InventoryTransferForm> {
             child: Column(
               children: [
                 DropdownButtonFormField(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   items: ['Internal Transfer', 'Receipt', 'Delivery'].map((type) {
                     return DropdownMenuItem(value: type, child: Text(type));
                   }).toList(),
@@ -1437,7 +1437,7 @@ class _InventoryTransferFormState extends State<InventoryTransferForm> {
                 ),
                 SizedBox(height: 12),
                 DropdownButtonFormField(
-                  value: _selectedProduct,
+                  initialValue: _selectedProduct,
                   items: widget.products.map((product) {
                     return DropdownMenuItem(
                       value: product['id'],
@@ -1450,7 +1450,7 @@ class _InventoryTransferFormState extends State<InventoryTransferForm> {
                 ),
                 SizedBox(height: 12),
                 DropdownButtonFormField(
-                  value: _selectedFromLocation,
+                  initialValue: _selectedFromLocation,
                   items: widget.warehouses.map((warehouse) {
                     return DropdownMenuItem(
                       value: warehouse['id'],
@@ -1463,7 +1463,7 @@ class _InventoryTransferFormState extends State<InventoryTransferForm> {
                 ),
                 SizedBox(height: 12),
                 DropdownButtonFormField(
-                  value: _selectedToLocation,
+                  initialValue: _selectedToLocation,
                   items: widget.warehouses.map((warehouse) {
                     return DropdownMenuItem(
                       value: warehouse['id'],
@@ -1565,7 +1565,7 @@ class _ReceiveItemsDialogState extends State<ReceiveItemsDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField(
-                value: _selectedProduct,
+                initialValue: _selectedProduct,
                 items: widget.products.map((product) {
                   return DropdownMenuItem(
                     value: product['id'],
@@ -1577,7 +1577,7 @@ class _ReceiveItemsDialogState extends State<ReceiveItemsDialog> {
                 validator: (value) => value == null ? 'Required' : null,
               ),
               DropdownButtonFormField(
-                value: _selectedWarehouse,
+                initialValue: _selectedWarehouse,
                 items: widget.warehouses.map((warehouse) {
                   return DropdownMenuItem(
                     value: warehouse['id'],
@@ -1683,7 +1683,7 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField(
-                value: _selectedProduct,
+                initialValue: _selectedProduct,
                 items: widget.products.map((product) {
                   return DropdownMenuItem(
                     value: product['id'],
@@ -1695,7 +1695,7 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                 validator: (value) => value == null ? 'Required' : null,
               ),
               DropdownButtonFormField(
-                value: _adjustmentType,
+                initialValue: _adjustmentType,
                 items: ['Increase', 'Decrease'].map((type) {
                   return DropdownMenuItem(value: type, child: Text(type));
                 }).toList(),
@@ -1703,7 +1703,7 @@ class _StockAdjustmentDialogState extends State<StockAdjustmentDialog> {
                 decoration: InputDecoration(labelText: 'Adjustment Type'),
               ),
               DropdownButtonFormField(
-                value: _selectedReason,
+                initialValue: _selectedReason,
                 items: ['Damaged', 'Found', 'Counting Error', 'Theft', 'Other'].map((reason) {
                   return DropdownMenuItem(value: reason, child: Text(reason));
                 }).toList(),
@@ -1905,7 +1905,7 @@ class _ScrapReturnDialogState extends State<ScrapReturnDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField(
-                value: _selectedType,
+                initialValue: _selectedType,
                 items: ['Scrap', 'Return'].map((type) {
                   return DropdownMenuItem(value: type, child: Text(type));
                 }).toList(),
@@ -1913,7 +1913,7 @@ class _ScrapReturnDialogState extends State<ScrapReturnDialog> {
                 decoration: InputDecoration(labelText: 'Type'),
               ),
               DropdownButtonFormField(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 items: ['Pending Inspection', 'Approved', 'Completed'].map((status) {
                   return DropdownMenuItem(value: status, child: Text(status));
                 }).toList(),
@@ -1921,7 +1921,7 @@ class _ScrapReturnDialogState extends State<ScrapReturnDialog> {
                 decoration: InputDecoration(labelText: 'Status'),
               ),
               DropdownButtonFormField(
-                value: _selectedProduct,
+                initialValue: _selectedProduct,
                 items: widget.products.map((product) {
                   return DropdownMenuItem(
                     value: product['id'],
@@ -1933,7 +1933,7 @@ class _ScrapReturnDialogState extends State<ScrapReturnDialog> {
                 validator: (value) => value == null ? 'Required' : null,
               ),
               DropdownButtonFormField(
-                value: _selectedWarehouse,
+                initialValue: _selectedWarehouse,
                 items: widget.warehouses.map((warehouse) {
                   return DropdownMenuItem(
                     value: warehouse['id'],
@@ -1988,7 +1988,7 @@ class _ScrapReturnDialogState extends State<ScrapReturnDialog> {
               
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${_selectedType} record created successfully!', style: TextStyle(fontFamily: 'Cairo')),
+                  content: Text('$_selectedType record created successfully!', style: TextStyle(fontFamily: 'Cairo')),
                   backgroundColor: Colors.green,
                 ),
               );

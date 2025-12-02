@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/Purchasing_page.dart';
+import 'package:vision_erp_app/screens/app/accounting_page.dart';
 import 'package:vision_erp_app/screens/app/analysis_and_report_page.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
 import 'package:vision_erp_app/screens/app/crm_page.dart';
 import 'package:vision_erp_app/screens/app/fixed_assets_page.dart';
 import 'package:vision_erp_app/screens/app/human_resources.dart';
+import 'package:vision_erp_app/screens/app/human_resources_overview_page.dart';
+import 'package:vision_erp_app/screens/app/inventory_page.dart';
+import 'package:vision_erp_app/screens/app/manufacturing_page.dart';
 import 'package:vision_erp_app/screens/app/materials_warehouses_page.dart';
+import 'package:vision_erp_app/screens/app/projects_page.dart';
+import 'package:vision_erp_app/screens/app/quality_control_page.dart';
+import 'package:vision_erp_app/screens/app/sale_page.dart';
+import 'package:vision_erp_app/screens/app/vat_page.dart';
+import 'package:vision_erp_app/screens/app/website_page.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart' ;
+import 'package:vision_erp_app/services/auth_service.dart';
 
 class RecommendationsSection extends StatelessWidget {
   final Function(
@@ -92,14 +103,29 @@ class RecommendationsSection extends StatelessWidget {
   }
 
   Widget _buildCategoryBox(BuildContext context, String title, IconData icon) {
-  return GestureDetector(
-    onTap: () {
+   return GestureDetector(
+    onTap: () async {
+      final isLoggedIn = await AuthService.isUserLoggedIn();
+      
       if (title.contains('Human Resources') || title.contains('الموارد البشرية')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HumanResourcesPage()),
-        );
-      }else if (title.contains('Materials and\nwarehouse') || title.contains('المواد\nوالمستودعات')) {
+        if (isLoggedIn) {
+          // جلب بيانات المستخدم الحالي
+          final user = await AuthService.getCurrentUser();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HumanResourcesPage(user: user),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HumanResourcesOverviewPage(),
+            ),
+          );
+        }
+      } else if (title.contains('Materials and\nwarehouse') || title.contains('المواد\nوالمستودعات')) {
         // Navigate to Materials and Warehouse Page
         Navigator.push(
           context,
@@ -119,6 +145,51 @@ class RecommendationsSection extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AnalysisReportsPage()),
+        );
+      } else if (title.contains('Value Added\nTax') || title.contains('ضريبة القيمة\nالمضافة')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ValueAddedTaxPage()),
+        );
+      } else if (title.contains('Projects') || title.contains('المشاريع')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProjectsPage()),
+        );
+      } else if (title.contains('Website') || title.contains('الموقع الإلكتروني')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const WebsitePage()),
+        );
+      } else if (title.contains('Manufacturing') || title.contains('التصنيع')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ManufacturingPage()),
+        );
+      } else if (title.contains('Sale') || title.contains('المبيعات')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SalePage()),
+        );
+      } else if (title.contains('Purchasing') || title.contains('المشتريات')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PurchasePage()),
+        );
+      } else if (title.contains('Accounting') || title.contains('المحاسبة')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AccountingPage()),
+        );
+      } else if (title.contains('Inventory') || title.contains('المخزون')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const InventoryPage()),
+        );
+      } else if (title.contains('Quality\nControl') || title.contains('مراقبة\nالجودة')) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const QualityControlPage()),
         );
       }
     },

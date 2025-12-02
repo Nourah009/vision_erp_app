@@ -1326,7 +1326,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                 validator: (value) => value!.isEmpty ? 'Please enter salary' : null,
               ),
               DropdownButtonFormField(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 items: ['Active', 'On Leave', 'Inactive']
                     .map((status) => DropdownMenuItem(value: status, child: Text(status)))
                     .toList(),
@@ -1370,6 +1370,8 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
 }
 
 class ShiftManagementSheet extends StatelessWidget {
+  const ShiftManagementSheet({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1518,7 +1520,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
             child: Column(
               children: [
                 DropdownButtonFormField(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   items: ['Annual Leave', 'Sick Leave', 'Emergency Leave', 'Maternity Leave']
                       .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                       .toList(),
@@ -1842,7 +1844,7 @@ class _RecruitmentPipelinePageState extends State<RecruitmentPipelinePage> {
             );
           },
         ),
-      )).toList(),
+      )),
     ];
   }
 }
@@ -1925,7 +1927,7 @@ class _PerformanceReviewDialogState extends State<PerformanceReviewDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           DropdownButtonFormField(
-            value: _selectedEmployee,
+            initialValue: _selectedEmployee,
             items: widget.employees
                 .map((employee) => DropdownMenuItem(
                       value: employee['id'],

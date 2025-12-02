@@ -1687,7 +1687,7 @@ class _AddLeadDialogState extends State<AddLeadDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedSource,
+                initialValue: _selectedSource,
                 decoration: InputDecoration(
                     labelText: 'Source', border: OutlineInputBorder()),
                 items: [
@@ -1710,7 +1710,7 @@ class _AddLeadDialogState extends State<AddLeadDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedPriority,
+                initialValue: _selectedPriority,
                 decoration: InputDecoration(
                     labelText: 'Priority', border: OutlineInputBorder()),
                 items: ['High', 'Medium', 'Low'].map((String value) {
@@ -1788,7 +1788,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
   String _selectedType = 'Call';
   String _selectedCustomer = '';
   String _selectedPriority = 'Medium';
-  DateTime _selectedDate = DateTime.now().add(Duration(days: 1));
+  final DateTime _selectedDate = DateTime.now().add(Duration(days: 1));
   DateTime get selectedDate => _selectedDate;
 
   @override
@@ -1811,7 +1811,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: _selectedType,
+                initialValue: _selectedType,
                 decoration: InputDecoration(
                     labelText: 'Activity Type', border: OutlineInputBorder()),
                 items: ['Call', 'Email', 'Meeting', 'Task', 'Follow-up']
@@ -1837,7 +1837,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedCustomer,
+                initialValue: _selectedCustomer,
                 decoration: InputDecoration(
                     labelText: 'Customer', border: OutlineInputBorder()),
                 items: widget.customers.map((customer) {
@@ -1855,7 +1855,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedPriority,
+                initialValue: _selectedPriority,
                 decoration: InputDecoration(
                     labelText: 'Priority', border: OutlineInputBorder()),
                 items: ['High', 'Medium', 'Low'].map((String value) {
@@ -1978,7 +1978,7 @@ class _CreateOpportunityDialogState extends State<CreateOpportunityDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedStage,
+                initialValue: _selectedStage,
                 decoration: InputDecoration(
                     labelText: 'Stage', border: OutlineInputBorder()),
                 items: [

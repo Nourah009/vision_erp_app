@@ -1,17 +1,21 @@
 // models/user_model.dart
 class UserModel {
   final String username;
+  final String name;
   final String role;
   final String department;
   final String? email;
   final String? phone;
+  final String? id;
 
   UserModel({
     required this.username,
+    required this.name,
     required this.role,
     required this.department,
     this.email,
-    this.phone, required id,
+    this.phone,
+    this.id,
   });
 
   // Create from login - أكثر مرونة
@@ -20,10 +24,12 @@ class UserModel {
     // حالياً نستخدم بيانات افتراضية بناءً على اسم المستخدم
     return UserModel(
       username: username,
+      name: username, // Using username as name for now
       role: _getRoleFromUsername(username),
       department: _getDepartmentFromUsername(username),
       email: '$username@visionerp.com',
-      phone: '+966 55 123 4567', id: null,
+      phone: '+966 55 123 4567',
+      id: null,
     );
   }
 
@@ -63,6 +69,7 @@ class UserModel {
       'department': department,
       'email': email,
       'phone': phone,
+      'id': id,
     };
   }
 
@@ -70,12 +77,12 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       username: map['username'] ?? '',
+      name: map['name'] ?? map['username'] ?? '',
       role: map['role'] ?? 'Employee',
       department: map['department'] ?? 'General Department',
       email: map['email'],
-      phone: map['phone'], id: null,
+      phone: map['phone'],
+      id: map['id'],
     );
   }
-
-  get id => null;
 }
