@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class CustomerRelationsPage extends StatefulWidget {
-  const CustomerRelationsPage({super.key});
+  const CustomerRelationsPage({super.key, UserModel? user});
 
   @override
   State<CustomerRelationsPage> createState() => _CustomerRelationsPageState();

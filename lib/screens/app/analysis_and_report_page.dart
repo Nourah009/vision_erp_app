@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 // Data models for charts
 class SalesData {
@@ -21,7 +22,7 @@ class PieData {
 }
 
 class AnalysisReportsPage extends StatefulWidget {
-  const AnalysisReportsPage({super.key});
+  const AnalysisReportsPage({super.key, UserModel? user});
 
   @override
   State<AnalysisReportsPage> createState() => _AnalysisReportsPageState();

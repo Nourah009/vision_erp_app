@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/app/Manufacturing_overview_page.dart';
+import 'package:vision_erp_app/screens/app/accounting_overview_page.dart';
+import 'package:vision_erp_app/screens/app/analysis_report_overview_page.dart';
+import 'package:vision_erp_app/screens/app/crm_page.dart';
+import 'package:vision_erp_app/screens/app/customer_relation_overview_page.dart';
+import 'package:vision_erp_app/screens/app/fixed_assets_overview_page.dart';
+import 'package:vision_erp_app/screens/app/inventory_overview_page.dart';
+import 'package:vision_erp_app/screens/app/material_warehouse_overview_page.dart';
 import 'package:vision_erp_app/screens/app/Purchasing_page.dart';
 import 'package:vision_erp_app/screens/app/accounting_page.dart';
-import 'package:vision_erp_app/screens/app/analysis_and_report_page.dart';
 import 'package:vision_erp_app/screens/app/app_localizations.dart';
-import 'package:vision_erp_app/screens/app/crm_page.dart';
 import 'package:vision_erp_app/screens/app/fixed_assets_page.dart';
 import 'package:vision_erp_app/screens/app/human_resources.dart';
 import 'package:vision_erp_app/screens/app/human_resources_overview_page.dart';
 import 'package:vision_erp_app/screens/app/inventory_page.dart';
 import 'package:vision_erp_app/screens/app/manufacturing_page.dart';
 import 'package:vision_erp_app/screens/app/materials_warehouses_page.dart';
+import 'package:vision_erp_app/screens/app/projects_overview_page.dart';
 import 'package:vision_erp_app/screens/app/projects_page.dart';
+import 'package:vision_erp_app/screens/app/purchasing_overview_page.dart';
+import 'package:vision_erp_app/screens/app/quality_control_overview_page.dart';
 import 'package:vision_erp_app/screens/app/quality_control_page.dart';
 import 'package:vision_erp_app/screens/app/sale_page.dart';
+import 'package:vision_erp_app/screens/app/sales_overview_page.dart';
+import 'package:vision_erp_app/screens/app/vat_overview_page.dart';
 import 'package:vision_erp_app/screens/app/vat_page.dart';
+import 'package:vision_erp_app/screens/app/website_overview_page.dart';
 import 'package:vision_erp_app/screens/app/website_page.dart';
-import 'package:vision_erp_app/screens/models/theme_model.dart' ;
+import 'package:vision_erp_app/screens/app/analysis_and_report_page.dart';
+import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/services/auth_service.dart';
 
 class RecommendationsSection extends StatelessWidget {
@@ -24,8 +37,7 @@ class RecommendationsSection extends StatelessWidget {
     required double mobile,
     double? tablet,
     double? desktop,
-  })
-  responsiveValue;
+  }) responsiveValue;
 
   const RecommendationsSection({super.key, required this.responsiveValue});
 
@@ -33,8 +45,7 @@ class RecommendationsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final isEnglish = Localizations.localeOf(context).languageCode == 'en';
-    
-    // List of all 14 categories with their icons
+
     final List<Map<String, dynamic>> categories = [
       {'title': isEnglish ? 'Human Resources' : 'الموارد البشرية', 'icon': Icons.people},
       {'title': isEnglish ? 'Materials and\nwarehouse' : 'المواد\nوالمستودعات', 'icon': Icons.warehouse},
@@ -64,19 +75,12 @@ class RecommendationsSection extends StatelessWidget {
             appLocalizations.recommendationsForYou,
             style: TextStyle(
               fontFamily: 'Cairo',
-              fontSize: responsiveValue(
-                context,
-                mobile: 18,
-                tablet: 20,
-                desktop: 22,
-              ),
+              fontSize: responsiveValue(context, mobile: 18, tablet: 20, desktop: 22),
               fontWeight: FontWeight.bold,
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: 16),
-
-          // Horizontal scrolling categories
+          const SizedBox(height: 16),
           SizedBox(
             height: 120,
             child: ListView.builder(
@@ -84,14 +88,11 @@ class RecommendationsSection extends StatelessWidget {
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 return Container(
-                  margin: EdgeInsets.only(
-                    right: index == categories.length - 1 ? 0 : 12,
-                    left: index == 0 ? 0 : 0,
-                  ),
+                  margin: EdgeInsets.only(right: index == categories.length - 1 ? 0 : 12),
                   child: _buildCategoryBox(
                     context,
                     categories[index]['title'],
-                    categories[index]['icon'] as IconData,
+                    categories[index]['icon'],
                   ),
                 );
               },
@@ -103,122 +104,170 @@ class RecommendationsSection extends StatelessWidget {
   }
 
   Widget _buildCategoryBox(BuildContext context, String title, IconData icon) {
-   return GestureDetector(
-    onTap: () async {
-      final isLoggedIn = await AuthService.isUserLoggedIn();
-      
-      if (title.contains('Human Resources') || title.contains('الموارد البشرية')) {
-        if (isLoggedIn) {
-          // جلب بيانات المستخدم الحالي
-          final user = await AuthService.getCurrentUser();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HumanResourcesPage(user: user),
-            ),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HumanResourcesOverviewPage(),
-            ),
-          );
+    return GestureDetector(
+      onTap: () async {
+        final isLoggedIn = await AuthService.isUserLoggedIn();
+
+        // Human Resources
+        if (title.contains('Human Resources') || title.contains('الموارد البشرية')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => HumanResourcesPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const HumanResourcesOverviewPage()));
+          }
         }
-      } else if (title.contains('Materials and\nwarehouse') || title.contains('المواد\nوالمستودعات')) {
-        // Navigate to Materials and Warehouse Page
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MaterialsWarehousesPage()),
-        );
-      } else if (title.contains('Fixed assets') || title.contains('الأصول الثابتة')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const FixedAssetsPage()),
-        );
-      } else if (title.contains('Customer\nRelations') || title.contains('علاقات\nالعملاء')) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CustomerRelationsPage()),
-          );
-        } else if (title.contains('Analysis and\nreports') || title.contains('التحليل\nوالتقارير')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AnalysisReportsPage()),
-        );
-      } else if (title.contains('Value Added\nTax') || title.contains('ضريبة القيمة\nالمضافة')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ValueAddedTaxPage()),
-        );
-      } else if (title.contains('Projects') || title.contains('المشاريع')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProjectsPage()),
-        );
-      } else if (title.contains('Website') || title.contains('الموقع الإلكتروني')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const WebsitePage()),
-        );
-      } else if (title.contains('Manufacturing') || title.contains('التصنيع')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ManufacturingPage()),
-        );
-      } else if (title.contains('Sale') || title.contains('المبيعات')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SalePage()),
-        );
-      } else if (title.contains('Purchasing') || title.contains('المشتريات')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PurchasePage()),
-        );
-      } else if (title.contains('Accounting') || title.contains('المحاسبة')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AccountingPage()),
-        );
-      } else if (title.contains('Inventory') || title.contains('المخزون')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const InventoryPage()),
-        );
-      } else if (title.contains('Quality\nControl') || title.contains('مراقبة\nالجودة')) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const QualityControlPage()),
-        );
-      }
-    },
-    child: Container(
-      width: 100,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.primaryColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: AppColors.primaryColor, size: 24),
-          SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryColor,
+
+        // Materials and warehouse
+        else if (title.contains('Materials') || title.contains('المواد')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => MaterialsWarehousesPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const MaterialsWarehouseOverviewPage()));
+          }
+        }
+
+        // Fixed Assets
+        else if (title.contains('Fixed assets') || title.contains('الأصول')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => FixedAssetsPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const FixedAssetsOverviewPage()));
+          }
+        }
+
+        else if (title.contains('Customer') || title.contains('علاقات')) {
+          if (isLoggedIn) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerRelationsPage()));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerRelationsOverviewPage()));
+          }
+        }
+
+        else if (title.contains('Analysis') || title.contains('التحليل')) {
+          if (isLoggedIn) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AnalysisReportsPage()));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AnalysisReportsOverviewPage()));
+          }
+        }
+
+        // VAT — FIXED (NO user PARAMETER)
+        else if (title.contains('Value Added') || title.contains('القيمة')) {
+          if (isLoggedIn) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ValueAddedTaxPage()));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ValueAddedTaxOverviewPage()));
+          }
+        }
+
+        // Projects
+        else if (title.contains('Projects') || title.contains('المشاريع')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ProjectsPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ProjectsOverviewPage()));
+          }
+        }
+
+        // Website
+        else if (title.contains('Website') || title.contains('الموقع')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => WebsitePage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const WebsiteOverviewPage()));
+          }
+        }
+
+        // Manufacturing
+        else if (title.contains('Manufacturing') || title.contains('التصنيع')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ManufacturingPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ManufacturingOverviewPage()));
+          }
+        }
+
+        // Sales
+        else if (title.contains('Sales') || title.contains('المبيعات')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SalePage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const SalesOverviewPage()));
+          }
+        }
+
+        // Purchasing
+        else if (title.contains('Purchasing') || title.contains('المشتريات')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => PurchasePage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const PurchasingOverviewPage()));
+          }
+        }
+
+        // Accounting
+        else if (title.contains('Accounting') || title.contains('المحاسبة')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AccountingPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountingOverviewPage()));
+          }
+        }
+
+        // Inventory
+        else if (title.contains('Inventory') || title.contains('المخزون')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => InventoryPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const InventoryOverviewPage()));
+          }
+        }
+
+        // Quality Control
+        else if (title.contains('Quality') || title.contains('الجودة')) {
+          if (isLoggedIn) {
+            final user = await AuthService.getCurrentUser();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => QualityControlPage(user: user)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const QualityControlOverviewPage()));
+          }
+        }
+      },
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: AppColors.primaryColor, size: 24),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

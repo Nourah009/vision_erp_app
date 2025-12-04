@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class MaterialsWarehousesPage extends StatefulWidget {
-  const MaterialsWarehousesPage({super.key});
+  const MaterialsWarehousesPage({super.key, UserModel? user});
 
   @override
   State<MaterialsWarehousesPage> createState() => _MaterialsWarehousesPageState();

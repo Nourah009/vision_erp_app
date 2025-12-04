@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 class FixedAssetsPage extends StatefulWidget {
-  const FixedAssetsPage({super.key});
+  const FixedAssetsPage({super.key, UserModel? user});
 
   @override
   State<FixedAssetsPage> createState() => _FixedAssetsPageState();

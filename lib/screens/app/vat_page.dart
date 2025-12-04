@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
+import 'package:vision_erp_app/screens/models/user_model.dart';
 
 // Data models for VAT
 class VATData {
@@ -44,7 +45,7 @@ class PieData {
 }
 
 class ValueAddedTaxPage extends StatefulWidget {
-  const ValueAddedTaxPage({super.key});
+  const ValueAddedTaxPage({super.key, UserModel? user});
 
   @override
   State<ValueAddedTaxPage> createState() => _ValueAddedTaxPageState();
