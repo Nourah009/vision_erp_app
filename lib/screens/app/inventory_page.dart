@@ -984,7 +984,7 @@ class _InventoryPageState extends State<InventoryPage> with SingleTickerProvider
                           ),
                           SizedBox(height: 4),
                           Text(
-                            '${totalQuantity}/${warehouse['capacity']} units (${percentage.toStringAsFixed(1)}%)',
+                            '$totalQuantity/${warehouse['capacity']} units (${percentage.toStringAsFixed(1)}%)',
                             style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey),
                           ),
                         ],

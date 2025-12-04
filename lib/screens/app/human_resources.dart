@@ -16,7 +16,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   int _selectedTabIndex = 0;
   DateTime _lastCheckIn = DateTime.now();
   bool _isCheckedIn = false;
-  String _breakStatus = 'No Break'; // 'No Break', 'On Break', 'Break Ended'
+  String _breakStatus = 'No Break';
 
   // Sample data for demonstration
   final List<Map<String, dynamic>> _employees = [
@@ -43,37 +43,13 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     {'period': 'November 2023', 'basicSalary': 5000, 'allowances': 480, 'deductions': 220, 'netSalary': 5260, 'status': 'Processed'},
   ];
 
-  final List<Map<String, dynamic>> _jobOpenings = [
-    {'id': 'J001', 'title': 'Senior Flutter Developer', 'department': 'IT', 'location': 'Riyadh', 'type': 'Full-time', 'status': 'Open', 'applicants': 5},
-    {'id': 'J002', 'title': 'HR Specialist', 'department': 'Human Resources', 'location': 'Jeddah', 'type': 'Full-time', 'status': 'Open', 'applicants': 3},
-    {'id': 'J003', 'title': 'Sales Manager', 'department': 'Sales', 'location': 'Dubai', 'type': 'Full-time', 'status': 'Closed', 'applicants': 8},
-  ];
-
-  List<Map<String, dynamic>> _trainingCourses = [
-    {'id': 'T001', 'title': 'Leadership Skills', 'duration': '2 weeks', 'level': 'Advanced', 'instructor': 'Dr. Smith', 'enrolled': 15, 'capacity': 20, 'status': 'Active'},
-    {'id': 'T002', 'title': 'Project Management', 'duration': '4 weeks', 'level': 'Intermediate', 'instructor': 'Prof. Ahmed', 'enrolled': 12, 'capacity': 25, 'status': 'Active'},
-    {'id': 'T003', 'title': 'Communication Skills', 'duration': '1 week', 'level': 'Beginner', 'instructor': 'Ms. Davis', 'enrolled': 20, 'capacity': 20, 'status': 'Full'},
-  ];
-
-  List<Map<String, dynamic>> _recruitmentPipeline = [
-    {'id': 'C001', 'name': 'Salem Abullatif', 'position': 'Senior Flutter Developer', 'stage': 'Applied', 'appliedDate': '2024-01-10', 'score': 0},
-    {'id': 'C002', 'name': 'Abdullah Bader', 'position': 'HR Specialist', 'stage': 'Screening', 'appliedDate': '2024-01-12', 'score': 75},
-    {'id': 'C003', 'name': 'Samer Ali', 'position': 'Senior Flutter Developer', 'stage': 'Interview', 'appliedDate': '2024-01-08', 'score': 82},
-    {'id': 'C004', 'name': 'Ali Naif', 'position': 'Sales Manager', 'stage': 'Offer', 'appliedDate': '2024-01-05', 'score': 88},
-  ];
-
-  final List<Map<String, dynamic>> _performanceReviews = [
-    {'employee': 'Ahmed Mohamed', 'period': 'Q4 2023', 'rating': 4.5, 'comments': 'Excellent performance with outstanding project delivery', 'reviewer': 'Sarah Ahmed'},
-    {'employee': 'Yasser Ali', 'period': 'Q4 2023', 'rating': 3.8, 'comments': 'Good overall performance with strong sales results', 'reviewer': 'Sarah Ahmed'},
-  ];
-
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 4, vsync: this); // Changed from 6 to 4 tabs
     _tabController.addListener(_handleTabSelection);
     _checkCurrentAttendanceStatus();
   }
@@ -395,121 +371,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  // Recruitment Functions
-  void _showRecruitmentPipeline() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecruitmentPipelinePage(
-          pipeline: _recruitmentPipeline,
-          onCandidateUpdated: (updatedPipeline) {
-            setState(() {
-              _recruitmentPipeline = updatedPipeline;
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  void _applyForJob(Map<String, dynamic> job) {
-    showDialog(
-      context: context,
-      builder: (context) => JobApplicationDialog(
-        job: job,
-        onApplicationSubmitted: (application) {
-          setState(() {
-            _recruitmentPipeline.add({
-              'id': 'C${_recruitmentPipeline.length + 1}'.padLeft(3, '0'),
-              'name': application['name'],
-              'position': job['title'],
-              'stage': 'Applied',
-              'appliedDate': _formatDate(DateTime.now()),
-              'score': 0
-            });
-            job['applicants'] = (job['applicants'] as int) + 1;
-          });
-        },
-      ),
-    );
-  }
-
-  // Training Functions
-  void _showTrainingManagement() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TrainingManagementPage(
-          courses: _trainingCourses,
-          onCourseUpdated: (updatedCourses) {
-            setState(() {
-              _trainingCourses = updatedCourses;
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  void _enrollInTraining(Map<String, dynamic> course) {
-    if (course['enrolled'] >= course['capacity']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Course is full!', style: TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Enroll in Course', style: TextStyle(fontFamily: 'Cairo')),
-        content: Text('Are you sure you want to enroll in ${course['title']}?', style: TextStyle(fontFamily: 'Cairo')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(fontFamily: 'Cairo')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                course['enrolled'] = course['enrolled'] + 1;
-                if (course['enrolled'] >= course['capacity']) {
-                  course['status'] = 'Full';
-                }
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Successfully enrolled in ${course['title']}', style: TextStyle(fontFamily: 'Cairo')),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: Text('Enroll', style: TextStyle(fontFamily: 'Cairo')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Performance Management
-  void _showPerformanceReview() {
-    showDialog(
-      context: context,
-      builder: (context) => PerformanceReviewDialog(
-        employees: _employees.where((e) => e['status'] == 'Active').toList(),
-        onReviewSubmitted: (review) {
-          setState(() {
-            _performanceReviews.add(review);
-          });
-        },
-      ),
-    );
-  }
-
   // Utility Functions
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -531,12 +392,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
         ],
       ),
     );
-  }
-
-  Color _getRatingColor(double rating) {
-    if (rating >= 4.0) return Colors.green;
-    if (rating >= 3.0) return Colors.orange;
-    return Colors.red;
   }
 
   // Filtered data based on search
@@ -583,8 +438,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             Tab(text: 'Employees'),
             Tab(text: 'Attendance'),
             Tab(text: 'Payroll'),
-            Tab(text: 'Recruitment'),
-            Tab(text: 'Training'),
+            // Removed Recruitment and Training tabs
           ],
         ),
       ),
@@ -595,11 +449,9 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           _buildEmployeesTab(),
           _buildAttendanceTab(),
           _buildPayrollTab(),
-          _buildRecruitmentTab(),
-          _buildTrainingTab(),
         ],
       ),
-      floatingActionButton: _buildFloatingActionButton(),
+      // Floating action button removed as requested
     );
   }
 
@@ -607,10 +459,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     final totalEmployees = _employees.length;
     final presentToday = _attendance.where((a) => a['date'] == _formatDate(DateTime.now()) && a['status'] == 'Present').length;
     final onLeave = _leaveRequests.where((l) => l['status'] == 'Approved').length;
-    final int() = _jobOpenings.where((j) => j['status'] == 'Open').length;
-    final averagePerformance = _performanceReviews.isNotEmpty 
-        ? _performanceReviews.map((r) => r['rating']).reduce((a, b) => a + b) / _performanceReviews.length
-        : 0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -628,13 +476,11 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           Row(
             children: [
               _buildStatCard('On Leave', onLeave.toString(), Colors.orange, Icons.beach_access),
-              SizedBox(width: 12),
-              _buildStatCard('Avg Performance', averagePerformance.toStringAsFixed(1), Colors.teal, Icons.assessment),
             ],
           ),
           SizedBox(height: 20),
 
-          // Quick Actions
+          // Quick Actions (only showing remaining actions)
           Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 12),
           Wrap(
@@ -645,19 +491,13 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
               _buildActionButton('Manage Shifts', Icons.schedule, Colors.green, _showShiftManagement),
               _buildActionButton('Process Payroll', Icons.attach_money, Colors.orange, _showPayrollCalculator),
               _buildActionButton('Request Leave', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
-              _buildActionButton('Training', Icons.school, Colors.brown, _showTrainingManagement),
-              _buildActionButton('Recruitment', Icons.work, Colors.red, _showRecruitmentPipeline),
-              _buildActionButton('Performance', Icons.assessment, Colors.teal, _showPerformanceReview),
+              // Removed: Training, Recruitment, Performance buttons
             ],
           ),
 
           // Recent Leave Requests with Approve/Reject buttons
           SizedBox(height: 20),
           _buildRecentLeaveRequests(),
-
-          // Performance Reviews Section
-          SizedBox(height: 20),
-          _buildRecentPerformanceReviews(),
         ],
       ),
     );
@@ -845,101 +685,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  Widget _buildRecruitmentTab() {
-    final openJobs = _jobOpenings.where((job) => job['status'] == 'Open').toList();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Open Positions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12),
-          ...openJobs.map((job) => _buildJobCard(job)),
-          SizedBox(height: 20),
-          Center(
-            child: ElevatedButton.icon(
-              onPressed: _showRecruitmentPipeline,
-              icon: Icon(Icons.visibility),
-              label: Text('View Recruitment Pipeline', style: TextStyle(fontFamily: 'Cairo')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrainingTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Available Courses', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12),
-          ..._trainingCourses.map((course) => _buildTrainingCard(course)),
-          SizedBox(height: 20),
-          Center(
-            child: ElevatedButton.icon(
-              onPressed: _showTrainingManagement,
-              icon: Icon(Icons.school),
-              label: Text('Manage Training', style: TextStyle(fontFamily: 'Cairo')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButton() {
-    switch (_selectedTabIndex) {
-      case 1: // Employees
-        return FloatingActionButton(
-          onPressed: _showAddEmployeeDialog,
-          backgroundColor: AppColors.primaryColor,
-          child: Icon(Icons.person_add, color: Colors.white),
-        );
-      case 2: // Attendance
-        return FloatingActionButton(
-          onPressed: _isCheckedIn ? _checkOut : _checkIn,
-          backgroundColor: _isCheckedIn ? Colors.red : Colors.green,
-          child: Icon(_isCheckedIn ? Icons.logout : Icons.login, color: Colors.white),
-        );
-      case 3: // Payroll
-        return FloatingActionButton(
-          onPressed: _showPayrollCalculator,
-          backgroundColor: AppColors.primaryColor,
-          child: Icon(Icons.attach_money, color: Colors.white),
-        );
-      case 4: // Recruitment
-        return FloatingActionButton(
-          onPressed: _showRecruitmentPipeline,
-          backgroundColor: AppColors.primaryColor,
-          child: Icon(Icons.work, color: Colors.white),
-        );
-      case 5: // Training
-        return FloatingActionButton(
-          onPressed: _showTrainingManagement,
-          backgroundColor: AppColors.primaryColor,
-          child: Icon(Icons.add, color: Colors.white),
-        );
-      default:
-        return FloatingActionButton(
-          onPressed: _showLeaveRequestForm,
-          backgroundColor: AppColors.primaryColor,
-          child: Icon(Icons.add, color: Colors.white),
-        );
-    }
-  }
-
   // Helper Widgets
   Widget _buildStatCard(String title, String value, Color color, IconData icon) {
     return Expanded(
@@ -1056,48 +801,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  Widget _buildJobCard(Map<String, dynamic> job) {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.work, color: AppColors.primaryColor),
-        title: Text(job['title'], style: TextStyle(fontFamily: 'Cairo')),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(job['department'], style: TextStyle(fontFamily: 'Cairo')),
-            Text('${job['location']} • ${job['type']} • ${job['applicants']} applicants', 
-              style: TextStyle(fontFamily: 'Cairo', color: Colors.grey)),
-          ],
-        ),
-        trailing: ElevatedButton(
-          onPressed: () => _applyForJob(job),
-          child: Text('Apply', style: TextStyle(fontFamily: 'Cairo')),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTrainingCard(Map<String, dynamic> course) {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.school, color: AppColors.primaryColor),
-        title: Text(course['title'], style: TextStyle(fontFamily: 'Cairo')),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Duration: ${course['duration']} • Level: ${course['level']}', style: TextStyle(fontFamily: 'Cairo')),
-            Text('Instructor: ${course['instructor']} • ${course['enrolled']}/${course['capacity']} enrolled', 
-              style: TextStyle(fontFamily: 'Cairo', color: Colors.grey)),
-          ],
-        ),
-        trailing: ElevatedButton(
-          onPressed: () => _enrollInTraining(course),
-          child: Text('Enroll', style: TextStyle(fontFamily: 'Cairo')),
-        ),
-      ),
-    );
-  }
-
   Widget _buildRecentLeaveRequests() {
     final pendingLeaves = _leaveRequests.where((leave) => leave['status'] == 'Pending').take(3).toList();
     
@@ -1174,63 +877,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  Widget _buildRecentPerformanceReviews() {
-    final recentReviews = _performanceReviews.take(3).toList();
-    
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Recent Performance Reviews', style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.bold)),
-                if (recentReviews.isNotEmpty)
-                  Chip(
-                    label: Text('Avg: ${(_performanceReviews.map((r) => r['rating']).reduce((a, b) => a + b) / _performanceReviews.length).toStringAsFixed(1)}',
-                      style: TextStyle(fontFamily: 'Cairo', color: Colors.white)),
-                    backgroundColor: Colors.teal,
-                  ),
-              ],
-            ),
-            SizedBox(height: 12),
-            ...recentReviews.map((review) => _buildPerformanceReviewItem(review)),
-            if (recentReviews.isEmpty)
-              Text('No performance reviews yet', style: TextStyle(fontFamily: 'Cairo', color: Colors.grey)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPerformanceReviewItem(Map<String, dynamic> review) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 4),
-      color: Colors.grey[50],
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _getRatingColor(review['rating']),
-          child: Text(review['rating'].toStringAsFixed(1), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ),
-        title: Text(review['employee'], style: TextStyle(fontFamily: 'Cairo')),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(review['period'], style: TextStyle(fontFamily: 'Cairo')),
-            if (review['comments'] != null && review['comments'].isNotEmpty)
-              Text(review['comments'], 
-                   style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey),
-                   maxLines: 1,
-                   overflow: TextOverflow.ellipsis),
-          ],
-        ),
-        trailing: Icon(Icons.star, color: Colors.amber),
-      ),
-    );
-  }
-
   void _showEmployeeFilter() {
     showDialog(
       context: context,
@@ -1239,7 +885,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Add filter options here
             Text('Filter functionality to be implemented', style: TextStyle(fontFamily: 'Cairo')),
           ],
         ),
@@ -1586,464 +1231,5 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
 
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
-}
-
-// Additional Pages
-class RecruitmentPipelinePage extends StatefulWidget {
-  final List<Map<String, dynamic>> pipeline;
-  final Function(List<Map<String, dynamic>>) onCandidateUpdated;
-
-  const RecruitmentPipelinePage({super.key, required this.pipeline, required this.onCandidateUpdated});
-
-  @override
-  State<RecruitmentPipelinePage> createState() => _RecruitmentPipelinePageState();
-}
-
-class _RecruitmentPipelinePageState extends State<RecruitmentPipelinePage> {
-  late List<Map<String, dynamic>> _pipeline;
-
-  @override
-  void initState() {
-    super.initState();
-    _pipeline = List.from(widget.pipeline);
-  }
-
-  void _updateCandidateStage(int index, String newStage) {
-    setState(() {
-      _pipeline[index]['stage'] = newStage;
-    });
-    widget.onCandidateUpdated(_pipeline);
-  }
-
-  void _updateCandidateScore(int index, int score) {
-    setState(() {
-      _pipeline[index]['score'] = score;
-    });
-    widget.onCandidateUpdated(_pipeline);
-  }
-
-  void _showScoreDialog(int index) {
-    final candidate = _pipeline[index];
-    final currentScore = candidate['score'] ?? 0;
-    TextEditingController scoreController = TextEditingController(text: currentScore.toString());
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Set Score for ${candidate['name']}', style: TextStyle(fontFamily: 'Cairo')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Current Score: ${candidate['score'] ?? 0}/100', style: TextStyle(fontFamily: 'Cairo')),
-            SizedBox(height: 16),
-            TextFormField(
-              controller: scoreController,
-              decoration: InputDecoration(
-                labelText: 'Score (0-100)',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                final score = int.tryParse(value ?? '');
-                if (score == null || score < 0 || score > 100) {
-                  return 'Please enter a valid score between 0-100';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(fontFamily: 'Cairo')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final newScore = int.tryParse(scoreController.text) ?? 0;
-              if (newScore >= 0 && newScore <= 100) {
-                _updateCandidateScore(index, newScore);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Score updated to $newScore', style: TextStyle(fontFamily: 'Cairo'))),
-                );
-              }
-            },
-            child: Text('Update Score', style: TextStyle(fontFamily: 'Cairo')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Recruitment Pipeline', style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.primaryColor,
-        elevation: 0,
-      ),
-      body: DefaultTabController(
-        length: 4,
-        child: Column(
-          children: [
-            TabBar(
-              tabs: [
-                Tab(text: 'Applied (${_pipeline.where((c) => c['stage'] == 'Applied').length})'),
-                Tab(text: 'Screening (${_pipeline.where((c) => c['stage'] == 'Screening').length})'),
-                Tab(text: 'Interview (${_pipeline.where((c) => c['stage'] == 'Interview').length})'),
-                Tab(text: 'Offer (${_pipeline.where((c) => c['stage'] == 'Offer').length})'),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _buildPipelineList('Applied'),
-                  _buildPipelineList('Screening'),
-                  _buildPipelineList('Interview'),
-                  _buildPipelineList('Offer'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPipelineList(String stage) {
-    final candidates = _pipeline.where((c) => c['stage'] == stage).toList();
-    
-    return ListView.builder(
-      itemCount: candidates.length,
-      itemBuilder: (context, index) {
-        final candidate = candidates[index];
-        final globalIndex = _pipeline.indexWhere((c) => c['id'] == candidate['id']);
-        
-        return Card(
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-              child: Text(candidate['name'][0], style: TextStyle(color: AppColors.primaryColor)),
-            ),
-            title: Text(candidate['name'], style: TextStyle(fontFamily: 'Cairo')),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(candidate['position'], style: TextStyle(fontFamily: 'Cairo')),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: 12, color: Colors.grey),
-                    SizedBox(width: 4),
-                    Text('Applied: ${candidate['appliedDate']}', style: TextStyle(fontFamily: 'Cairo', fontSize: 12)),
-                  ],
-                ),
-                if (candidate['score'] != null && candidate['score'] > 0)
-                  Row(
-                    children: [
-                      Icon(Icons.score, size: 12, color: Colors.orange),
-                      SizedBox(width: 4),
-                      Text('Score: ${candidate['score']}/100', 
-                           style: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-              ],
-            ),
-            trailing: PopupMenuButton(
-              itemBuilder: (context) => _buildStageMenuItems(globalIndex, candidate['stage']),
-            ),
-            onTap: () => _showCandidateDetails(globalIndex),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showCandidateDetails(int index) {
-    final candidate = _pipeline[index];
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Candidate Details', style: TextStyle(fontFamily: 'Cairo')),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Name', candidate['name']),
-              _buildDetailRow('Position', candidate['position']),
-              _buildDetailRow('Stage', candidate['stage']),
-              _buildDetailRow('Applied Date', candidate['appliedDate']),
-              _buildDetailRow('Score', '${candidate['score'] ?? 0}/100'),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => _showScoreDialog(index),
-                child: Text('Update Score', style: TextStyle(fontFamily: 'Cairo')),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(fontFamily: 'Cairo')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Text('$label: ', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: TextStyle(fontFamily: 'Cairo'))),
-        ],
-      ),
-    );
-  }
-
-  List<PopupMenuEntry> _buildStageMenuItems(int index, String currentStage) {
-    final stages = ['Applied', 'Screening', 'Interview', 'Offer', 'Hired', 'Rejected'];
-    
-    return [
-      PopupMenuItem(
-        child: ListTile(
-          leading: Icon(Icons.score, color: Colors.orange),
-          title: Text('Update Score', style: TextStyle(fontFamily: 'Cairo')),
-          onTap: () {
-            Navigator.pop(context);
-            _showScoreDialog(index);
-          },
-        ),
-      ),
-      PopupMenuDivider(),
-      ...stages.map((stage) => PopupMenuItem(
-        child: ListTile(
-          leading: Icon(
-            stage == currentStage ? Icons.radio_button_checked : Icons.radio_button_off,
-            color: stage == currentStage ? AppColors.primaryColor : Colors.grey,
-          ),
-          title: Text(stage, style: TextStyle(
-            fontFamily: 'Cairo',
-            color: stage == currentStage ? AppColors.primaryColor : Colors.black,
-            fontWeight: stage == currentStage ? FontWeight.bold : FontWeight.normal,
-          )),
-          onTap: () {
-            Navigator.pop(context);
-            _updateCandidateStage(index, stage);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Moved ${_pipeline[index]['name']} to $stage', style: TextStyle(fontFamily: 'Cairo'))),
-            );
-          },
-        ),
-      )),
-    ];
-  }
-}
-
-class TrainingManagementPage extends StatelessWidget {
-  final List<Map<String, dynamic>> courses;
-  final Function(List<Map<String, dynamic>>) onCourseUpdated;
-
-  const TrainingManagementPage({super.key, required this.courses, required this.onCourseUpdated});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Training Management', style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.primaryColor,
-        elevation: 0,
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(16),
-        children: [
-          ...courses.map((course) => _buildTrainingItem(course)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrainingItem(Map<String, dynamic> course) {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.school, color: AppColors.primaryColor),
-        title: Text(course['title'], style: TextStyle(fontFamily: 'Cairo')),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${course['duration']} • ${course['level']}', style: TextStyle(fontFamily: 'Cairo')),
-            Text('Instructor: ${course['instructor']}', style: TextStyle(fontFamily: 'Cairo')),
-            LinearProgressIndicator(
-              value: course['enrolled'] / course['capacity'],
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                course['enrolled'] >= course['capacity'] ? Colors.red : Colors.green
-              ),
-            ),
-            Text('${course['enrolled']}/${course['capacity']} enrolled', 
-              style: TextStyle(fontFamily: 'Cairo', fontSize: 12)),
-          ],
-        ),
-        trailing: Chip(
-          label: Text(course['status'], style: TextStyle(fontFamily: 'Cairo', color: Colors.white)),
-          backgroundColor: course['status'] == 'Active' ? Colors.green : 
-                         course['status'] == 'Full' ? Colors.red : Colors.orange,
-        ),
-      ),
-    );
-  }
-}
-
-class PerformanceReviewDialog extends StatefulWidget {
-  final List<Map<String, dynamic>> employees;
-  final Function(Map<String, dynamic>) onReviewSubmitted;
-
-  const PerformanceReviewDialog({super.key, required this.employees, required this.onReviewSubmitted});
-
-  @override
-  State<PerformanceReviewDialog> createState() => _PerformanceReviewDialogState();
-}
-
-class _PerformanceReviewDialogState extends State<PerformanceReviewDialog> {
-  String? _selectedEmployee;
-  double _rating = 3.0;
-  final _commentsController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Performance Review', style: TextStyle(fontFamily: 'Cairo')),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonFormField(
-            initialValue: _selectedEmployee,
-            items: widget.employees
-                .map((employee) => DropdownMenuItem(
-                      value: employee['id'],
-                      child: Text(employee['name'], style: TextStyle(fontFamily: 'Cairo')),
-                    ))
-                .toList(),
-            onChanged: (value) => setState(() => _selectedEmployee = value as String?),
-            decoration: InputDecoration(labelText: 'Employee'),
-          ),
-          SizedBox(height: 16),
-          Text('Rating: ${_rating.toStringAsFixed(1)}', style: TextStyle(fontFamily: 'Cairo')),
-          Slider(
-            value: _rating,
-            min: 1,
-            max: 5,
-            divisions: 8,
-            onChanged: (value) => setState(() => _rating = value),
-          ),
-          SizedBox(height: 16),
-          Text('Comments:', style: TextStyle(fontFamily: 'Cairo')),
-          TextField(
-            controller: _commentsController,
-            maxLines: 3,
-            decoration: InputDecoration(hintText: 'Enter comments...'),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel', style: TextStyle(fontFamily: 'Cairo')),
-        ),
-        ElevatedButton(
-          onPressed: _selectedEmployee == null ? null : () {
-            final employee = widget.employees.firstWhere((e) => e['id'] == _selectedEmployee);
-            widget.onReviewSubmitted({
-              'employee': employee['name'],
-              'period': 'Q1 ${DateTime.now().year}',
-              'rating': _rating,
-              'comments': _commentsController.text,
-              'reviewer': 'Manager',
-              'date': DateTime.now().toString(),
-            });
-            Navigator.pop(context);
-          },
-          child: Text('Submit Review', style: TextStyle(fontFamily: 'Cairo')),
-        ),
-      ],
-    );
-  }
-}
-
-class JobApplicationDialog extends StatefulWidget {
-  final Map<String, dynamic> job;
-  final Function(Map<String, dynamic>) onApplicationSubmitted;
-
-  const JobApplicationDialog({super.key, required this.job, required this.onApplicationSubmitted});
-
-  @override
-  State<JobApplicationDialog> createState() => _JobApplicationDialogState();
-}
-
-class _JobApplicationDialogState extends State<JobApplicationDialog> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _experienceController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Apply for ${widget.job['title']}', style: TextStyle(fontFamily: 'Cairo')),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: 'Full Name'),
-          ),
-          TextFormField(
-            controller: _emailController,
-            decoration: InputDecoration(labelText: 'Email'),
-            keyboardType: TextInputType.emailAddress,
-          ),
-          TextFormField(
-            controller: _phoneController,
-            decoration: InputDecoration(labelText: 'Phone'),
-            keyboardType: TextInputType.phone,
-          ),
-          TextFormField(
-            controller: _experienceController,
-            decoration: InputDecoration(labelText: 'Years of Experience'),
-            keyboardType: TextInputType.number,
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel', style: TextStyle(fontFamily: 'Cairo')),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            widget.onApplicationSubmitted({
-              'name': _nameController.text,
-              'email': _emailController.text,
-              'phone': _phoneController.text,
-              'experience': _experienceController.text,
-              'position': widget.job['title'],
-              'appliedDate': DateTime.now().toString(),
-            });
-            Navigator.pop(context);
-          },
-          child: Text('Submit Application', style: TextStyle(fontFamily: 'Cairo')),
-        ),
-      ],
-    );
   }
 }

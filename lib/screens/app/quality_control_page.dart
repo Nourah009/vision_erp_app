@@ -190,7 +190,7 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
   ];
 
   // Statistics
-  Map<String, double> _defectsByCategory = {
+  final Map<String, double> _defectsByCategory = {
     'Visual': 35,
     'Functional': 25,
     'Electrical': 20,
@@ -198,7 +198,7 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
     'Packaging': 5,
   };
 
-  Map<String, double> _inspectionsByType = {
+  final Map<String, double> _inspectionsByType = {
     'Incoming': 40,
     'InProcess': 30,
     'Final': 20,
@@ -846,7 +846,7 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
                     ),
                   ),
                   SizedBox(width: 20),
-                  Container(
+                  SizedBox(
                     width: 150,
                     height: 150,
                     child: _buildPieChart(),
@@ -877,7 +877,7 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
           Expanded(
             child: Text(category, style: TextStyle(fontFamily: 'Cairo', fontSize: 12)),
           ),
-          Text('${percentage}%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+          Text('$percentage%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -1018,8 +1018,8 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
             if (inspection.status == 'Pending')
               TextButton(
                 onPressed: () => _viewInspectionDetails(inspection),
-                child: Text('Start', style: TextStyle(fontFamily: 'Cairo', fontSize: 12)),
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                child: Text('Start', style: TextStyle(fontFamily: 'Cairo', fontSize: 12)),
               ),
           ],
         ),
@@ -1166,7 +1166,7 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(category, style: TextStyle(fontFamily: 'Cairo')),
-              Text('${percentage}%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+              Text('$percentage%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
             ],
           ),
           SizedBox(height: 4),
@@ -1190,7 +1190,7 @@ class _QualityControlPageState extends State<QualityControlPage> with SingleTick
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(type, style: TextStyle(fontFamily: 'Cairo')),
-              Text('${percentage}%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+              Text('$percentage%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
             ],
           ),
           SizedBox(height: 4),
@@ -1313,8 +1313,8 @@ class _NewInspectionSheetState extends State<NewInspectionSheet> {
   final _orderNumberController = TextEditingController();
   final _totalItemsController = TextEditingController();
   String _selectedType = 'Incoming';
-  String _selectedWarehouse = 'Main Warehouse';
-  String _selectedInspector = 'Ahmed Ali';
+  final String _selectedWarehouse = 'Main Warehouse';
+  final String _selectedInspector = 'Ahmed Ali';
 
   @override
   Widget build(BuildContext context) {
@@ -1361,7 +1361,7 @@ class _NewInspectionSheetState extends State<NewInspectionSheet> {
                 ),
                 SizedBox(height: 12),
                 DropdownButtonFormField(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   items: ['Incoming', 'InProcess', 'Final', 'Random', 'Supplier']
                       .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                       .toList(),
@@ -1592,7 +1592,7 @@ class _InspectionDetailPageState extends State<InspectionDetailPage> {
                       : null,
                 ),
               );
-            }).toList(),
+            }),
             
             if (_inspection.status == 'Pending')
               SizedBox(height: 20),
@@ -1704,7 +1704,7 @@ class _DefectReportDialogState extends State<DefectReportDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField(
-                value: _selectedDefectType,
+                initialValue: _selectedDefectType,
                 items: ['Minor', 'Major', 'Critical']
                     .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                     .toList(),
@@ -1725,7 +1725,7 @@ class _DefectReportDialogState extends State<DefectReportDialog> {
               ),
               SizedBox(height: 12),
               DropdownButtonFormField(
-                value: _selectedAssignee,
+                initialValue: _selectedAssignee,
                 items: ['Quality Manager', 'Production Supervisor', 'Maintenance', 'Supplier']
                     .map((person) => DropdownMenuItem(value: person, child: Text(person)))
                     .toList(),

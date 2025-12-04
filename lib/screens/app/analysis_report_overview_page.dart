@@ -239,7 +239,7 @@ class AnalysisReportsOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive business intelligence and reporting system designed to provide real-time insights, generate detailed analytics, and create customizable reports across all organizational departments for data-driven decision making.'
+                ? 'Powerful business intelligence and reporting system designed to provide real-time insights, generate detailed analytics, and create customizable reports across all organizational departments for data-driven decision making.'
                 : 'نظام شامل لتحليل الأعمال والتقارير مصمم لتقديم رؤى آنية، وإنشاء تحليلات مفصلة، وإنشاء تقارير قابلة للتخصيص عبر جميع أقسام المنظمة لاتخاذ قرارات قائمة على البيانات.',
             style: TextStyle(
               fontFamily: 'Cairo',
@@ -622,7 +622,7 @@ class AnalysisReportsOverviewPage extends StatelessWidget {
           SizedBox(height: screenWidth > 600 ? 12 : 10),
           Text(
             isEnglish
-                ? 'Login is required to access advanced analytics features including custom report generation, real-time dashboards, and comprehensive business intelligence tools.'
+                ? 'Login is required to access advanced analytics features including custom report generation, real-time dashboards, and Powerful business intelligence tools.'
                 : 'يتطلب تسجيل الدخول للوصول إلى ميزات التحليلات المتقدمة بما في ذلك إنشاء التقارير المخصصة، ولوحات التحكم الآنية، وأدوات تحليل الأعمال الشاملة.',
             style: TextStyle(
               fontFamily: 'Cairo',

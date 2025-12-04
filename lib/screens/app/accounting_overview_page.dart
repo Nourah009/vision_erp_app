@@ -229,7 +229,7 @@ class AccountingOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Complete financial accounting system designed to manage all financial transactions, maintain accurate general ledger, handle accounts payable and receivable, process payroll, and generate comprehensive financial reports with real-time insights.'
+                ? 'Complete financial accounting system designed to manage all financial transactions, maintain accurate general ledger, handle accounts payable and receivable, process payroll, and generate Powerful financial reports with real-time insights.'
                 : 'نظام محاسبي مالي متكامل مصمم لإدارة جميع المعاملات المالية، والحفاظ على دفتر الأستاذ العام الدقيق، ومعالجة الحسابات الدائنة والمدينة، ومعالجة الرواتب، وإنشاء تقارير مالية شاملة مع رؤى آنية.',
             style: TextStyle(
               fontFamily: 'Cairo',
