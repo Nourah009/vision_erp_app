@@ -239,7 +239,7 @@ class WebsiteOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Website Content Management System (CMS) designed to build, manage, and optimize your digital presence. Features include responsive website builder, SEO optimization tools, content management, e-commerce integration, analytics dashboard, and multi-language support for creating engaging and effective web experiences.'
+                ? 'Powerful Website Content Management System (CMS) designed to build, manage, and optimize your digital presence. Features include responsive website builder, SEO optimization tools, content management, e-commerce integration, analytics dashboard, and multi-language support for creating engaging and effective web experiences.'
                 : 'نظام شامل لإدارة محتوى الموقع الإلكتروني (CMS) مصمم لبناء وإدارة وتحسين التواجد الرقمي الخاص بك. يتضمن ميزات منشئ مواقع متجاوب، أدوات تحسين محركات البحث، إدارة المحتوى، تكامل التجارة الإلكترونية، لوحة تحليل البيانات، ودعم متعدد اللغات لإنشاء تجارب ويب جذابة وفعالة.',
             style: TextStyle(
               fontFamily: 'Cairo',

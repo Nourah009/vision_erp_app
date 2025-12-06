@@ -239,7 +239,7 @@ class SalesOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Complete Sales Management system designed to optimize the entire sales lifecycle from lead generation to revenue realization. Features include customer relationship management, sales pipeline tracking, order processing, quotation management, invoicing, and comprehensive sales analytics for revenue growth and customer satisfaction.'
+                ? 'Complete Sales Management system designed to optimize the entire sales lifecycle from lead generation to revenue realization. Features include customer relationship management, sales pipeline tracking, order processing, quotation management, invoicing, and Powerful sales analytics for revenue growth and customer satisfaction.'
                 : 'نظام متكامل لإدارة المبيعات مصمم لتحسين دورة حياة المبيعات الكاملة من توليد العملاء المحتملين إلى تحقيق الإيرادات. يتضمن ميزات إدارة علاقات العملاء، وتتبع مسار المبيعات، ومعالجة الطلبات، وإدارة العروض، والفواتير، وتحليلات المبيعات الشاملة لنمو الإيرادات ورضا العملاء.',
             style: TextStyle(
               fontFamily: 'Cairo',

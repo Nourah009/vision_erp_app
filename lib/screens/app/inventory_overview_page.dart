@@ -239,7 +239,7 @@ class InventoryOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive inventory management system designed to track, manage, and optimize stock levels across multiple warehouses with real-time visibility, automated reordering, and detailed reporting for efficient inventory control and cost optimization.'
+                ? 'Powerful inventory management system designed to track, manage, and optimize stock levels across multiple warehouses with real-time visibility, automated reordering, and detailed reporting for efficient inventory control and cost optimization.'
                 : 'نظام شامل لإدارة المخزون مصمم لتتبع وإدارة وتحسين مستويات المخزون عبر مستودعات متعددة مع رؤية آنية، وإعادة الطلب التلقائي، وتقارير مفصلة للتحكم الفعال في المخزون وتحسين التكاليف.',
             style: TextStyle(
               fontFamily: 'Cairo',
@@ -669,7 +669,7 @@ class InventoryOverviewPage extends StatelessWidget {
           SizedBox(height: screenWidth > 600 ? 12 : 10),
           Text(
             isEnglish
-                ? 'Login is required to access full inventory features including stock management, warehouse control, inventory tracking, and comprehensive reporting.'
+                ? 'Login is required to access full inventory features including stock management, warehouse control, inventory tracking, and Powerful reporting.'
                 : 'يتطلب تسجيل الدخول للوصول إلى جميع ميزات المخزون بما في ذلك إدارة المخزون، والتحكم بالمستودعات، وتتبع المخزون، والتقارير الشاملة.',
             style: TextStyle(
               fontFamily: 'Cairo',

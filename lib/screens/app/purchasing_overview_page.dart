@@ -239,7 +239,7 @@ class PurchasingOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive procurement and purchasing management system designed to streamline the entire purchasing cycle from requisition to payment. Features include vendor management, purchase order processing, inventory integration, approval workflows, and spend analysis for cost optimization and efficient supply chain management.'
+                ? 'Powerful procurement and purchasing management system designed to streamline the entire purchasing cycle from requisition to payment. Features include vendor management, purchase order processing, inventory integration, approval workflows, and spend analysis for cost optimization and efficient supply chain management.'
                 : 'نظام شامل لإدارة المشتريات والشراء مصمم لتبسيط دورة الشراء الكاملة من الطلب حتى الدفع. يتضمن ميزات إدارة الموردين، ومعالجة أوامر الشراء، والتكامل مع المخزون، وسير عمل الموافقة، وتحليل الإنفاق لتحسين التكاليف وإدارة سلسلة التوريد بكفاءة.',
             style: TextStyle(
               fontFamily: 'Cairo',

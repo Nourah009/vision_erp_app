@@ -239,7 +239,7 @@ class ManufacturingOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Manufacturing Execution System (MES) designed to optimize production processes, manage workflows, control quality, and enhance operational efficiency through real-time monitoring, production planning, and performance analytics.'
+                ? 'Powerful Manufacturing Execution System (MES) designed to optimize production processes, manage workflows, control quality, and enhance operational efficiency through real-time monitoring, production planning, and performance analytics.'
                 : 'نظام تنفيذ التصنيع الشامل (MES) مصمم لتحسين عمليات الإنتاج، وإدارة سير العمل، والتحكم في الجودة، وتعزيز الكفاءة التشغيلية من خلال المراقبة الآنية، وتخطيط الإنتاج، وتحليلات الأداء.',
             style: TextStyle(
               fontFamily: 'Cairo',

@@ -239,7 +239,7 @@ class QualityControlOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Quality Management System (QMS) designed to ensure product and service excellence through systematic quality control, inspection management, compliance tracking, and continuous improvement processes. Features include defect analysis, corrective actions, audit management, and real-time quality monitoring.'
+                ? 'Powerful Quality Management System (QMS) designed to ensure product and service excellence through systematic quality control, inspection management, compliance tracking, and continuous improvement processes. Features include defect analysis, corrective actions, audit management, and real-time quality monitoring.'
                 : 'نظام شامل لإدارة الجودة (QMS) مصمم لضمان تميز المنتج والخدمة من خلال مراقبة الجودة المنهجية، وإدارة التفتيش، وتتبع الامتثال، وعمليات التحسين المستمر. يتضمن ميزات تحليل العيوب، والإجراءات التصحيحية، وإدارة التدقيق، ومراقبة الجودة الآنية.',
             style: TextStyle(
               fontFamily: 'Cairo',

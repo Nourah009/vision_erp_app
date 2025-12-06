@@ -13,10 +13,11 @@ class HumanResourcesPage extends StatefulWidget {
 
 class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _selectedTabIndex = 0;
   DateTime _lastCheckIn = DateTime.now();
   bool _isCheckedIn = false;
   String _breakStatus = 'No Break';
+  bool _showAddEmployeeQuickAction = false; // Set to false to hide Add Employee quick action
+
 
   // Sample data for demonstration
   final List<Map<String, dynamic>> _employees = [
@@ -46,11 +47,15 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // Configuration flags
+  final bool _showEmployeeEditOptions = false; // Set to false to hide edit options
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this); // Changed from 6 to 4 tabs
-    _tabController.addListener(_handleTabSelection);
+    // Only 4 tabs: Dashboard, Employees, Attendance, Payroll
+    // Recruitment and Training tabs are HIDDEN
+    _tabController = TabController(length: 4, vsync: this);
     _checkCurrentAttendanceStatus();
   }
 
@@ -70,12 +75,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
         _lastCheckIn = DateTime.now();
       });
     }
-  }
-
-  void _handleTabSelection() {
-    setState(() {
-      _selectedTabIndex = _tabController.index;
-    });
   }
 
   @override
@@ -111,10 +110,12 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             onPressed: () => Navigator.pop(context),
             child: Text('Close', style: TextStyle(fontFamily: 'Cairo')),
           ),
-          ElevatedButton(
-            onPressed: () => _editEmployee(employee),
-            child: Text('Edit', style: TextStyle(fontFamily: 'Cairo')),
-          ),
+          // Edit button is CONDITIONALLY SHOWN based on _showEmployeeEditOptions
+          if (_showEmployeeEditOptions)
+            ElevatedButton(
+              onPressed: () => _editEmployee(employee),
+              child: Text('Edit', style: TextStyle(fontFamily: 'Cairo')),
+            ),
         ],
       ),
     );
@@ -438,7 +439,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             Tab(text: 'Employees'),
             Tab(text: 'Attendance'),
             Tab(text: 'Payroll'),
-            // Removed Recruitment and Training tabs
+            // Recruitment and Training tabs are HIDDEN (not shown)
           ],
         ),
       ),
@@ -449,9 +450,10 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           _buildEmployeesTab(),
           _buildAttendanceTab(),
           _buildPayrollTab(),
+          // Recruitment and Training tabs are HIDDEN (not shown)
         ],
       ),
-      // Floating action button removed as requested
+      // Floating Action Button is HIDDEN (removed as requested)
     );
   }
 
@@ -464,7 +466,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Quick Stats
+          // Quick Stats - Performance section HIDDEN
           Row(
             children: [
               _buildStatCard('Total Employees', totalEmployees.toString(), Colors.blue, Icons.people),
@@ -476,28 +478,33 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           Row(
             children: [
               _buildStatCard('On Leave', onLeave.toString(), Colors.orange, Icons.beach_access),
+              // Performance stat card is HIDDEN
             ],
           ),
           SizedBox(height: 20),
 
-          // Quick Actions (only showing remaining actions)
+          // Quick Actions - Training, Recruitment, and Performance actions HIDDEN
           Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 12),
           Wrap(
             spacing: 12,
             runSpacing: 12,
             children: [
-              _buildActionButton('Add Employee', Icons.person_add, Colors.blue, _showAddEmployeeDialog),
+              if (_showAddEmployeeQuickAction)
+                   _buildActionButton('Add Employee', Icons.person_add, Colors.blue, _showAddEmployeeDialog),
+                   
               _buildActionButton('Manage Shifts', Icons.schedule, Colors.green, _showShiftManagement),
               _buildActionButton('Process Payroll', Icons.attach_money, Colors.orange, _showPayrollCalculator),
               _buildActionButton('Request Leave', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
-              // Removed: Training, Recruitment, Performance buttons
+              // Training, Recruitment, and Performance quick action buttons are HIDDEN
             ],
           ),
 
           // Recent Leave Requests with Approve/Reject buttons
           SizedBox(height: 20),
           _buildRecentLeaveRequests(),
+
+          // Performance Reviews Section is HIDDEN (entire section not shown)
         ],
       ),
     );
@@ -550,20 +557,33 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
                   title: Text(employee['name'], style: TextStyle(fontFamily: 'Cairo')),
                   subtitle: Text('${employee['position']} - ${employee['department']}', style: TextStyle(fontFamily: 'Cairo')),
                   trailing: PopupMenuButton(
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        child: Text('View Details', style: TextStyle(fontFamily: 'Cairo')),
-                        onTap: () => _showEmployeeDetails(employee),
-                      ),
-                      PopupMenuItem(
-                        child: Text('Edit', style: TextStyle(fontFamily: 'Cairo')),
-                        onTap: () => _editEmployee(employee),
-                      ),
-                      PopupMenuItem(
-                        child: Text('Delete', style: TextStyle(fontFamily: 'Cairo')),
-                        onTap: () => _deleteEmployee(employee),
-                      ),
-                    ],
+                    itemBuilder: (context) {
+                      List<PopupMenuItem> items = [
+                        PopupMenuItem(
+                          child: Text('View Details', style: TextStyle(fontFamily: 'Cairo')),
+                          onTap: () => _showEmployeeDetails(employee),
+                        ),
+                      ];
+                      
+                      // Edit option is CONDITIONALLY HIDDEN based on _showEmployeeEditOptions
+                      if (_showEmployeeEditOptions) {
+                        items.add(
+                          PopupMenuItem(
+                            child: Text('Edit', style: TextStyle(fontFamily: 'Cairo')),
+                            onTap: () => _editEmployee(employee),
+                          ),
+                        );
+                      }
+                      
+                      items.add(
+                        PopupMenuItem(
+                          child: Text('Delete', style: TextStyle(fontFamily: 'Cairo')),
+                          onTap: () => _deleteEmployee(employee),
+                        ),
+                      );
+                      
+                      return items;
+                    },
                   ),
                   onTap: () => _showEmployeeDetails(employee),
                 ),

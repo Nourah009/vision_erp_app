@@ -239,7 +239,7 @@ class ProjectsOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Project Management system designed to plan, execute, monitor, and control projects from initiation to completion. Features include task management, resource allocation, budget tracking, timeline visualization, and real-time collaboration tools for efficient project delivery.'
+                ? 'Powerful Project Management system designed to plan, execute, monitor, and control projects from initiation to completion. Features include task management, resource allocation, budget tracking, timeline visualization, and real-time collaboration tools for efficient project delivery.'
                 : 'نظام شامل لإدارة المشاريع مصمم لتخطيط وتنفيذ ومراقبة والتحكم في المشاريع من البداية حتى الانتهاء. يتضمن ميزات إدارة المهام، تخصيص الموارد، تتبع الميزانية، تصور الجداول الزمنية، وأدوات التعاون الآنية لتسليم المشاريع بكفاءة.',
             style: TextStyle(
               fontFamily: 'Cairo',

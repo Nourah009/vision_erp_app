@@ -55,7 +55,7 @@ class MaterialsWarehouseOverviewPage extends StatelessWidget {
                   ? 'Materials & Warehouse System Overview'
                   : 'نظرة عامة على نظام المواد والمستودعات',
               isEnglish
-                  ? 'A comprehensive inventory and materials management system designed to help organizations efficiently track stock levels, control warehouse operations, manage material movement, and ensure accurate real-time inventory visibility.'
+                  ? 'A Powerful inventory and materials management system designed to help organizations efficiently track stock levels, control warehouse operations, manage material movement, and ensure accurate real-time inventory visibility.'
                   : 'نظام متكامل لإدارة المخزون والمواد يساعد المؤسسات على تتبّع مستويات المخزون، والتحكم في عمليات المستودعات، وإدارة حركة المواد، وضمان رؤية دقيقة ومحدّثة للمخزون.',
               screenWidth,
             ),

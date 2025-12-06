@@ -239,7 +239,7 @@ class ValueAddedTaxOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Value Added Tax (VAT) management system designed to ensure tax compliance, automate tax calculations, generate accurate tax reports, and streamline the entire tax filing process. Features include automatic VAT computation on invoices, tax return generation, integration with tax authorities, and real-time tax liability monitoring.'
+                ? 'Powerful Value Added Tax (VAT) management system designed to ensure tax compliance, automate tax calculations, generate accurate tax reports, and streamline the entire tax filing process. Features include automatic VAT computation on invoices, tax return generation, integration with tax authorities, and real-time tax liability monitoring.'
                 : 'نظام شامل لإدارة ضريبة القيمة المضافة (VAT) مصمم لضمان الامتثال الضريبي، وأتمتة حسابات الضرائب، وإنشاء تقارير ضريبية دقيقة، وتبسيط عملية تقديم الإقرارات الضريبية الكاملة. يتضمن ميزات الحساب التلقائي للضريبة على الفواتير، وإنشاء إقرارات ضريبية، والتكامل مع السلطات الضريبية، ومراقبة الالتزامات الضريبية الآنية.',
             style: TextStyle(
               fontFamily: 'Cairo',

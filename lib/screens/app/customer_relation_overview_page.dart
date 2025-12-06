@@ -239,7 +239,7 @@ class CustomerRelationsOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Customer Relationship Management (CRM) system designed to manage customer interactions, track communication history, improve customer satisfaction, and build long-term relationships through personalized service and efficient support.'
+                ? 'Powerful Customer Relationship Management (CRM) system designed to manage customer interactions, track communication history, improve customer satisfaction, and build long-term relationships through personalized service and efficient support.'
                 : 'نظام شامل لإدارة علاقات العملاء (CRM) مصمم لإدارة تفاعلات العملاء، وتتبع سجل الاتصالات، وتحسين رضا العملاء، وبناء علاقات طويلة الأجل من خلال الخدمة المخصصة والدعم الفعال.',
             style: TextStyle(
               fontFamily: 'Cairo',

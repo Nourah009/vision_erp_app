@@ -239,7 +239,7 @@ class FixedAssetsOverviewPage extends StatelessWidget {
           ),
           child: Text(
             isEnglish
-                ? 'Comprehensive Fixed Asset Management system designed to track, manage, and optimize all organizational assets including machinery, equipment, vehicles, and properties with features for depreciation calculation, maintenance scheduling, and lifecycle management.'
+                ? 'Powerful Fixed Asset Management system designed to track, manage, and optimize all organizational assets including machinery, equipment, vehicles, and properties with features for depreciation calculation, maintenance scheduling, and lifecycle management.'
                 : 'نظام شامل لإدارة الأصول الثابتة مصمم لتتبع وإدارة وتحسين جميع أصول المؤسسة بما في ذلك الآلات والمعدات والمركبات والعقارات مع ميزات لحساب الاستهلاك وجدولة الصيانة وإدارة دورة الحياة.',
             style: TextStyle(
               fontFamily: 'Cairo',
@@ -669,7 +669,7 @@ class FixedAssetsOverviewPage extends StatelessWidget {
           SizedBox(height: screenWidth > 600 ? 12 : 10),
           Text(
             isEnglish
-                ? 'Login is required to access full fixed assets features including asset registration, depreciation calculation, maintenance scheduling, and comprehensive asset reporting.'
+                ? 'Login is required to access full fixed assets features including asset registration, depreciation calculation, maintenance scheduling, and Powerful asset reporting.'
                 : 'يتطلب تسجيل الدخول للوصول إلى جميع ميزات الأصول الثابتة بما في ذلك تسجيل الأصول وحساب الاستهلاك وجدولة الصيانة والتقارير الشاملة للأصول.',
             style: TextStyle(
               fontFamily: 'Cairo',
