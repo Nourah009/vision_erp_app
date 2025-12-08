@@ -761,22 +761,20 @@ class _MaterialsWarehousesPageState extends State<MaterialsWarehousesPage> with 
       child: Column(
         children: [
           // Quick Stats
-          Row(
+         Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
               _buildStatCard('Total Products', totalProducts.toString(), Colors.blue, Icons.inventory),
-              SizedBox(width: 12),
+              SizedBox(width: 10),
               _buildStatCard('Total Warehouses', totalWarehouses.toString(), Colors.green, Icons.warehouse),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              _buildStatCard('Inventory Value', '\$${totalValue.toStringAsFixed(0)}', Colors.orange, Icons.attach_money),
-              SizedBox(width: 12),
+              SizedBox(height: 10),
+               _buildStatCard('Inventory Value', '\$${totalValue.toStringAsFixed(0)}', Colors.orange, Icons.attach_money),
+              SizedBox(width: 10),
               _buildStatCard('Critical Alerts', criticalAlerts.toString(), Colors.red, Icons.warning),
+              SizedBox(height: 10),
             ],
           ),
-          SizedBox(height: 20),
 
           // Quick Actions
           Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),

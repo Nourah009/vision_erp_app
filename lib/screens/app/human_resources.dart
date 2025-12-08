@@ -16,7 +16,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   DateTime _lastCheckIn = DateTime.now();
   bool _isCheckedIn = false;
   String _breakStatus = 'No Break';
-  bool _showAddEmployeeQuickAction = false; // Set to false to hide Add Employee quick action
+  final bool _showAddEmployeeQuickAction = false; // Set to false to hide Add Employee quick action
 
 
   // Sample data for demonstration
@@ -470,19 +470,15 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           Row(
             children: [
               _buildStatCard('Total Employees', totalEmployees.toString(), Colors.blue, Icons.people),
-              SizedBox(width: 12),
+              SizedBox(width: 10),
               _buildStatCard('Present Today', presentToday.toString(), Colors.green, Icons.check_circle),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
+              SizedBox(width: 10),
               _buildStatCard('On Leave', onLeave.toString(), Colors.orange, Icons.beach_access),
-              // Performance stat card is HIDDEN
             ],
           ),
-          SizedBox(height: 20),
-
+          SizedBox(height: 10),
+          // Performance stat card is HIDDEN
+          
           // Quick Actions - Training, Recruitment, and Performance actions HIDDEN
           Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 12),
@@ -712,7 +708,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(icon, color: color, size: 24),
               SizedBox(height: 8),
