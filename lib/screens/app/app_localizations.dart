@@ -199,6 +199,8 @@ class AppLocalizations {
 
   var RecommendationsForYou;
 
+  String get languageCode => locale.languageCode;
+
   String? _getText(String key) {
     return _localizedValues[locale.languageCode]?[key];
   }

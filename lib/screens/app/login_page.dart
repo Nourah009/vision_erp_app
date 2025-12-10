@@ -44,51 +44,130 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    if (_usernameController.text.isEmpty) {
-      _showError(AppLocalizations.of(context)!.userName.isEmpty ? 'Please enter your username' : 'يرجى إدخال اسم المستخدم');
-      return;
-    }
-  
-    if (_passwordController.text.isEmpty) {
-      _showError(AppLocalizations.of(context)!.password.isEmpty ? 'Please enter your password' : 'يرجى إدخال كلمة المرور');
-      return;
-    }
+  // التحقق من إدخال اسم المستخدم
+  if (_usernameController.text.isEmpty) {
+    _showError(AppLocalizations.of(context)!.userName.isEmpty 
+        ? 'Please enter your username' 
+        : 'يرجى إدخال اسم المستخدم');
+    return;
+  }
 
-    setState(() {
-      _isLoading = true;
-    });
+  // التحقق من إدخال كلمة المرور
+  if (_passwordController.text.isEmpty) {
+    _showError(AppLocalizations.of(context)!.password.isEmpty 
+        ? 'Please enter your password' 
+        : 'يرجى إدخال كلمة المرور');
+    return;
+  }
 
-    try {
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
+  setState(() {
+    _isLoading = true;
+  });
 
-      final result = await AuthService.login(username, password, _rememberMe);
+  try {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    final result = await AuthService.login(username, password, _rememberMe);
     
-      if (result['success'] == true) {
-        final user = result['user'] as UserModel;
-        _handleSuccessfulLogin(user);
-      } else {
-        _showError(result['message'] as String);
+    if (result['success'] == true) {
+      final user = result['user'] as UserModel;
+      
+      // عرض رسالة خاصة إذا كان المستخدم CEO
+      if (user.isCEO) {
+        final appLocalizations = AppLocalizations.of(context)!;
+        _showSuccess(
+          appLocalizations.languageCode == 'en'
+            ? 'Welcome CEO ${user.name}! Administrative access granted.'
+            : 'مرحباً بك المدير التنفيذي ${user.nameNative}! تم منح صلاحيات إدارية.'
+        );
       }
-    } catch (e) {
-      final user = UserModel.fromLogin(_usernameController.text.trim());
-      await AuthService.saveUserSession(user, _rememberMe);
+      
       _handleSuccessfulLogin(user);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    } else {
+      // تحسين عرض رسائل الخطأ بناءً على اللغة
+      final errorMessage = result['message'] as String;
+      final appLocalizations = AppLocalizations.of(context)!;
+      
+      // ترجمة بعض رسائل الخطأ الشائعة
+      String localizedError = errorMessage;
+      if (errorMessage.contains('Invalid username or password') || 
+          errorMessage.contains('401')) {
+        localizedError = appLocalizations.languageCode == 'en'
+          ? 'Invalid username or password'
+          : 'اسم المستخدم أو كلمة المرور غير صحيحة';
+      } else if (errorMessage.contains('Connection error')) {
+        localizedError = appLocalizations.languageCode == 'en'
+          ? 'Connection error. Please check your internet connection.'
+          : 'خطأ في الاتصال. يرجى التحقق من اتصال الإنترنت.';
+      } else if (errorMessage.contains('Server error')) {
+        localizedError = appLocalizations.languageCode == 'en'
+          ? 'Server error. Please try again later.'
+          : 'خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.';
+      }
+      
+      _showError(localizedError);
     }
-  }
-
-  void _handleSuccessfulLogin(UserModel user) {
+  } catch (e) {
+    // في حالة فشل الاتصال بالخادم، استخدم الوضع التجريبي
     final appLocalizations = AppLocalizations.of(context)!;
-    _showSuccess('${appLocalizations.login} ${appLocalizations.login.toLowerCase().contains('successful') ? 'successful' : 'ناجح'}! ${appLocalizations.welcome} ${user.username}');
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => DashboardPage(user: user)),
+    
+    // عرض تحذير بأننا في الوضع التجريبي
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          appLocalizations.languageCode == 'en'
+            ? '⚠️ Using demo mode (server unavailable)'
+            : '⚠️ استخدام الوضع التجريبي (الخادم غير متاح)'
+        ),
+        backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 3),
+      ),
     );
+    
+    // استخدام بيانات تجريبية
+    final user = UserModel.fromLogin(_usernameController.text.trim());
+    await AuthService.saveUserSession(user, _rememberMe);
+    _handleSuccessfulLogin(user);
+    
+    // تسجيل الخطأ للتصحيح
+    print('Login error (using demo mode): $e');
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
+// تحديث دالة _handleSuccessfulLogin لإضافة معلومات إضافية
+void _handleSuccessfulLogin(UserModel user) {
+  final appLocalizations = AppLocalizations.of(context)!;
+  final welcomeMessage = appLocalizations.languageCode == 'en'
+    ? 'Welcome ${user.name}!'
+    : 'مرحباً بك ${user.nameNative}!';
+  
+  // عرض رسالة نجاح مع معلومات إضافية للمدير التنفيذي
+  String successMessage = '';
+  if (user.isCEO) {
+    successMessage = appLocalizations.languageCode == 'en'
+      ? '✅ Login successful! $welcomeMessage\nCEO privileges activated.'
+      : '✅ تسجيل الدخول ناجح! $welcomeMessage\nتم تفعيل صلاحيات المدير التنفيذي.';
+  } else {
+    successMessage = appLocalizations.languageCode == 'en'
+      ? '✅ Login successful! $welcomeMessage'
+      : '✅ تسجيل الدخول ناجح! $welcomeMessage';
+  }
+  
+  _showSuccess(successMessage);
+  
+  // الانتقال إلى DashboardPage مع تمرير بيانات المستخدم
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => DashboardPage(user: user),
+    ),
+  );
+}
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
