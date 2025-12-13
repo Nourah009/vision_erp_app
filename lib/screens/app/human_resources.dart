@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/services/hr_service.dart';
 
 class HumanResourcesPage extends StatefulWidget {
   final UserModel? user;
@@ -17,6 +18,12 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   bool _isCheckedIn = false;
   String _breakStatus = 'No Break';
   final bool _showAddEmployeeQuickAction = false; // Set to false to hide Add Employee quick action
+  final bool _showManageShiftAction = false; // Set to false to hide Manage Shift options
+  final bool _showProcessPayrollAction = false; // Set to false to hide process payroll option
+  late EmployeeStats _employeeStats;
+  bool _isLoading = true;
+  int? _organizationId; // This should come from user data or context
+  
 
 
   // Sample data for demonstration
@@ -43,7 +50,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     {'period': 'December 2023', 'basicSalary': 5000, 'allowances': 450, 'deductions': 180, 'netSalary': 5270, 'status': 'Processed'},
     {'period': 'November 2023', 'basicSalary': 5000, 'allowances': 480, 'deductions': 220, 'netSalary': 5260, 'status': 'Processed'},
   ];
-
+  
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -55,9 +62,42 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     super.initState();
     // Only 4 tabs: Dashboard, Employees, Attendance, Payroll
     // Recruitment and Training tabs are HIDDEN
+    _organizationId = int.tryParse(
+    widget.user?.organizationId.toString() ?? '8'
+  );
     _tabController = TabController(length: 4, vsync: this);
     _checkCurrentAttendanceStatus();
+    _fetchEmployeeStats();
+
   }
+  Future<void> _fetchEmployeeStats() async {
+  if (_organizationId == null) return;
+  
+  setState(() {
+    _isLoading = true;
+  });
+  
+  try {
+    final stats = await HRService.getEmployeeCounts(_organizationId!);
+    setState(() {
+      _employeeStats = stats;
+      _isLoading = false;
+    });
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+    });
+    print('Error fetching employee stats: $e');
+    // Optionally show an error message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Failed to load employee statistics', 
+                    style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   void _checkCurrentAttendanceStatus() {
     final now = DateTime.now();
@@ -345,6 +385,20 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
+  void _showVocationRequestForm() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => VocationRequestForm(
+        onVocationRequested: (request) {
+          setState(() {
+            _leaveRequests.add(request);
+          });
+        },
+      ),
+    );
+  }
+
   // Payroll Functions
   void _showPayrollCalculator() {
     showDialog(
@@ -461,50 +515,83 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     final totalEmployees = _employees.length;
     final presentToday = _attendance.where((a) => a['date'] == _formatDate(DateTime.now()) && a['status'] == 'Present').length;
     final onLeave = _leaveRequests.where((l) => l['status'] == 'Approved').length;
+    final absentToday = totalEmployees - presentToday - onLeave; 
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // Quick Stats - Performance section HIDDEN
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      children: [
+        // Quick Stats section
+        if (_isLoading)
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primaryColor,
+              ),
+            ),
+          )
+        else
           Row(
             children: [
-              _buildStatCard('Total Employees', totalEmployees.toString(), Colors.blue, Icons.people),
-              SizedBox(width: 10),
-              _buildStatCard('Present Today', presentToday.toString(), Colors.green, Icons.check_circle),
-              SizedBox(width: 10),
-              _buildStatCard('On Leave', onLeave.toString(), Colors.orange, Icons.beach_access),
+              _buildStatCard(
+                'Total Employees', 
+                _employeeStats.allEmployees.toString(), 
+                Colors.blue, 
+                Icons.people
+              ),
+              SizedBox(width: 8),
+              _buildStatCard(
+                'Present Today', 
+                _employeeStats.attendanceToday.toString(), 
+                Colors.green, 
+                Icons.check_circle
+              ),
+              SizedBox(width: 8),
+              _buildStatCard(
+                'On Leave', 
+                _employeeStats.onLeave.toString(), 
+                Colors.orange, 
+                Icons.beach_access
+              ),
+              SizedBox(width: 8),
+              _buildStatCard(
+                'Absent Today',
+                absentToday.toString(),
+                Colors.purple,
+                Icons.cancel
+              ),
             ],
           ),
-          SizedBox(height: 10),
-          // Performance stat card is HIDDEN
-          
-          // Quick Actions - Training, Recruitment, and Performance actions HIDDEN
-          Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              if (_showAddEmployeeQuickAction)
-                   _buildActionButton('Add Employee', Icons.person_add, Colors.blue, _showAddEmployeeDialog),
-                   
+        
+        SizedBox(height: 16),
+        
+        // Quick Actions
+        Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
+        SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            if (_showAddEmployeeQuickAction)
+              _buildActionButton('Add Employee', Icons.person_add, Colors.blue, _showAddEmployeeDialog),
+            if (_showManageShiftAction)     
               _buildActionButton('Manage Shifts', Icons.schedule, Colors.green, _showShiftManagement),
+            if (_showProcessPayrollAction)
               _buildActionButton('Process Payroll', Icons.attach_money, Colors.orange, _showPayrollCalculator),
-              _buildActionButton('Request Leave', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
-              // Training, Recruitment, and Performance quick action buttons are HIDDEN
-            ],
-          ),
 
-          // Recent Leave Requests with Approve/Reject buttons
-          SizedBox(height: 20),
-          _buildRecentLeaveRequests(),
+            _buildActionButton('Leave Request', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
+            _buildActionButton('Vocation Request', Icons.flight_takeoff, Colors.yellow[700]!, _showVocationRequestForm),
+          ],
+        ),
 
-          // Performance Reviews Section is HIDDEN (entire section not shown)
-        ],
-      ),
-    );
-  }
+        // Recent Leave Requests with Approve/Reject buttons
+        SizedBox(height: 20),
+        _buildRecentLeaveRequests(),
+      ],
+    ),
+  );
+}
 
   Widget _buildEmployeesTab() {
     return Column(
@@ -677,25 +764,60 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   }
 
   Widget _buildPayrollTab() {
+    // Calculate totals
+    final totalBasicSalary = _employees.fold(0, (sum, employee) => sum + (employee['salary'] as int));
+    final totalAllowances = _payrollRecords.fold(0, (sum, record) => sum + (record['allowances'] as int));
+    final totalDeductions = _payrollRecords.fold(0, (sum, record) => sum + (record['deductions'] as int));
+    final totalNetSalary = totalBasicSalary + totalAllowances - totalDeductions;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Totals Section
+          Text('Totals', 
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16), // Increased spacing
+          
+          // Totals Grid with proper spacing
+          GridView.count(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 16, // Space between columns
+            mainAxisSpacing: 16, // Space between rows
+            childAspectRatio: 2.5, // Adjust aspect ratio for better appearance
+            children: [
+              _buildTotalItem('Total Basic Salary', '\$$totalBasicSalary', Colors.blue),
+              _buildTotalItem('Total Allowances', '\$$totalAllowances', Colors.green),
+              _buildTotalItem('Total Deductions', '\$$totalDeductions', Colors.orange),
+              _buildTotalItem('Total Net Salaries', '\$$totalNetSalary', Colors.purple),
+            ],
+          ),
+
+          // Employee Salary Details Table
+          SizedBox(height: 32), // Increased spacing
+          Text('Employee Salary Details', 
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
+          _buildEmployeePayrollTable(),
+
+          // Previous Payroll Records
+          SizedBox(height: 32),
+          Text('Previous Payroll Records', 
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
           ..._payrollRecords.asMap().entries.map((entry) {
             final index = entry.key;
             final record = entry.value;
-            return _buildPayrollCard(record, index);
+            return Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: _buildPayrollCard(record, index),
+            );
           }),
+        
           SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: _showPayrollCalculator,
-            icon: Icon(Icons.calculate),
-            label: Text('Calculate Payroll', style: TextStyle(fontFamily: 'Cairo')),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              foregroundColor: Colors.white,
-            ),
-          ),
         ],
       ),
     );
@@ -781,17 +903,11 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
 
   Widget _buildPayrollCard(Map<String, dynamic> record, int index) {
     return Card(
+      margin: EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(Icons.attach_money, color: AppColors.primaryColor),
-        title: Text(record['period'], style: TextStyle(fontFamily: 'Cairo')),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Net Salary: \$${record['netSalary']}', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
-            Text('Basic: \$${record['basicSalary']} | Allowances: \$${record['allowances']} | Deductions: \$${record['deductions']}', 
-              style: TextStyle(fontFamily: 'Cairo', fontSize: 12)),
-          ],
-        ),
+        title: Text(record['period'], style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500)),
+        subtitle: Text('Net: \$${record['netSalary']}', style: TextStyle(fontFamily: 'Cairo')),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -803,16 +919,43 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
               ),
               child: Text(record['status'], style: TextStyle(
                 color: record['status'] == 'Processed' ? Colors.green : Colors.orange,
-                fontFamily: 'Cairo'
+                fontFamily: 'Cairo',
+                fontSize: 12,
               )),
             ),
+            SizedBox(width: 8),
             if (record['status'] != 'Processed')
               IconButton(
-                icon: Icon(Icons.play_arrow, color: Colors.green),
+                icon: Icon(Icons.play_arrow, color: Colors.green, size: 20),
                 onPressed: () => _processPayroll(index),
               ),
           ],
         ),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Payroll Details', style: TextStyle(fontFamily: 'Cairo')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildDetailRow('Period', record['period']),
+                  _buildDetailRow('Basic Salary', '\$${record['basicSalary']}'),
+                  _buildDetailRow('Allowances', '\$${record['allowances']}'),
+                  _buildDetailRow('Deductions', '\$${record['deductions']}'),
+                  _buildDetailRow('Net Salary', '\$${record['netSalary']}'),
+                  _buildDetailRow('Status', record['status']),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Close', style: TextStyle(fontFamily: 'Cairo')),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -893,6 +1036,211 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
+  // Helper method for total items
+  Widget _buildTotalItem(String label, String value, Color color) {
+    return Container(
+      padding: EdgeInsets.all(16), // Increased padding
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(label, 
+              style: TextStyle(
+                fontFamily: 'Cairo', 
+                fontSize: 14, 
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
+              )),
+          SizedBox(height: 8), // Space between label and value
+          Text(value, 
+              style: TextStyle(
+                fontFamily: 'Cairo', 
+                fontSize: 18, 
+                fontWeight: FontWeight.bold, 
+                color: color,
+              )),
+        ],
+      ),
+    );
+  }
+
+  // Build Employee Payroll Table
+  Widget _buildEmployeePayrollTable() {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Column(
+          children: [
+            // Table Header
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text('Employee', 
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal)),
+                    ),
+                    Expanded(
+                      child: Text('Basic', 
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                          textAlign: TextAlign.center),
+                    ),
+                    Expanded(
+                      child: Text('Allowances', 
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                          textAlign: TextAlign.center),
+                    ),
+                    Expanded(
+                      child: Text('Deductions', 
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                          textAlign: TextAlign.center),
+                    ),
+                    Expanded(
+                      child: Text('Net', 
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                          textAlign: TextAlign.center),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Table Rows
+            ..._employees.map((employee) {
+              // Calculate allowances and deductions for this employee
+              // In a real app, these would come from employee-specific payroll records
+              final allowances = (employee['salary'] as int) * 0.1; // 10% of basic salary
+              final deductions = (employee['salary'] as int) * 0.05; // 5% of basic salary
+              final netSalary = (employee['salary'] as int) + allowances - deductions;
+              
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(employee['name'], 
+                                style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500)),
+                            Text(employee['position'], 
+                                style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Text('\$${employee['salary']}', 
+                            style: TextStyle(fontFamily: 'Cairo'),
+                            textAlign: TextAlign.center),
+                      ),
+                      Expanded(
+                        child: Text('\$${allowances.toInt()}', 
+                            style: TextStyle(fontFamily: 'Cairo', color: Colors.green),
+                            textAlign: TextAlign.center),
+                      ),
+                      Expanded(
+                        child: Text('\$${deductions.toInt()}', 
+                            style: TextStyle(fontFamily: 'Cairo', color: Colors.orange),
+                            textAlign: TextAlign.center),
+                      ),
+                      Expanded(
+                        child: Text('\$${netSalary.toInt()}', 
+                            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
+                            textAlign: TextAlign.center),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+            
+            // Table Footer (Totals Row)
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text('Total', 
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '\$${_employees.fold(0, (sum, employee) => sum + (employee['salary'] as int))}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '\$${(_employees.fold(0, (sum, employee) => sum + (employee['salary'] as int)) * 0.1).toInt()}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.green),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '\$${(_employees.fold(0, (sum, employee) => sum + (employee['salary'] as int)) * 0.05).toInt()}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.orange),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '\$${_employees.fold(0, (sum, employee) {
+                          final basic = employee['salary'] as int;
+                          final allowances = basic * 0.1;
+                          final deductions = basic * 0.05;
+                          return sum + (basic + allowances - deductions).toInt();
+                        })}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showEmployeeFilter() {
     showDialog(
       context: context,
@@ -955,6 +1303,15 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _positionController.dispose();
+    _departmentController.dispose();
+    _salaryController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.employee == null ? 'Add New Employee' : 'Edit Employee', 
@@ -970,24 +1327,28 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                 decoration: InputDecoration(labelText: 'Full Name'),
                 validator: (value) => value!.isEmpty ? 'Please enter name' : null,
               ),
+              SizedBox(height: 12),
               TextFormField(
                 controller: _positionController,
                 decoration: InputDecoration(labelText: 'Position'),
                 validator: (value) => value!.isEmpty ? 'Please enter position' : null,
               ),
+              SizedBox(height: 12),
               TextFormField(
                 controller: _departmentController,
                 decoration: InputDecoration(labelText: 'Department'),
                 validator: (value) => value!.isEmpty ? 'Please enter department' : null,
               ),
+              SizedBox(height: 12),
               TextFormField(
                 controller: _salaryController,
                 decoration: InputDecoration(labelText: 'Salary'),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Please enter salary' : null,
               ),
+              SizedBox(height: 12),
               DropdownButtonFormField(
-                initialValue: _selectedStatus,
+                value: _selectedStatus,
                 items: ['Active', 'On Leave', 'Inactive']
                     .map((status) => DropdownMenuItem(value: status, child: Text(status)))
                     .toList(),
@@ -1006,7 +1367,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              widget.onEmployeeAdded({
+              final newEmployee = {
                 'id': widget.employee?['id'] ?? '00${DateTime.now().millisecondsSinceEpoch}',
                 'name': _nameController.text,
                 'position': _positionController.text,
@@ -1014,7 +1375,9 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                 'salary': int.parse(_salaryController.text),
                 'status': _selectedStatus,
                 'joinDate': widget.employee?['joinDate'] ?? _formatDate(DateTime.now()),
-              });
+              };
+              
+              widget.onEmployeeAdded(newEmployee);
               Navigator.pop(context);
             }
           },
@@ -1047,7 +1410,10 @@ class ShiftManagementSheet extends StatelessWidget {
           _buildShiftCard('Night Shift', '10:00 PM - 07:00 AM', Colors.purple),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              // Implement shift management logic here
+              Navigator.pop(context);
+            },
             child: Text('Manage Shifts', style: TextStyle(fontFamily: 'Cairo')),
           ),
         ],
@@ -1083,6 +1449,14 @@ class _PayrollCalculatorDialogState extends State<PayrollCalculatorDialog> {
   double _netSalary = 0;
 
   @override
+  void dispose() {
+    _basicSalaryController.dispose();
+    _allowancesController.dispose();
+    _deductionsController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Payroll Calculator', style: TextStyle(fontFamily: 'Cairo')),
@@ -1095,12 +1469,14 @@ class _PayrollCalculatorDialogState extends State<PayrollCalculatorDialog> {
             keyboardType: TextInputType.number,
             onChanged: _calculateNetSalary,
           ),
+          SizedBox(height: 12),
           TextFormField(
             controller: _allowancesController,
             decoration: InputDecoration(labelText: 'Allowances'),
             keyboardType: TextInputType.number,
             onChanged: _calculateNetSalary,
           ),
+          SizedBox(height: 12),
           TextFormField(
             controller: _deductionsController,
             decoration: InputDecoration(labelText: 'Deductions'),
@@ -1125,11 +1501,15 @@ class _PayrollCalculatorDialogState extends State<PayrollCalculatorDialog> {
         ),
         ElevatedButton(
           onPressed: () {
+            final basic = double.tryParse(_basicSalaryController.text) ?? 0;
+            final allowances = double.tryParse(_allowancesController.text) ?? 0;
+            final deductions = double.tryParse(_deductionsController.text) ?? 0;
+            
             widget.onPayrollCalculated({
               'period': '${DateTime.now().month}/${DateTime.now().year}',
-              'basicSalary': double.parse(_basicSalaryController.text),
-              'allowances': double.parse(_allowancesController.text),
-              'deductions': double.parse(_deductionsController.text),
+              'basicSalary': basic,
+              'allowances': allowances,
+              'deductions': deductions,
               'netSalary': _netSalary,
               'status': 'Pending'
             });
@@ -1156,7 +1536,7 @@ class LeaveRequestForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onLeaveRequested;
 
   const LeaveRequestForm({super.key, required this.onLeaveRequested});
-
+  
   @override
   State<LeaveRequestForm> createState() => _LeaveRequestFormState();
 }
@@ -1169,6 +1549,12 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
   final _reasonController = TextEditingController();
 
   @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -1176,18 +1562,20 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('Request Leave', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
           Form(
             key: _formKey,
             child: Column(
               children: [
                 DropdownButtonFormField(
-                  initialValue: _selectedType,
+                  value: _selectedType,
                   items: ['Annual Leave', 'Sick Leave', 'Emergency Leave', 'Maternity Leave']
                       .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                       .toList(),
                   onChanged: (value) => setState(() => _selectedType = value!),
                   decoration: InputDecoration(labelText: 'Leave Type'),
                 ),
+                SizedBox(height: 12),
                 ListTile(
                   title: Text(_fromDate == null ? 'Select From Date' : 'From: ${_formatDate(_fromDate!)}'),
                   trailing: Icon(Icons.calendar_today),
@@ -1214,10 +1602,15 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                     if (date != null) setState(() => _toDate = date);
                   },
                 ),
+                SizedBox(height: 12),
                 TextFormField(
                   controller: _reasonController,
-                  decoration: InputDecoration(labelText: 'Reason'),
+                  decoration: InputDecoration(
+                    labelText: 'Reason',
+                    border: OutlineInputBorder(),
+                  ),
                   maxLines: 3,
+                  validator: (value) => value!.isEmpty ? 'Please enter reason' : null,
                 ),
               ],
             ),
@@ -1239,6 +1632,119 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
               }
             },
             child: Text('Submit Request', style: TextStyle(fontFamily: 'Cairo')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+}
+
+class VocationRequestForm extends StatefulWidget {
+  final Function(Map<String, dynamic>) onVocationRequested;
+
+  const VocationRequestForm({super.key, required this.onVocationRequested});
+  
+  @override
+  State<VocationRequestForm> createState() => _VocationRequestFormState();
+}
+
+class _VocationRequestFormState extends State<VocationRequestForm> {
+  final _formKey = GlobalKey<FormState>();
+  DateTime? _fromDate;
+  DateTime? _toDate;
+  final _destinationController = TextEditingController();
+  final _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _destinationController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Request Vocation', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(_fromDate == null ? 'Select Start Date' : 'From: ${_formatDate(_fromDate!)}'),
+                  trailing: Icon(Icons.calendar_today),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2025),
+                    );
+                    if (date != null) setState(() => _fromDate = date);
+                  },
+                ),
+                ListTile(
+                  title: Text(_toDate == null ? 'Select End Date' : 'To: ${_formatDate(_toDate!)}'),
+                  trailing: Icon(Icons.calendar_today),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _fromDate ?? DateTime.now(),
+                      firstDate: _fromDate ?? DateTime.now(),
+                      lastDate: DateTime(2025),
+                    );
+                    if (date != null) setState(() => _toDate = date);
+                  },
+                ),
+                SizedBox(height: 12),
+                TextFormField(
+                  controller: _destinationController,
+                  decoration: InputDecoration(
+                    labelText: 'Destination',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => value!.isEmpty ? 'Please enter destination' : null,
+                ),
+                SizedBox(height: 12),
+                TextFormField(
+                  controller: _reasonController,
+                  decoration: InputDecoration(
+                    labelText: 'Reason for Vocation',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                  validator: (value) => value!.isEmpty ? 'Please enter reason' : null,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate() && _fromDate != null && _toDate != null) {
+                widget.onVocationRequested({
+                  'id': 'V${DateTime.now().millisecondsSinceEpoch}',
+                  'employee': 'Current User',
+                  'type': 'Vocation',
+                  'from': _formatDate(_fromDate!),
+                  'to': _formatDate(_toDate!),
+                  'destination': _destinationController.text,
+                  'reason': _reasonController.text,
+                  'status': 'Pending'
+                });
+                Navigator.pop(context);
+              }
+            },
+            child: Text('Submit Vocation Request', style: TextStyle(fontFamily: 'Cairo')),
           ),
         ],
       ),
