@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vision_erp_app/screens/models/employee_model.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
 import 'package:vision_erp_app/services/hr_service.dart';
@@ -17,22 +18,18 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   DateTime _lastCheckIn = DateTime.now();
   bool _isCheckedIn = false;
   String _breakStatus = 'No Break';
-  final bool _showAddEmployeeQuickAction = false; // Set to false to hide Add Employee quick action
-  final bool _showManageShiftAction = false; // Set to false to hide Manage Shift options
-  final bool _showProcessPayrollAction = false; // Set to false to hide process payroll option
-  late EmployeeStats _employeeStats;
+  final bool _showAddEmployeeQuickAction = false;
+  final bool _showManageShiftAction = false;
+  final bool _showProcessPayrollAction = false;
+  EmployeeStats _employeeStats = EmployeeStats.empty(); // تهيئة بقيم افتراضية
   bool _isLoading = true;
-  int? _organizationId; // This should come from user data or context
+  bool _isEmployeesLoading = true;
+  int? _organizationId;
   
-
-
-  // Sample data for demonstration
-  final List<Map<String, dynamic>> _employees = [
-    {'id': '001', 'name': 'Ahmed Mohamed', 'position': 'Software Developer', 'department': 'IT', 'status': 'Active', 'salary': 5000, 'joinDate': '2023-01-15'},
-    {'id': '002', 'name': 'Sarah Ahmed', 'position': 'HR Manager', 'department': 'HR', 'status': 'Active', 'salary': 7000, 'joinDate': '2022-03-10'},
-    {'id': '003', 'name': 'Yasser Ali', 'position': 'Sales Executive', 'department': 'Sales', 'status': 'On Leave', 'salary': 4500, 'joinDate': '2023-06-20'},
-  ];
-
+  // قائمة الموظفين الحقيقية من API
+  List<EmployeeModel> _employees = [];
+  
+  // بيانات أخرى
   final List<Map<String, dynamic>> _attendance = [
     {'date': '2024-01-15', 'checkIn': '08:00 AM', 'checkOut': '05:00 PM', 'status': 'Present', 'breaks': []},
     {'date': '2024-01-14', 'checkIn': '08:15 AM', 'checkOut': '05:30 PM', 'status': 'Present', 'breaks': []},
@@ -53,57 +50,106 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
-  // Configuration flags
-  final bool _showEmployeeEditOptions = false; // Set to false to hide edit options
+  final bool _showEmployeeEditOptions = false;
 
   @override
   void initState() {
     super.initState();
-    // Only 4 tabs: Dashboard, Employees, Attendance, Payroll
-    // Recruitment and Training tabs are HIDDEN
+    
     _organizationId = int.tryParse(
-    widget.user?.organizationId.toString() ?? '8'
-  );
-    _tabController = TabController(length: 4, vsync: this);
-    _checkCurrentAttendanceStatus();
-    _fetchEmployeeStats();
-
-  }
-  Future<void> _fetchEmployeeStats() async {
-  if (_organizationId == null) return;
-  
-  setState(() {
-    _isLoading = true;
-  });
-  
-  try {
-    final stats = await HRService.getEmployeeCounts(_organizationId!);
-    setState(() {
-      _employeeStats = stats;
-      _isLoading = false;
-    });
-  } catch (e) {
-    setState(() {
-      _isLoading = false;
-    });
-    print('Error fetching employee stats: $e');
-    // Optionally show an error message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Failed to load employee statistics', 
-                    style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.red,
-      ),
+      widget.user?.organizationId.toString() ?? '8'
     );
+    
+    _tabController = TabController(length: 4, vsync: this);
+    
+    // تحميل البيانات عند بدء التطبيق
+    _initializeData();
   }
-}
 
-  void _checkCurrentAttendanceStatus() {
+  Future<void> _initializeData() async {
+    await _checkCurrentAttendanceStatus();
+    await _fetchEmployeeStats();
+    await _fetchEmployees();
+  }
+
+  Future<void> _fetchEmployeeStats() async {
+    if (_organizationId == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final stats = await HRService.getEmployeeCounts(_organizationId!);
+      setState(() {
+        _employeeStats = stats;
+      });
+    } catch (e) {
+      print('Error fetching employee stats: $e');
+      // استخدام القيم الافتراضية في حالة حدوث خطأ
+      setState(() {
+        _employeeStats = EmployeeStats.empty();
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load statistics', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchEmployees() async {
+    if (_organizationId == null) {
+      setState(() {
+        _isEmployeesLoading = false;
+      });
+      return;
+    }
+    
+    setState(() {
+      _isEmployeesLoading = true;
+    });
+    
+    try {
+      final employees = await HRService.getEmployeesByOrgId(_organizationId!);
+      setState(() {
+        _employees = employees;
+      });
+    } catch (e) {
+      print('Error fetching employees: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load employees', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isEmployeesLoading = false;
+      });
+    }
+  }
+
+  Future<void> _checkCurrentAttendanceStatus() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     
-    // Check if user has already checked in today
+    // التحقق إذا كان المستخدم قد سجل الدخول اليوم
     final todayRecord = _attendance.firstWhere(
       (record) => record['date'] == _formatDate(today),
       orElse: () => {},
@@ -125,7 +171,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   }
 
   // Core HR Functions
-  void _showEmployeeDetails(Map<String, dynamic> employee) {
+  void _showEmployeeDetails(EmployeeModel employee) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -135,13 +181,13 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailRow('Employee ID', employee['id']),
-              _buildDetailRow('Name', employee['name']),
-              _buildDetailRow('Position', employee['position']),
-              _buildDetailRow('Department', employee['department']),
-              _buildDetailRow('Status', employee['status']),
-              _buildDetailRow('Salary', '\$${employee['salary']}'),
-              _buildDetailRow('Join Date', employee['joinDate']),
+              _buildDetailRow('Employee ID', employee.id),
+              _buildDetailRow('Name', employee.name),
+              _buildDetailRow('Position', employee.position),
+              _buildDetailRow('Department', employee.department),
+              _buildDetailRow('Status', employee.status),
+              _buildDetailRow('Salary', '\$${employee.salary}'),
+              _buildDetailRow('Join Date', employee.joinDate),
             ],
           ),
         ),
@@ -150,7 +196,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             onPressed: () => Navigator.pop(context),
             child: Text('Close', style: TextStyle(fontFamily: 'Cairo')),
           ),
-          // Edit button is CONDITIONALLY SHOWN based on _showEmployeeEditOptions
           if (_showEmployeeEditOptions)
             ElevatedButton(
               onPressed: () => _editEmployee(employee),
@@ -161,18 +206,22 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  void _editEmployee(Map<String, dynamic> employee) {
-    Navigator.pop(context); // Close details dialog first
+  void _editEmployee(EmployeeModel employee) {
+    Navigator.pop(context); // إغلاق نافذة التفاصيل أولاً
     
     showDialog(
       context: context,
       builder: (context) => AddEmployeeDialog(
-        employee: employee,
+        employee: employee.toJson(),
         onEmployeeAdded: (updatedEmployee) {
+          // هنا يجب إضافة منطق تحديث الموظف عبر الـ API
           setState(() {
-            final index = _employees.indexWhere((e) => e['id'] == employee['id']);
+            final index = _employees.indexWhere((e) => e.id == employee.id);
             if (index != -1) {
-              _employees[index] = {..._employees[index], ...updatedEmployee};
+              _employees[index] = EmployeeModel.fromJson({
+                ..._employees[index].toJson(),
+                ...updatedEmployee,
+              });
             }
           });
         },
@@ -180,12 +229,12 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  void _deleteEmployee(Map<String, dynamic> employee) {
+  void _deleteEmployee(EmployeeModel employee) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Delete Employee', style: TextStyle(fontFamily: 'Cairo')),
-        content: Text('Are you sure you want to delete ${employee['name']}?', style: TextStyle(fontFamily: 'Cairo')),
+        content: Text('Are you sure you want to delete ${employee.name}?', style: TextStyle(fontFamily: 'Cairo')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -194,11 +243,14 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           ElevatedButton(
             onPressed: () {
               setState(() {
-                _employees.removeWhere((e) => e['id'] == employee['id']);
+                _employees.removeWhere((e) => e.id == employee.id);
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Employee deleted successfully', style: TextStyle(fontFamily: 'Cairo'))),
+                SnackBar(
+                  content: Text('Employee deleted successfully', style: TextStyle(fontFamily: 'Cairo')),
+                  backgroundColor: Colors.green,
+                ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -214,8 +266,10 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
       context: context,
       builder: (context) => AddEmployeeDialog(
         onEmployeeAdded: (employee) {
+          // تحويل Map إلى EmployeeModel
+          final newEmployee = EmployeeModel.fromJson(employee);
           setState(() {
-            _employees.add(employee);
+            _employees.add(newEmployee);
           });
         },
       ),
@@ -231,7 +285,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
       _isCheckedIn = true;
       _lastCheckIn = now;
       
-      // Add or update attendance record
+      // إضافة أو تحديث سجل الحضور
       final existingIndex = _attendance.indexWhere((record) => record['date'] == today);
       if (existingIndex != -1) {
         _attendance[existingIndex]['checkIn'] = _formatTime(now);
@@ -449,14 +503,19 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  // Filtered data based on search
-  List<Map<String, dynamic>> get _filteredEmployees {
+  // تصفية الموظفين بناءً على البحث
+  List<EmployeeModel> get _filteredEmployees {
     if (_searchQuery.isEmpty) return _employees;
     return _employees.where((employee) =>
-      employee['name'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-      employee['position'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-      employee['department'].toLowerCase().contains(_searchQuery.toLowerCase())
+      employee.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      employee.position.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      employee.department.toLowerCase().contains(_searchQuery.toLowerCase())
     ).toList();
+  }
+
+  // الحصول على إجمالي المرتبات
+  int get _totalBasicSalary {
+    return _employees.fold(0, (sum, employee) => sum + employee.salary);
   }
 
   @override
@@ -493,7 +552,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             Tab(text: 'Employees'),
             Tab(text: 'Attendance'),
             Tab(text: 'Payroll'),
-            // Recruitment and Training tabs are HIDDEN (not shown)
           ],
         ),
       ),
@@ -504,94 +562,96 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           _buildEmployeesTab(),
           _buildAttendanceTab(),
           _buildPayrollTab(),
-          // Recruitment and Training tabs are HIDDEN (not shown)
         ],
       ),
-      // Floating Action Button is HIDDEN (removed as requested)
     );
   }
 
   Widget _buildDashboardTab() {
-    final totalEmployees = _employees.length;
-    final presentToday = _attendance.where((a) => a['date'] == _formatDate(DateTime.now()) && a['status'] == 'Present').length;
-    final onLeave = _leaveRequests.where((l) => l['status'] == 'Approved').length;
-    final absentToday = totalEmployees - presentToday - onLeave; 
-
     return SingleChildScrollView(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-        // Quick Stats section
-        if (_isLoading)
-          Container(
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primaryColor,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // Quick Stats section
+          if (_isLoading)
+            Container(
+              padding: EdgeInsets.all(20),
+              child: Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(
+                      color: AppColors.primaryColor,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Loading statistics...',
+                      style: TextStyle(fontFamily: 'Cairo'),
+                    ),
+                  ],
+                ),
               ),
+            )
+          else
+            Row(
+              children: [
+                _buildStatCard(
+                  'Total Employees', 
+                  _employeeStats.allEmployees.toString(), 
+                  Colors.blue, 
+                  Icons.people
+                ),
+                SizedBox(width: 8),
+                _buildStatCard(
+                  'Present Today', 
+                  _employeeStats.attendanceToday.toString(), 
+                  Colors.green, 
+                  Icons.check_circle
+                ),
+                SizedBox(width: 8),
+                _buildStatCard(
+                  'On Leave', 
+                  _employeeStats.onLeave.toString(), 
+                  Colors.orange, 
+                  Icons.beach_access
+                ),
+                SizedBox(width: 8),
+                _buildStatCard(
+                  'Absent Today',
+                  _employeeStats.absentToday.toString(),
+                  Colors.purple,
+                  Icons.cancel
+                ),
+              ],
             ),
-          )
-        else
-          Row(
+          
+          SizedBox(height: 16),
+          
+          // Quick Actions
+          Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              _buildStatCard(
-                'Total Employees', 
-                _employeeStats.allEmployees.toString(), 
-                Colors.blue, 
-                Icons.people
-              ),
-              SizedBox(width: 8),
-              _buildStatCard(
-                'Present Today', 
-                _employeeStats.attendanceToday.toString(), 
-                Colors.green, 
-                Icons.check_circle
-              ),
-              SizedBox(width: 8),
-              _buildStatCard(
-                'On Leave', 
-                _employeeStats.onLeave.toString(), 
-                Colors.orange, 
-                Icons.beach_access
-              ),
-              SizedBox(width: 8),
-              _buildStatCard(
-                'Absent Today',
-                absentToday.toString(),
-                Colors.purple,
-                Icons.cancel
-              ),
+              if (_showAddEmployeeQuickAction)
+                _buildActionButton('Add Employee', Icons.person_add, Colors.blue, _showAddEmployeeDialog),
+              if (_showManageShiftAction)     
+                _buildActionButton('Manage Shifts', Icons.schedule, Colors.green, _showShiftManagement),
+              if (_showProcessPayrollAction)
+                _buildActionButton('Process Payroll', Icons.attach_money, Colors.orange, _showPayrollCalculator),
+
+              _buildActionButton('Leave Request', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
+              _buildActionButton('Vocation Request', Icons.flight_takeoff, Colors.yellow[700]!, _showVocationRequestForm),
             ],
           ),
-        
-        SizedBox(height: 16),
-        
-        // Quick Actions
-        Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
-        SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            if (_showAddEmployeeQuickAction)
-              _buildActionButton('Add Employee', Icons.person_add, Colors.blue, _showAddEmployeeDialog),
-            if (_showManageShiftAction)     
-              _buildActionButton('Manage Shifts', Icons.schedule, Colors.green, _showShiftManagement),
-            if (_showProcessPayrollAction)
-              _buildActionButton('Process Payroll', Icons.attach_money, Colors.orange, _showPayrollCalculator),
 
-            _buildActionButton('Leave Request', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
-            _buildActionButton('Vocation Request', Icons.flight_takeoff, Colors.yellow[700]!, _showVocationRequestForm),
-          ],
-        ),
-
-        // Recent Leave Requests with Approve/Reject buttons
-        SizedBox(height: 20),
-        _buildRecentLeaveRequests(),
-      ],
-    ),
-  );
-}
+          // Recent Leave Requests
+          SizedBox(height: 20),
+          _buildRecentLeaveRequests(),
+        ],
+      ),
+    );
+  }
 
   Widget _buildEmployeesTab() {
     return Column(
@@ -626,53 +686,96 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: _filteredEmployees.length,
-            itemBuilder: (context, index) {
-              final employee = _filteredEmployees[index];
-              return Card(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-                    child: Icon(Icons.person, color: AppColors.primaryColor),
+          child: _isEmployeesLoading
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: AppColors.primaryColor),
+                      SizedBox(height: 16),
+                      Text(
+                        'Loading employees...',
+                        style: TextStyle(fontFamily: 'Cairo'),
+                      ),
+                    ],
                   ),
-                  title: Text(employee['name'], style: TextStyle(fontFamily: 'Cairo')),
-                  subtitle: Text('${employee['position']} - ${employee['department']}', style: TextStyle(fontFamily: 'Cairo')),
-                  trailing: PopupMenuButton(
-                    itemBuilder: (context) {
-                      List<PopupMenuItem> items = [
-                        PopupMenuItem(
-                          child: Text('View Details', style: TextStyle(fontFamily: 'Cairo')),
-                          onTap: () => _showEmployeeDetails(employee),
-                        ),
-                      ];
-                      
-                      // Edit option is CONDITIONALLY HIDDEN based on _showEmployeeEditOptions
-                      if (_showEmployeeEditOptions) {
-                        items.add(
-                          PopupMenuItem(
-                            child: Text('Edit', style: TextStyle(fontFamily: 'Cairo')),
-                            onTap: () => _editEmployee(employee),
+                )
+              : _filteredEmployees.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.people_outline,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            _employees.isEmpty
+                                ? 'No employees found'
+                                : 'No results for "$_searchQuery"',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          if (_employees.isEmpty && !_isEmployeesLoading)
+                            ElevatedButton(
+                              onPressed: _fetchEmployees,
+                              child: Text('Retry', style: TextStyle(fontFamily: 'Cairo')),
+                            ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _filteredEmployees.length,
+                      itemBuilder: (context, index) {
+                        final employee = _filteredEmployees[index];
+                        return Card(
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                              child: Icon(Icons.person, color: AppColors.primaryColor),
+                            ),
+                            title: Text(employee.name, style: TextStyle(fontFamily: 'Cairo')),
+                            subtitle: Text('${employee.position} - ${employee.department}', 
+                                     style: TextStyle(fontFamily: 'Cairo')),
+                            trailing: PopupMenuButton(
+                              itemBuilder: (context) {
+                                List<PopupMenuItem> items = [
+                                  PopupMenuItem(
+                                    child: Text('View Details', style: TextStyle(fontFamily: 'Cairo')),
+                                    onTap: () => _showEmployeeDetails(employee),
+                                  ),
+                                ];
+                                
+                                if (_showEmployeeEditOptions) {
+                                  items.add(
+                                    PopupMenuItem(
+                                      child: Text('Edit', style: TextStyle(fontFamily: 'Cairo')),
+                                      onTap: () => _editEmployee(employee),
+                                    ),
+                                  );
+                                }
+                                
+                                items.add(
+                                  PopupMenuItem(
+                                    child: Text('Delete', style: TextStyle(fontFamily: 'Cairo')),
+                                    onTap: () => _deleteEmployee(employee),
+                                  ),
+                                );
+                                
+                                return items;
+                              },
+                            ),
+                            onTap: () => _showEmployeeDetails(employee),
                           ),
                         );
-                      }
-                      
-                      items.add(
-                        PopupMenuItem(
-                          child: Text('Delete', style: TextStyle(fontFamily: 'Cairo')),
-                          onTap: () => _deleteEmployee(employee),
-                        ),
-                      );
-                      
-                      return items;
-                    },
-                  ),
-                  onTap: () => _showEmployeeDetails(employee),
-                ),
-              );
-            },
-          ),
+                      },
+                    ),
         ),
       ],
     );
@@ -686,7 +789,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
 
     return Column(
       children: [
-        // Current Status Card with last check-in time
+        // Current Status Card
         Card(
           margin: EdgeInsets.all(16),
           child: Padding(
@@ -764,12 +867,6 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   }
 
   Widget _buildPayrollTab() {
-    // Calculate totals
-    final totalBasicSalary = _employees.fold(0, (sum, employee) => sum + (employee['salary'] as int));
-    final totalAllowances = _payrollRecords.fold(0, (sum, record) => sum + (record['allowances'] as int));
-    final totalDeductions = _payrollRecords.fold(0, (sum, record) => sum + (record['deductions'] as int));
-    final totalNetSalary = totalBasicSalary + totalAllowances - totalDeductions;
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -778,26 +875,26 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
           // Totals Section
           Text('Totals', 
               style: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16), // Increased spacing
+          SizedBox(height: 16),
           
-          // Totals Grid with proper spacing
+          // Totals Grid
           GridView.count(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
-            crossAxisSpacing: 16, // Space between columns
-            mainAxisSpacing: 16, // Space between rows
-            childAspectRatio: 2.5, // Adjust aspect ratio for better appearance
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 2.5,
             children: [
-              _buildTotalItem('Total Basic Salary', '\$$totalBasicSalary', Colors.blue),
-              _buildTotalItem('Total Allowances', '\$$totalAllowances', Colors.green),
-              _buildTotalItem('Total Deductions', '\$$totalDeductions', Colors.orange),
-              _buildTotalItem('Total Net Salaries', '\$$totalNetSalary', Colors.purple),
+              _buildTotalItem('Total Basic Salary', '\$$_totalBasicSalary', Colors.blue),
+              _buildTotalItem('Total Allowances', '\$${(_totalBasicSalary * 0.1).toInt()}', Colors.green),
+              _buildTotalItem('Total Deductions', '\$${(_totalBasicSalary * 0.05).toInt()}', Colors.orange),
+              _buildTotalItem('Total Net Salaries', '\$${_totalBasicSalary + (_totalBasicSalary * 0.1).toInt() - (_totalBasicSalary * 0.05).toInt()}', Colors.purple),
             ],
           ),
 
           // Employee Salary Details Table
-          SizedBox(height: 32), // Increased spacing
+          SizedBox(height: 32),
           Text('Employee Salary Details', 
               style: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.bold)),
           SizedBox(height: 16),
@@ -1036,10 +1133,9 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  // Helper method for total items
   Widget _buildTotalItem(String label, String value, Color color) {
     return Container(
-      padding: EdgeInsets.all(16), // Increased padding
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -1063,7 +1159,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
                 color: Colors.grey[700],
                 fontWeight: FontWeight.w500,
               )),
-          SizedBox(height: 8), // Space between label and value
+          SizedBox(height: 8),
           Text(value, 
               style: TextStyle(
                 fontFamily: 'Cairo', 
@@ -1076,8 +1172,19 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     );
   }
 
-  // Build Employee Payroll Table
   Widget _buildEmployeePayrollTable() {
+    if (_employees.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(20),
+        child: Center(
+          child: Text(
+            'No employee data available',
+            style: TextStyle(fontFamily: 'Cairo', color: Colors.grey[600]),
+          ),
+        ),
+      );
+    }
+
     return Card(
       child: Padding(
         padding: EdgeInsets.all(8),
@@ -1128,12 +1235,11 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
             
             // Table Rows
             ..._employees.map((employee) {
-              // Calculate allowances and deductions for this employee
-              // In a real app, these would come from employee-specific payroll records
-              final allowances = (employee['salary'] as int) * 0.1; // 10% of basic salary
-              final deductions = (employee['salary'] as int) * 0.05; // 5% of basic salary
-              final netSalary = (employee['salary'] as int) + allowances - deductions;
-              
+              final basicSalary = employee.salary;
+              final allowances = basicSalary * 0.1;
+              final deductions = basicSalary * 0.05;
+              final netSalary = basicSalary + allowances - deductions;
+
               return Container(
                 decoration: BoxDecoration(
                   border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
@@ -1147,30 +1253,30 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(employee['name'], 
+                            Text(employee.name,
                                 style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500)),
-                            Text(employee['position'], 
+                            Text(employee.position,
                                 style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey[600])),
                           ],
                         ),
                       ),
                       Expanded(
-                        child: Text('\$${employee['salary']}', 
+                        child: Text('\$${basicSalary}',
                             style: TextStyle(fontFamily: 'Cairo'),
                             textAlign: TextAlign.center),
                       ),
                       Expanded(
-                        child: Text('\$${allowances.toInt()}', 
+                        child: Text('\$${allowances.toInt()}',
                             style: TextStyle(fontFamily: 'Cairo', color: Colors.green),
                             textAlign: TextAlign.center),
                       ),
                       Expanded(
-                        child: Text('\$${deductions.toInt()}', 
+                        child: Text('\$${deductions.toInt()}',
                             style: TextStyle(fontFamily: 'Cairo', color: Colors.orange),
                             textAlign: TextAlign.center),
                       ),
                       Expanded(
-                        child: Text('\$${netSalary.toInt()}', 
+                        child: Text('\$${netSalary.toInt()}',
                             style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
                             textAlign: TextAlign.center),
                       ),
@@ -1200,21 +1306,21 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
                     ),
                     Expanded(
                       child: Text(
-                        '\$${_employees.fold(0, (sum, employee) => sum + (employee['salary'] as int))}',
+                        '\$${_totalBasicSalary}',
                         style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
                     Expanded(
                       child: Text(
-                        '\$${(_employees.fold(0, (sum, employee) => sum + (employee['salary'] as int)) * 0.1).toInt()}',
+                        '\$${(_totalBasicSalary * 0.1).toInt()}',
                         style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.green),
                         textAlign: TextAlign.center,
                       ),
                     ),
                     Expanded(
                       child: Text(
-                        '\$${(_employees.fold(0, (sum, employee) => sum + (employee['salary'] as int)) * 0.05).toInt()}',
+                        '\$${(_totalBasicSalary * 0.05).toInt()}',
                         style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.orange),
                         textAlign: TextAlign.center,
                       ),
@@ -1222,7 +1328,7 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
                     Expanded(
                       child: Text(
                         '\$${_employees.fold(0, (sum, employee) {
-                          final basic = employee['salary'] as int;
+                          final basic = employee.salary;
                           final allowances = basic * 0.1;
                           final deductions = basic * 0.05;
                           return sum + (basic + allowances - deductions).toInt();
