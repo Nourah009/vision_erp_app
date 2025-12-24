@@ -25,7 +25,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   bool get isEnglish => _currentLanguage == 'en';
 
   // Employee information (read-only)
-  String get _employeeId => 'EMP-${widget.user.id ?? '001'}';
+  String get _employeeId => 'EMP-${widget.user.id}';
   String get _position => widget.user.role;
   String get _department => widget.user.department;
   String get _employmentStatus => isEnglish ? 'Active - At the head of his job' : 'نشط - على رأس عمله';

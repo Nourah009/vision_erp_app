@@ -5,6 +5,7 @@ import 'package:vision_erp_app/core/platform/platform_service.dart';
 import 'package:vision_erp_app/core/storage/prefs_storage_service.dart';
 import 'package:vision_erp_app/core/storage/secure_storage_service.dart';
 import 'package:vision_erp_app/core/storage/storage_service.dart';
+import 'package:vision_erp_app/core/logging/logger_service.dart';
 import 'package:vision_erp_app/features/auth/data/datasources/remote/auth_remote_data_source.dart';
 import 'package:vision_erp_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:vision_erp_app/features/auth/domain/repositories/auth_repository.dart';
@@ -37,6 +38,7 @@ void init() {
   // Core
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton(() => PlatformService());
+  sl.registerLazySingleton(() => LoggerService());
 
   if (kIsWeb) {
     sl.registerLazySingleton<StorageService>(() => PrefsStorageService());
