@@ -713,36 +713,39 @@ int get _totalNetSalaries {
             )
             
           else
-            Row(
-              children: [
-                _buildStatCard(
-                  'Total Employees', 
-                  _employeeStats.allEmployees.toString(), 
-                  Colors.blue, 
-                  Icons.people
-                ),
-                SizedBox(width: 8),
-                _buildStatCard(
-                  'Present Today', 
-                  _employeeStats.attendanceToday.toString(), 
-                  Colors.green, 
-                  Icons.check_circle
-                ),
-                SizedBox(width: 8),
-                _buildStatCard(
-                  'On Leave', 
-                  _employeeStats.onLeave.toString(), 
-                  Colors.orange, 
-                  Icons.beach_access
-                ),
-                SizedBox(width: 8),
-                _buildStatCard(
-                  'Absent Today',
-                  _employeeStats.absentToday.toString(),
-                  Colors.purple,
-                  Icons.cancel
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < 600) {
+                  // Use GridView for narrow screens
+                  return GridView.count(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    childAspectRatio: 1.5,
+                    children: [
+                      _buildStatCard('Total Employees', _employeeStats.allEmployees.toString(), Colors.blue, Icons.people),
+                      _buildStatCard('Present Today', _employeeStats.attendanceToday.toString(), Colors.green, Icons.check_circle),
+                      _buildStatCard('On Leave', _employeeStats.onLeave.toString(), Colors.orange, Icons.beach_access),
+                      _buildStatCard('Absent Today', _employeeStats.absentToday.toString(), Colors.purple, Icons.cancel),
+                    ],
+                  );
+                } else {
+                  // Use Row for wider screens
+                  return Row(
+                    children: [
+                      _buildStatCard('Total Employees', _employeeStats.allEmployees.toString(), Colors.blue, Icons.people),
+                      SizedBox(width: 8),
+                      _buildStatCard('Present Today', _employeeStats.attendanceToday.toString(), Colors.green, Icons.check_circle),
+                      SizedBox(width: 8),
+                      _buildStatCard('On Leave', _employeeStats.onLeave.toString(), Colors.orange, Icons.beach_access),
+                      SizedBox(width: 8),
+                      _buildStatCard('Absent Today', _employeeStats.absentToday.toString(), Colors.purple, Icons.cancel),
+                    ],
+                  );
+                }
+              },
             ),
           
           SizedBox(height: 16),
@@ -1090,7 +1093,7 @@ int get _totalNetSalaries {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 2.5,
+                childAspectRatio: 2.8,
                 children: [
                   _buildTotalItem('Total Basic Salary', '\$$_totalBasicSalary', Colors.blue, Icons.money),
                   _buildTotalItem('Total Allowances', '\$$_totalAllowances', Colors.green, Icons.add_circle),
@@ -1101,7 +1104,10 @@ int get _totalNetSalaries {
 
               // Employee Salary Details
               SizedBox(height: 32),
-              _buildEmployeePayrollTable(),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: _buildEmployeePayrollTable(),
+              ),
               
               // ملخص التطابق
               SizedBox(height: 20),
@@ -1187,7 +1193,7 @@ Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
                     fontSize: 12, 
                     color: Colors.grey[600],
                   )),
-              SizedBox(height: 4),
+              SizedBox(height: 2),
               Text(value, 
                   style: TextStyle(
                     fontFamily: 'Cairo', 
@@ -1370,11 +1376,13 @@ Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
     );
   }
 
-  return Card(
-    child: Padding(
-      padding: EdgeInsets.all(8),
-      child: Column(
-        children: [
+  return Card(nstrainedBox(
+        constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width * 1.5),
+        child: Column(
+          children: [
+            // Table Header
+            Container(
+          children: [
           // Table Header
           Container(
             decoration: BoxDecoration(

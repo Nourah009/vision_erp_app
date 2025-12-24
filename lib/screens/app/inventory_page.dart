@@ -19,6 +19,7 @@ class _InventoryPageState extends State<InventoryPage> with SingleTickerProvider
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _showAdvancedFilters = false;
+  Map<String, dynamic>? _selectedProduct;
   bool _showLocationView = false;
   
   // Dashboard Data

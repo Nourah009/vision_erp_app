@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vision_erp_app/core/di/injection_container.dart';
 import 'package:vision_erp_app/core/platform/platform_service.dart';
+import 'package:vision_erp_app/core/services/permission_service.dart';
 import 'package:vision_erp_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vision_erp_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:vision_erp_app/features/auth/presentation/bloc/auth_state.dart';
@@ -17,6 +18,18 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _platformService = sl<PlatformService>();
+  final _permissionService = sl<PermissionService>();
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissions();
+  }
+
+  void _requestPermissions() async {
+    await _permissionService.requestNotificationPermission();
+    await _permissionService.requestLocationPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
