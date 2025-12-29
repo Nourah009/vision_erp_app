@@ -34,21 +34,9 @@ class AuthService {
         
         // تحقق من نجاح تسجيل الدخول بناءً على messageCode
         if (responseData['messageCode'] == 0) {
-          // إنشاء نموذج المستخدم من بيانات API
-          final user = UserModel(
-            id: responseData['id']?.toString() ?? '0',
-            username: responseData['username'] ?? '',
-            name: responseData['name'] ?? responseData['username'] ?? '',
-            nameNative: responseData['nameNative'] ?? '',
-            nameForeign: responseData['nameForeign'] ?? '',
-            employeeCode: responseData['employeeCode'] ?? '',
-            organizationId: responseData['organizationId']?.toString() ?? '0',
-            isCEO: responseData['isCEO'] ?? false,
-            language: responseData['language'] ?? 'en',
-            role: responseData['isCEO'] == true ? 'CEO' : 'Employee',
-            department: 'Organization ${responseData['organizationId'] ?? 0}',
-          );
-          
+        // إنشاء نموذج المستخدم من بيانات API
+          final user = UserModel.fromApiResponse(responseData);
+
           // حفظ جلسة المستخدم
           await _saveUserSession(user, rememberMe, responseData);
           

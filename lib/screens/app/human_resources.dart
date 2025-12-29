@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:vision_erp_app/screens/models/employee_model.dart';
 import 'package:vision_erp_app/screens/models/theme_model.dart';
 import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/services/attendance_service.dart';
 import 'package:vision_erp_app/services/hr_service.dart';
+
 
 // Utility function for date formatting
 String formatDate(DateTime date) {
@@ -33,13 +35,9 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   
   // قائمة الموظفين الحقيقية من API
   List<EmployeeModel> _employees = [];
-  
+
   // بيانات أخرى
-  final List<Map<String, dynamic>> _attendance = [
-    {'date': '2024-01-15', 'checkIn': '08:00 AM', 'checkOut': '05:00 PM', 'status': 'Present', 'breaks': []},
-    {'date': '2024-01-14', 'checkIn': '08:15 AM', 'checkOut': '05:30 PM', 'status': 'Present', 'breaks': []},
-    {'date': '2024-01-13', 'checkIn': '--', 'checkOut': '--', 'status': 'Absent', 'breaks': []},
-  ];
+  List<Map<String, dynamic>> _attendance = [];
 
   final List<Map<String, dynamic>> _leaveRequests = [
     {'id': 'L001', 'employee': 'Ahmed Mohamed', 'type': 'Annual Leave', 'from': '2024-01-20', 'to': '2024-01-25', 'status': 'Pending', 'reason': 'Family vacation'},
@@ -73,23 +71,26 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
   }
 
   Future<void> _initializeData() async {
-      try {
-        // تحميل الإحصائيات أولاً (داشبورد)
-        await _fetchEmployeeStats();
-        
-        // تحميل الموظفين (خلفية)
-        await _fetchAllEmployeeData();
-        
-        // التحقق من حالة الحضور (إذا كان مطلوباً)
-        await _checkCurrentAttendanceStatus();
-      } catch (e) {
-        print('Error initializing data: $e');
-        setState(() {
-          _isLoading = false;
-          _isEmployeesLoading = false;
-        });
-      }
-    }
+  try {
+    // تحميل الإحصائيات أولاً (داشبورد)
+    await _fetchEmployeeStats();
+    
+    // تحميل الموظفين (خلفية)
+    await _fetchAllEmployeeData();
+    
+    // تحميل بيانات الحضور
+    await _fetchAttendanceData();
+    
+    // التحقق من حالة الحضور الحالية
+    await _checkCurrentAttendanceStatus();
+  } catch (e) {
+    print('Error initializing data: $e');
+    setState(() {
+      _isLoading = false;
+      _isEmployeesLoading = false;
+    });
+  }
+}
   Future<void> _fetchEmployeeStats() async {
       if (_organizationId == null || _organizationId == 0) {
         print('Invalid organizationId: $_organizationId');
@@ -176,6 +177,43 @@ class _HumanResourcesPageState extends State<HumanResourcesPage> with SingleTick
     });
   }
 }
+Future<void> _fetchAttendanceData() async {
+  final employeeId = int.tryParse(widget.user?.employeeCode ?? '') ?? 0;
+  if (employeeId == 0) {
+    print('⚠️ No employee ID found for attendance');
+    return;
+  }
+
+  try {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final attendanceHistory = await AttendanceService.getAttendanceHistory(
+      employeeId: employeeId,
+      token: widget.user?.token,
+    );
+
+    if (attendanceHistory.isNotEmpty) {
+      setState(() {
+        _attendance = attendanceHistory;
+      });
+    }
+  } catch (e) {
+    print('❌ Error fetching attendance: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Failed to load attendance data', 
+                    style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
 
 
 List<EmployeeModel> _mergeEmployeeData(
@@ -250,22 +288,38 @@ List<EmployeeModel> _mergeEmployeeData(
   }
 
   Future<void> _checkCurrentAttendanceStatus() async {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+  try {
+    if (widget.user?.employeeId == null) return;
     
-    // التحقق إذا كان المستخدم قد سجل الدخول اليوم
-    final todayRecord = _attendance.firstWhere(
-      (record) => record['date'] == formatDate(today),
-      orElse: () => {},
+    final todayAttendance = await AttendanceService.getTodayAttendance(
+      widget.user!.employeeId!,
+      token: widget.user?.token,
     );
     
-    if (todayRecord.isNotEmpty && todayRecord['checkIn'] != '--') {
+    final firstStartTime = todayAttendance['firstStartTime'];
+    
+    if (firstStartTime != null && firstStartTime != '--') {
       setState(() {
         _isCheckedIn = true;
+        // You might want to parse the time string to DateTime
         _lastCheckIn = DateTime.now();
       });
     }
+    
+    // Check break status
+    final breakStartTime = todayAttendance['breakStartTime'];
+    final breakEndTime = todayAttendance['breakEndTime'];
+    
+    if (breakStartTime != null && breakStartTime != '--' && 
+        (breakEndTime == null || breakEndTime == '--')) {
+      setState(() {
+        _breakStatus = 'On Break';
+      });
+    }
+  } catch (e) {
+    print('❌ Error checking current attendance status: $e');
   }
+}
 
   @override
   void dispose() {
@@ -381,106 +435,274 @@ List<EmployeeModel> _mergeEmployeeData(
   }
 
   // Attendance Functions
-  void _checkIn() {
-    final now = DateTime.now();
-    final today = formatDate(now);
-    
-    setState(() {
-      _isCheckedIn = true;
-      _lastCheckIn = now;
-      
-      // إضافة أو تحديث سجل الحضور
-      final existingIndex = _attendance.indexWhere((record) => record['date'] == today);
-      if (existingIndex != -1) {
-        _attendance[existingIndex]['checkIn'] = _formatTime(now);
-        _attendance[existingIndex]['status'] = 'Present';
-      } else {
-        _attendance.insert(0, {
-          'date': today,
-          'checkIn': _formatTime(now),
-          'checkOut': '--',
-          'status': 'Present',
-          'breaks': []
-        });
-      }
-    });
-    
+  Future<void> _checkIn() async {
+  final now = DateTime.now();
+  
+  if (widget.user?.employeeId == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Checked in at ${_formatTime(now)}', style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.green,
+        content: Text('Employee ID not found', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  try {
+    final result = await AttendanceService.recordAttendance(
+      employeeId: widget.user!.employeeId!,
+      recordDateTime: now,
+      dateType: AttendanceService.firstStartDateTime,
+      token: widget.user?.token,
+    );
+
+    if (result['success'] == true) {
+      setState(() {
+        _isCheckedIn = true;
+        _lastCheckIn = now;
+      });
+      
+      // Refresh attendance data
+      await _fetchAttendanceData();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Checked in successfully at ${_formatTime(now)}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to check in: ${result['message']}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error checking in: $e', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
       ),
     );
   }
+}
+// Add this method with your other attendance methods
+void _requestAbsence() {
+  showDialog(
+    context: context,
+    builder: (context) => AbsenceRequestDialog(
+      onAbsenceRequested: (absenceData) async {
+        if (widget.user?.employeeId != null) {
+          try {
+            setState(() {
+              _isLoading = true;
+            });
 
-  void _checkOut() {
-    final now = DateTime.now();
-    final today = formatDate(now);
-    
-    setState(() {
-      _isCheckedIn = false;
-      
-      final existingIndex = _attendance.indexWhere((record) => record['date'] == today);
-      if (existingIndex != -1) {
-        _attendance[existingIndex]['checkOut'] = _formatTime(now);
-      }
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Checked out at ${_formatTime(now)}', style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
+            final result = await AttendanceService.recordAbsence(
+              employeeId: widget.user!.employeeId!,
+              absenceDate: DateTime.parse(absenceData['date']),
+              reason: absenceData['reason'],
+              managerId: absenceData['managerId'],
+              token: widget.user?.token,
+            );
 
-  void _startBreak() {
-    final now = DateTime.now();
-    final today = _formatDate(now);
-    
-    setState(() {
-      _breakStatus = 'On Break';
-      
-      final existingIndex = _attendance.indexWhere((record) => record['date'] == today);
-      if (existingIndex != -1) {
-        _attendance[existingIndex]['breaks'].add({
-          'start': _formatTime(now),
-          'end': '--'
-        });
-      }
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Break started at ${_formatTime(now)}', style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.orange,
-      ),
-    );
-  }
-
-  void _endBreak() {
-    final now = DateTime.now();
-    final today = _formatDate(now);
-    
-    setState(() {
-      _breakStatus = 'Break Ended';
-      
-      final existingIndex = _attendance.indexWhere((record) => record['date'] == today);
-      if (existingIndex != -1 && _attendance[existingIndex]['breaks'].isNotEmpty) {
-        final lastBreak = _attendance[existingIndex]['breaks'].last;
-        if (lastBreak['end'] == '--') {
-          lastBreak['end'] = _formatTime(now);
+            if (result['success'] == true) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Absence request submitted successfully', 
+                              style: TextStyle(fontFamily: 'Cairo')),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Failed to submit absence: ${result['message']}', 
+                              style: TextStyle(fontFamily: 'Cairo')),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error: $e', style: TextStyle(fontFamily: 'Cairo')),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } finally {
+            setState(() {
+              _isLoading = false;
+            });
+          }
         }
-      }
-    });
-    
+      },
+    ),
+  );
+}
+
+Future<void> _checkOut() async {
+  final now = DateTime.now();
+  
+  if (widget.user?.employeeId == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Break ended at ${_formatTime(now)}', style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: Colors.purple,
+        content: Text('Employee ID not found', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  try {
+    final result = await AttendanceService.recordAttendance(
+      employeeId: widget.user!.employeeId!,
+      recordDateTime: now,
+      dateType: AttendanceService.firstEndDateTime,
+      token: widget.user?.token,
+    );
+
+    if (result['success'] == true) {
+      setState(() {
+        _isCheckedIn = false;
+      });
+      
+      // Refresh attendance data
+      await _fetchAttendanceData();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Checked out successfully at ${_formatTime(now)}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.blue,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to check out: ${result['message']}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error checking out: $e', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
       ),
     );
   }
+}
+
+Future<void> _startBreak() async {
+  final now = DateTime.now();
+  
+  if (widget.user?.employeeId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Employee ID not found', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  try {
+    final result = await AttendanceService.recordAttendance(
+      employeeId: widget.user!.employeeId!,
+      recordDateTime: now,
+      dateType: AttendanceService.startBreakDateTime,
+      token: widget.user?.token,
+    );
+
+    if (result['success'] == true) {
+      setState(() {
+        _breakStatus = 'On Break';
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Break started at ${_formatTime(now)}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to start break: ${result['message']}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error starting break: $e', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
+
+Future<void> _endBreak() async {
+  final now = DateTime.now();
+  
+  if (widget.user?.employeeId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Employee ID not found', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  try {
+    final result = await AttendanceService.recordAttendance(
+      employeeId: widget.user!.employeeId!,
+      recordDateTime: now,
+      dateType: AttendanceService.endBreakDateTime,
+      token: widget.user?.token,
+    );
+
+    if (result['success'] == true) {
+      setState(() {
+        _breakStatus = 'Break Ended';
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Break ended at ${_formatTime(now)}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.purple,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to end break: ${result['message']}', 
+                      style: TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error ending break: $e', style: TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   // Leave Management Functions
   void _approveLeave(int index) {
@@ -692,60 +914,62 @@ int get _totalNetSalaries {
           ],
         ),
         SizedBox(height: 16),
-          // Quick Stats section
-          if (_isLoading)
-            Container(
-              padding: EdgeInsets.all(20),
-              child: Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(
-                      color: AppColors.primaryColor,
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Loading statistics...',
-                      style: TextStyle(fontFamily: 'Cairo'),
-                    ),
-                  ],
-                ),
+           // Stats section using GridView
+        if (_isLoading)
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Column(
+                children: [
+                  CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Loading statistics...',
+                    style: TextStyle(fontFamily: 'Cairo'),
+                  ),
+                ],
               ),
-            )
-            
-          else
-            Row(
-              children: [
-                _buildStatCard(
-                  'Total Employees', 
-                  _employeeStats.allEmployees.toString(), 
-                  Colors.blue, 
-                  Icons.people
-                ),
-                SizedBox(width: 8),
-                _buildStatCard(
-                  'Present Today', 
-                  _employeeStats.attendanceToday.toString(), 
-                  Colors.green, 
-                  Icons.check_circle
-                ),
-                SizedBox(width: 8),
-                _buildStatCard(
-                  'On Leave', 
-                  _employeeStats.onLeave.toString(), 
-                  Colors.orange, 
-                  Icons.beach_access
-                ),
-                SizedBox(width: 8),
-                _buildStatCard(
-                  'Absent Today',
-                  _employeeStats.absentToday.toString(),
-                  Colors.purple,
-                  Icons.cancel
-                ),
-              ],
             ),
-          
-          SizedBox(height: 16),
+          )
+        else
+          GridView.count(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.5,
+            children: [
+              _buildStatCard(
+                'Total Employees', 
+                _employeeStats.allEmployees.toString(), 
+                Colors.blue, 
+                Icons.people
+              ),
+              _buildStatCard(
+                'Present Today', 
+                _employeeStats.attendanceToday.toString(), 
+                Colors.green, 
+                Icons.check_circle
+              ),
+              _buildStatCard(
+                'On Leave', 
+                _employeeStats.onLeave.toString(), 
+                Colors.orange, 
+                Icons.beach_access
+              ),
+              _buildStatCard(
+                'Absent Today',
+                _employeeStats.absentToday.toString(),
+                Colors.purple,
+                Icons.cancel
+              ),
+            ],
+          ),
+        
+        SizedBox(height: 16),
           
           // Quick Actions
           Text('Quick Actions', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
@@ -763,6 +987,7 @@ int get _totalNetSalaries {
 
               _buildActionButton('Leave Request', Icons.beach_access, Colors.purple, _showLeaveRequestForm),
               _buildActionButton('Vocation Request', Icons.flight_takeoff, Colors.yellow[700]!, _showVocationRequestForm),
+              _buildAttendanceButton('Absence', Icons.person_off, Colors.red, _requestAbsence),
             ],
           ),
 
@@ -862,8 +1087,14 @@ int get _totalNetSalaries {
                               child: Icon(Icons.person, color: AppColors.primaryColor),
                             ),
                             title: Text(employee.name, style: TextStyle(fontFamily: 'Cairo')),
-                            subtitle: Text('${employee.position} - ${employee.department}', 
-                                     style: TextStyle(fontFamily: 'Cairo')),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(employee.position, style: TextStyle(fontFamily: 'Cairo')),
+                                Text(employee.department, 
+                                     style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
                             trailing: PopupMenuButton(
                               itemBuilder: (context) {
                                 List<PopupMenuItem> items = [
@@ -902,90 +1133,135 @@ int get _totalNetSalaries {
     );
   }
 
-  Widget _buildAttendanceTab() {
-    final todayRecord = _attendance.firstWhere(
-      (record) => record['date'] == _formatDate(DateTime.now()),
-      orElse: () => {'checkIn': '--', 'checkOut': '--', 'status': 'Absent'},
-    );
+ Widget _buildAttendanceTab() {
+  final today = DateTime.now();
+  final todayFormatted = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+  
+  // Find today's record
+  final todayRecord = _attendance.firstWhere(
+    (record) => record['date'] == todayFormatted,
+    orElse: () => {
+      'date': todayFormatted,
+      'firstStartTime': '--',
+      'firstEndTime': '--',
+      'breakStartTime': '--',
+      'breakEndTime': '--',
+      'status': 'Absent',
+      'breaks': []
+    },
+  );
 
-    return Column(
-      children: [
-        // Current Status Card
-        Card(
-          margin: EdgeInsets.all(16),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text('Today\'s Status', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatusItem('Check In', todayRecord['checkIn']),
-                    _buildStatusItem('Check Out', todayRecord['checkOut']),
-                    _buildStatusItem('Break', _breakStatus),
-                  ],
+  return Column(
+    children: [
+      // Current Status Card
+      Card(
+        margin: EdgeInsets.all(16),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Text('Today\'s Status', 
+                  style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatusItem('Check In', todayRecord['firstStartTime'] ?? '--'),
+                  _buildStatusItem('Check Out', todayRecord['firstEndTime'] ?? '--'),
+                  _buildStatusItem('Break', _breakStatus),
+                ],
+              ),
+              SizedBox(height: 8),
+              if (_isCheckedIn)
+                Text(
+                  'Last check-in: ${_formatTime(_lastCheckIn)}',
+                  style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
-                if (_isCheckedIn)
-                  Text(
-                    'Last check-in: ${_formatTime(_lastCheckIn)}',
-                    style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildAttendanceButton(
+                    'Check In', 
+                    Icons.login, 
+                    Colors.green, 
+                    _isCheckedIn ? null : _checkIn
                   ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildAttendanceButton('Check In', Icons.login, Colors.green, _isCheckedIn ? null : _checkIn),
-                    _buildAttendanceButton('Check Out', Icons.logout, Colors.red, !_isCheckedIn ? null : _checkOut),
-                    _buildAttendanceButton(
-                      _breakStatus == 'On Break' ? 'End Break' : 'Start Break', 
-                      Icons.free_breakfast, 
-                      Colors.orange, 
-                      _breakStatus == 'On Break' ? _endBreak : _startBreak
+                  _buildAttendanceButton(
+                    'Check Out', 
+                    Icons.logout, 
+                    Colors.red, 
+                    !_isCheckedIn ? null : _checkOut
+                  ),
+                  _buildAttendanceButton(
+                    _breakStatus == 'On Break' ? 'End Break' : 'Start Break', 
+                    Icons.free_breakfast, 
+                    Colors.orange, 
+                    _breakStatus == 'On Break' ? _endBreak : _startBreak
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      // Refresh button for attendance
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: ElevatedButton.icon(
+          onPressed: _fetchAttendanceData,
+          icon: Icon(Icons.refresh),
+          label: Text('Refresh Attendance', style: TextStyle(fontFamily: 'Cairo')),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
+            foregroundColor: Colors.white,
+            minimumSize: Size(double.infinity, 40),
+          ),
+        ),
+      ),
+
+      // Attendance History
+      Expanded(
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
+            : ListView.builder(
+                itemCount: _attendance.length,
+                itemBuilder: (context, index) {
+                  final record = _attendance[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: ListTile(
+                      leading: Icon(
+                        record['status'] == 'Present' ? Icons.check_circle : 
+                        record['status'] == 'Absent' ? Icons.cancel : Icons.watch_later,
+                        color: record['status'] == 'Present' ? Colors.green : 
+                               record['status'] == 'Absent' ? Colors.red : Colors.orange,
+                      ),
+                      title: Text(record['date'], style: TextStyle(fontFamily: 'Cairo')),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('In: ${record['firstStartTime']} - Out: ${record['firstEndTime']}', 
+                              style: TextStyle(fontFamily: 'Cairo')),
+                          if (record['breakStartTime'] != '--')
+                            Text('Break: ${record['breakStartTime']} - ${record['breakEndTime']}', 
+                                style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey)),
+                        ],
+                      ),
+                      trailing: Text(record['status'] ?? 'N/A', style: TextStyle(
+                        color: record['status'] == 'Present' ? Colors.green : 
+                               record['status'] == 'Absent' ? Colors.red : Colors.orange,
+                        fontFamily: 'Cairo'
+                      )),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // Attendance History
-        Expanded(
-          child: ListView.builder(
-            itemCount: _attendance.length,
-            itemBuilder: (context, index) {
-              final record = _attendance[index];
-              return Card(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: ListTile(
-                  leading: Icon(
-                    record['status'] == 'Present' ? Icons.check_circle : Icons.cancel,
-                    color: record['status'] == 'Present' ? Colors.green : Colors.red,
-                  ),
-                  title: Text(record['date'], style: TextStyle(fontFamily: 'Cairo')),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${record['checkIn']} - ${record['checkOut']}', style: TextStyle(fontFamily: 'Cairo')),
-                      if (record['breaks'] != null && record['breaks'].isNotEmpty)
-                        Text('Breaks: ${record['breaks'].length}', style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey)),
-                    ],
-                  ),
-                  trailing: Text(record['status'], style: TextStyle(
-                    color: record['status'] == 'Present' ? Colors.green : Colors.red,
-                    fontFamily: 'Cairo'
-                  )),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
+                  );
+                },
+              ),
+      ),
+    ],
+  );
+}
 
   Widget _buildPayrollTab() {
   return SingleChildScrollView(
@@ -1159,7 +1435,7 @@ int get _totalNetSalaries {
 
 Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
   return Container(
-    padding: EdgeInsets.all(16),
+    padding: EdgeInsets.all(12),
     decoration: BoxDecoration(
       color: color.withOpacity(0.05),
       borderRadius: BorderRadius.circular(12),
@@ -1168,15 +1444,15 @@ Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
     child: Row(
       children: [
         Container(
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: color, size: 20),
+          child: Icon(icon, color: color, size: 18),
         ),
         SizedBox(width: 12),
-        Expanded(
+       Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1184,17 +1460,21 @@ Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
               Text(label, 
                   style: TextStyle(
                     fontFamily: 'Cairo', 
-                    fontSize: 12, 
+                    fontSize: 11, // Smaller font
                     color: Colors.grey[600],
-                  )),
+                  ),
+                  maxLines: 2, // Allow text to wrap
+                  overflow: TextOverflow.ellipsis),
               SizedBox(height: 4),
               Text(value, 
                   style: TextStyle(
                     fontFamily: 'Cairo', 
-                    fontSize: 18, 
+                    fontSize: 16, // Slightly smaller
                     fontWeight: FontWeight.bold, 
                     color: color,
-                  )),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
@@ -1946,6 +2226,10 @@ class _VocationRequestFormState extends State<VocationRequestForm> {
   final _destinationController = TextEditingController();
   final _reasonController = TextEditingController();
 
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
   @override
   void dispose() {
     _destinationController.dispose();
@@ -2035,6 +2319,113 @@ class _VocationRequestFormState extends State<VocationRequestForm> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AbsenceRequestDialog extends StatefulWidget {
+  final Function(Map<String, dynamic>) onAbsenceRequested;
+
+  const AbsenceRequestDialog({super.key, required this.onAbsenceRequested});
+
+  @override
+  State<AbsenceRequestDialog> createState() => _AbsenceRequestDialogState();
+}
+
+class _AbsenceRequestDialogState extends State<AbsenceRequestDialog> {
+  final _formKey = GlobalKey<FormState>();
+  DateTime? _absenceDate;
+  final _reasonController = TextEditingController();
+  final _managerIdController = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    _managerIdController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Request Absence', style: TextStyle(fontFamily: 'Cairo')),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(
+                  _absenceDate == null 
+                    ? 'Select Absence Date' 
+                    : 'Date: ${_formatDate(_absenceDate!)}',
+                  style: TextStyle(fontFamily: 'Cairo'),
+                ),
+                trailing: Icon(Icons.calendar_today),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now().subtract(Duration(days: 30)), // Allow past dates
+                    lastDate: DateTime.now().add(Duration(days: 365)),
+                  );
+                  if (date != null) {
+                    setState(() => _absenceDate = date);
+                  }
+                },
+              ),
+              SizedBox(height: 12),
+              TextFormField(
+                controller: _managerIdController,
+                decoration: InputDecoration(
+                  labelText: 'Manager ID (Optional)',
+                  hintText: 'Enter manager ID if required',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 12),
+              TextFormField(
+                controller: _reasonController,
+                decoration: InputDecoration(
+                  labelText: 'Reason for Absence*',
+                  hintText: 'e.g., Sick, Personal, Vacation, ADS',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                validator: (value) => value!.isEmpty ? 'Please enter reason' : null,
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Note: Use "ADS" for approved absence (as per API)',
+                style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cancel', style: TextStyle(fontFamily: 'Cairo')),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate() && _absenceDate != null) {
+              widget.onAbsenceRequested({
+                'date': _formatDate(_absenceDate!),
+                'reason': _reasonController.text,
+                'managerId': _managerIdController.text.isNotEmpty 
+                  ? int.tryParse(_managerIdController.text) 
+                  : null,
+              });
+              Navigator.pop(context);
+            }
+          },
+          child: Text('Submit Request', style: TextStyle(fontFamily: 'Cairo')),
+        ),
+      ],
     );
   }
 
