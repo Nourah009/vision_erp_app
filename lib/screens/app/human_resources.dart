@@ -1376,67 +1376,19 @@ Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
     );
   }
 
-  return Card(nstrainedBox(
+  return Card(
+    child: ConstrainedBox(
         constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width * 1.5),
         child: Column(
           children: [
             // Table Header
             Container(
-          children: [
-          // Table Header
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text('Employee', 
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal)),
-                  ),
-                  Expanded(
-                    child: Text('Basic Salary', 
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
-                        textAlign: TextAlign.center),
-                  ),
-                  Expanded(
-                    child: Text('Allowances', 
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
-                        textAlign: TextAlign.center),
-                  ),
-                  Expanded(
-                    child: Text('Deductions', 
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
-                        textAlign: TextAlign.center),
-                  ),
-                  Expanded(
-                    child: Text('Net Salary', 
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
-                        textAlign: TextAlign.center),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Table Rows
-          ..._employees.map((employee) {
-            // استخدام البيانات المالية من الـ API
-            final basicSalary = employee.basicSalary;
-            final allowances = employee.sumAlWValue;
-            final deductions = employee.sumDeDValue;
-            final netSalary = employee.sumAllValue;
-
-            return Container(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
               ),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -1444,96 +1396,142 @@ Widget _buildTotalItem(String label, String value, Color color, IconData icon) {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(employee.name,
-                              style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500)),
-                          Text(employee.position,
-                              style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey[600])),
-                        ],
-                      ),
+                      child: Text('Employee',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal)),
                     ),
                     Expanded(
-                      child: Text('\$${basicSalary.toStringAsFixed(0)}',
-                          style: TextStyle(fontFamily: 'Cairo'),
-                          textAlign: TextAlign.center),
+                      child: Text('Basic Salary',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center),
                     ),
                     Expanded(
-                      child: Text('\$${allowances.toStringAsFixed(0)}',
-                          style: TextStyle(fontFamily: 'Cairo', color: Colors.green),
-                          textAlign: TextAlign.center),
+                      child: Text('Allowances',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center),
                     ),
                     Expanded(
-                      child: Text('\$${deductions.toStringAsFixed(0)}',
-                          style: TextStyle(fontFamily: 'Cairo', color: Colors.orange),
-                          textAlign: TextAlign.center),
+                      child: Text('Deductions',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center),
                     ),
                     Expanded(
-                      child: Text('\$${netSalary.toStringAsFixed(0)}',
-                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
-                          textAlign: TextAlign.center),
+                      child: Text('Net Salary',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center),
                     ),
                   ],
                 ),
               ),
-            );
-          }).toList(),
-          
-          // Table Footer (Totals Row)
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.05),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
-              ),
             ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text('Total', 
+
+            // Table Rows
+            ..._employees.map((employee) {
+              // استخدام البيانات المالية من الـ API
+              final basicSalary = employee.basicSalary;
+              final allowances = employee.sumAlWValue;
+              final deductions = employee.sumDeDValue;
+              final netSalary = employee.sumAllValue;
+
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(employee.name,
+                                style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500)),
+                            Text(employee.position,
+                                style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Text('\$${basicSalary.toStringAsFixed(0)}',
+                            style: TextStyle(fontFamily: 'Cairo'),
+                            textAlign: TextAlign.center),
+                      ),
+                      Expanded(
+                        child: Text('\$${allowances.toStringAsFixed(0)}',
+                            style: TextStyle(fontFamily: 'Cairo', color: Colors.green),
+                            textAlign: TextAlign.center),
+                      ),
+                      Expanded(
+                        child: Text('\$${deductions.toStringAsFixed(0)}',
+                            style: TextStyle(fontFamily: 'Cairo', color: Colors.orange),
+                            textAlign: TextAlign.center),
+                      ),
+                      Expanded(
+                        child: Text('\$${netSalary.toStringAsFixed(0)}',
+                            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
+                            textAlign: TextAlign.center),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+
+            // Table Footer (Totals Row)
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text('Total',
                         style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '\$${_employees.fold(0, (sum, employee) => sum + employee.basicSalary.toInt())}',
-                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '\$${_employees.fold(0, (sum, employee) => sum + employee.sumAlWValue.toInt())}',
-                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.green),
-                      textAlign: TextAlign.center,
+                    Expanded(
+                      child: Text(
+                        '\$${_employees.fold(0, (sum, employee) => sum + employee.basicSalary.toInt())}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '\$${_employees.fold(0, (sum, employee) => sum + employee.sumDeDValue.toInt())}',
-                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.orange),
-                      textAlign: TextAlign.center,
+                    Expanded(
+                      child: Text(
+                        '\$${_employees.fold(0, (sum, employee) => sum + employee.sumAlWValue.toInt())}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.green),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '\$${_employees.fold(0, (sum, employee) => sum + employee.sumAllValue.toInt())}',
-                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
-                      textAlign: TextAlign.center,
+                    Expanded(
+                      child: Text(
+                        '\$${_employees.fold(0, (sum, employee) => sum + employee.sumDeDValue.toInt())}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.orange),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Text(
+                        '\$${_employees.fold(0, (sum, employee) => sum + employee.sumAllValue.toInt())}',
+                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.purple),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
 }
 
   void _showEmployeeFilter() {
