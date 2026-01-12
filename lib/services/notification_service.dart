@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vision_erp_app/screens/models/notification_model.dart';
+import 'package:vision_erp_app/core/models/notification_model.dart';
 
 
 class NotificationService {

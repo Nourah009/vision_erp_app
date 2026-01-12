@@ -1,4 +1,4 @@
-import 'package:vision_erp_app/screens/models/message_model.dart';
+import 'package:vision_erp_app/core/models/message_model.dart';
 
 class MessageService {
   static final MessageService _instance = MessageService._internal();

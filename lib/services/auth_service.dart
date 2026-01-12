@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/core/models/user_model.dart';
 
 class AuthService {
   static const String baseUrl = 'https://fc.visioncit.com';

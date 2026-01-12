@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vision_erp_app/screens/app/app_localizations.dart';
-import 'package:vision_erp_app/screens/models/theme_model.dart';
-import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/core/models/theme_model.dart';
+import 'package:vision_erp_app/core/models/user_model.dart';
+import 'package:vision_erp_app/screens/app/sidebar_menu_sections/app_localizations.dart';
 
 class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Function(BuildContext context, {

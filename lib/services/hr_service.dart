@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:vision_erp_app/screens/models/employee_model.dart';
-
+import 'package:vision_erp_app/core/models/employee_model.dart';
 class HRService {
   static const String baseUrl = 'https://fc.visioncit.com';
   

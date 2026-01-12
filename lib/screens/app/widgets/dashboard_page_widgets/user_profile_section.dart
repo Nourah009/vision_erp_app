@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vision_erp_app/screens/app/app_localizations.dart';
-import 'package:vision_erp_app/screens/app/profile_page.dart';
-import 'package:vision_erp_app/screens/models/theme_model.dart';
-import 'package:vision_erp_app/screens/models/user_model.dart';
+import 'package:vision_erp_app/core/models/theme_model.dart';
+import 'package:vision_erp_app/core/models/user_model.dart';
+import 'package:vision_erp_app/screens/app/sidebar_menu_sections/app_localizations.dart';
+import 'package:vision_erp_app/screens/app/user_profile_page_sections/profile_page.dart';
 
 class UserProfileSection extends StatelessWidget {
   final Function(BuildContext context, {

@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:vision_erp_app/screens/app/app_localizations.dart';
-import 'package:vision_erp_app/screens/app/splash_screen.dart';
-import 'package:vision_erp_app/screens/models/theme_model.dart';
-import 'package:vision_erp_app/screens/providers/theme_notifier.dart';
+import 'package:vision_erp_app/core/models/theme_model.dart';
+import 'package:vision_erp_app/core/providers/theme_notifier.dart';
+import 'package:vision_erp_app/screens/app/sidebar_menu_sections/app_localizations.dart';
+import 'package:vision_erp_app/screens/app/splash_screen/splash_screen.dart';
 import 'package:vision_erp_app/services/localization_service.dart';
 
 void main() {
